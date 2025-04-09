@@ -1,0 +1,33 @@
+<conversation_summary>
+  <decisions>
+    1. The product aims to solve the problem of creating high-quality educational flashcards efficiently by using both AI-generated content and manual creation.
+    2. The MVP will include separate view for AI-generation of flashcards based on user-pasted text, and a separate view for viewing "My flashcards" list along with options to perform manual CRUD operations for flashcards, and a basic user account system using simple email and password authentication.
+    3. Flashcards have only two fields: "Front" (max 500 characters) and "Back" (max 200 characters), with both fields required.
+    4. AI-generated flashcards will go through a review process. The user can edit (via a modal), accept, or reject generated flashcards inline and then confirm the review process to save accepted cards.
+    5. The separate study mode view will allow user to study flashcards using an external spaced repetition algorithm. User can exit study mode view and return to the home screen any time.
+    6. Account management includes the ability to change the password (after entering the current password) and delete the account. Account deletion will require reauthentication and a confirmation prompt. All data (including flashcards) related to the user will be deleted upon account deletion.
+    7. All flashcard functionalities (AI-generation and manual CRUD) are restricted to authenticated users. Users can only view and manage flashcards they own.
+    8. Both frontend and backend validations, along with database schema constraints, will enforce required fields and character limits.
+    9. In order to measure success criteria, the MVP will track user acceptance rates for AI-generated flashcards and the percentage of flashcards created using AI. The logs will be stored in a database for analysis.
+  </decisions>
+  <matched_recommendations>
+    1. Ensure clear separation between AI-generated flashcards and manual CRUD operations to provide a seamless user experience.
+    2. Implement character limit validations and required field validations consistently across frontend, backend, and database layers.
+    3. Design a flashcard review interface that supports inline actions for rejection and acceptance, with an edit modal for modifications.
+    4. Secure account management features with reauthentication and confirmation prompts, especially for account deletion and password change.
+  </matched_recommendations>
+  <prd_planning_summary>
+    The conversation established that the primary functional requirements for the MVP include AI-driven and manual flashcard creation.
+    Users will input a large block of text to generate flashcards, each consisting of a "Front" (max 500 characters) and a "Back" (max 200 characters).
+    Users will review the AI-generated flashcards, making edits through a modal or choosing to accept or reject them inline before finalizing the accepted cards for saving.
+    Additionally, the application supports manual CRUD operations for flashcards under a “My flashcards” view.
+    The product includes a study mode where flashcards are presented in an order determined by an external spaced repetition algorithm (accessed via an API or local library); initially, only the front is displayed, with the back revealed upon user interaction.
+    Ultimately, the user will rate how well they remembered the answer, which will inform the spaced repetition algorithm for future study sessions.
+    From an account management perspective, users have simple email/password authentication. They can change their password (requiring the current password) and delete their account (requiring reauthentication and a confirmation step).
+    The success criteria for the MVP require achieving a 75% user acceptance rate for AI-generated flashcards and that 75% of flashcards are created using AI.
+  </prd_planning_summary>
+  <unresolved_issues>
+    1. The specific integration details for the external spaced repetition algorithm remain unspecified (e.g., API endpoints or SDK integration).
+    2. The exact UI flow for flashcard editing (modal behavior) and confirmation steps might require further clarification once mockups or prototypes are developed.
+  </unresolved_issues>
+</conversation_summary>

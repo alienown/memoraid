@@ -1,0 +1,64 @@
+You are an experienced product manager tasked with creating a comprehensive Product Requirements Document (PRD) based on the descriptions below:
+
+<project_description>
+{{project-description}} <- insert the MVP idea
+</project_description>
+
+<project_details>
+{{project-details}} <- insert summary of the planning session
+</project_details>
+
+Follow these steps to create a comprehensive and well-organized document:
+
+1. Divide the PRD into the following sections:
+a. Project Overview
+b. User Problem
+c. Functional Requirements
+d. Project Boundaries
+e. User Stories
+f. Success Metrics
+
+2. In each section, provide detailed and relevant information based on the project description and answers to clarifying questions. Ensure that:
+- You use clear and concise language.
+- You include specific details and data where necessary.
+- You maintain consistency throughout the document.
+- You address all points listed in each section.
+
+3. When creating user stories and acceptance criteria:
+- List ALL necessary user stories, including basic, alternative, and edge-case scenarios.
+- Assign a unique requirement ID (e.g., US-001) to each user story for direct traceability.
+- Include at least one user story specifically for secure access or authentication if the application requires user identification or access restrictions.
+- Ensure no potential user interaction is omitted.
+- Ensure each user story is testable.
+
+Use the following structure for each user story:
+- ID
+- Title
+- Description
+- Acceptance Criteria
+
+4. After completing the PRD, review it against this checklist:
+- Can each user story be tested?
+- Are the acceptance criteria clear and specific?
+- Do we have enough user stories to build a fully functional application?
+- Have we included authentication and authorization requirements (if applicable)?
+
+5. PRD Formatting:
+- Maintain consistent formatting and numbering.
+- Do not use bold formatting in markdown (**).
+- List ALL user stories.
+- Format the PRD in proper markdown.
+
+Prepare the PRD using the following structure:
+```markdown
+# Product Requirements Document (PRD) - {{app-name}}
+## 1. Product Overview
+## 2. User Problem
+## 3. Functional Requirements
+## 4. Product Boundaries
+## 5. User Stories
+## 6. Success Metrics
+```
+
+Be sure to fill out each section with detailed, relevant information based on the project description and our clarifying questions.
+Make sure the PRD is comprehensive, clear, and includes all the relevant information needed to continue working on the product.

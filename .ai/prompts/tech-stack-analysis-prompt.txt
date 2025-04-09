@@ -1,0 +1,21 @@
+<course-tech-stack>
+{{tech-stack}} <- Insert a description of your tech stack here
+</course-tech-stack>
+
+<my-tech-stack>
+{{my-tech-stack}} <- Insert a description of your tech stack here
+</my-tech-stack>
+
+I'm taking part in a course and I will develop a project. The product requirements description is in the file #prd.md. I need to analyze whether my tech stack is suitable for the project.
+The course authors have provided a tech stack that they recommend for the project. However I have my own tech stack that I would like to use.
+Perform a critical but objective analysis of whether the my-tech-stack adequately addresses the needs of #prd.md.
+Compare the two tech stacks and provide a detailed analysis of the pros and cons of each stack in relation to the project requirements.
+
+Consider the following questions:
+
+1. Will the technology allow us to quickly deliver an MVP?
+2. Will the solution be scalable as the project grows?
+3. Will the maintenance and development costs be acceptable?
+4. Do we really need such a complex solution?
+5. Is there a simpler approach that meets our requirements?
+6. Will the technology allow us to ensure adequate security?

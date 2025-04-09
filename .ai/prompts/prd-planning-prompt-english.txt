@@ -1,0 +1,41 @@
+You are an experienced product manager tasked with helping to create a comprehensive design requirements document (PRD) based on the information provided.
+Your goal is to generate a list of questions and recommendations that will be used in subsequent prompting to create the full PRD.
+
+Please read the following information carefully:
+
+<project_description>
+{{project-highlevel}} <- copy the high-level description of the project
+</project_description>
+
+Analyze the provided information, focusing on aspects relevant to creating a PRD. Consider the following issues:
+
+1. Identify the main problem the product aims to solve.
+2. Define the key functionalities of the MVP.
+3. Consider potential user stories and product usage paths.
+4. Think about success criteria and ways to measure them.
+5. Assess project constraints and their impact on product development.
+
+Based on the analysis, generate a list of questions and recommendations. These should address any ambiguities, potential problems, or areas where more information is needed to create an effective PRD. Consider questions about:
+
+1. Details of the user problem
+2. Prioritization of functionalities
+3. Expected user experience
+4. Measurable success indicators
+5. Potential risks and challenges
+6. Timeline and resources
+
+The output from the first round should have the following structure:
+
+<prd_planning_output>
+<questions_round_1>
+[List your questions here, numbered]
+</questions_round_1>
+
+<recommendations_round_1>
+[List your recommendations here, numbered]
+</recommendations_round_1>
+</prd_planning_output>
+
+Ask questions and generate recommendations until you have a comprehensive understanding of the project.
+When everything is clear and you have enough information, indicate that you are ready to proceed with the next steps.
+<end_of_prompt>
