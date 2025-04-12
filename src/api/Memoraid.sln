@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memoraid.WebApi", "Memoraid.WebApi\Memoraid.WebApi.csproj", "{30D9DDC5-34D6-47FB-8998-A6FC91705A57}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memoraid.Tests.Unit", "Memoraid.Tests.Unit\Memoraid.Tests.Unit.csproj", "{ABDEE191-5B08-4063-A4D1-84978D8D2270}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{30D9DDC5-34D6-47FB-8998-A6FC91705A57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30D9DDC5-34D6-47FB-8998-A6FC91705A57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30D9DDC5-34D6-47FB-8998-A6FC91705A57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30D9DDC5-34D6-47FB-8998-A6FC91705A57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABDEE191-5B08-4063-A4D1-84978D8D2270}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABDEE191-5B08-4063-A4D1-84978D8D2270}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABDEE191-5B08-4063-A4D1-84978D8D2270}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABDEE191-5B08-4063-A4D1-84978D8D2270}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D3CC0653-13A7-48AA-98B5-EC4BEE6C1B92}
+	EndGlobalSection
+EndGlobal

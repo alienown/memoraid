@@ -1,0 +1,16 @@
+High-Level Description:
+Develop a simplified proof-of-concept (POC) for Memoraid—a web-based flashcard platform. This POC will focus on the AI-Generated Flashcards feature, allowing users to paste text and automatically generate flashcards directly from the frontend.
+
+Key Feature for the POC:
+- Implement the AI flashcard generation functionality that allows users to paste text and receive flashcards with a "Front" (max 500 characters) and "Back" (max 200 characters) generated using OpenAI.
+
+Tech Stack for the Key Feature:
+- Frontend: React with Vite, TypeScript, Tailwind CSS, and Shadcn/ui for building the UI.
+- AI Integration: OpenAI SDK using a provided API key from environment variables.
+
+Requirements for the POC:
+1. Build a simple interface where a user can input or paste text.
+2. Integrate directly with the OpenAI API (using an API key from environment variables) to generate flashcards.
+3. Display the generated flashcards, where each flashcard includes a "Front" and a "Back".
+
+Provide a detailed plan for creating POC and ask for confirmation before proceeding with the implementation.

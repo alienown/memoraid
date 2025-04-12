@@ -1,9 +1,9 @@
 <course-tech-stack>
-{{tech-stack}} <- Insert a description of your tech stack here
+  #tech-stack-proposed.md
 </course-tech-stack>
 
 <my-tech-stack>
-{{my-tech-stack}} <- Insert a description of your tech stack here
+  #tech-stack.md
 </my-tech-stack>
 
 I'm taking part in a course and I will develop a project. The product requirements description is in the file #prd.md. I need to analyze whether my tech stack is suitable for the project.
