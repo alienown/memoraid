@@ -122,7 +122,7 @@
 ### FLASHCARD_AI_GENERATIONS Resource
 
 - **POST /flashcards/generate**
-  - Description: Generate flashcards using AI based on user-supplied text.
+  - Description: Generate flashcard proposals using AI based on user-supplied text.
   - Request:
     {
       "sourceText": "string, required, maximum 10000 characters"
