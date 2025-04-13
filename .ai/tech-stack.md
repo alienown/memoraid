@@ -7,8 +7,11 @@ Frontend - React with Vite:
 
 Backend - .NET API and PostgreSQL as a database:
 
-- .NET has built in simple JWT authentication that is easy to set up
-- custom web API allows for further development of custom functionalities after MVP is delivered
+- minimal API built with .NET 9
+- simple JWT authentication that is easy to set up in .NET
+- FluentValidation for validating API requests and responses
+- Entity Framework Core for easy database access and migrations
+- NUnit and Shouldly for testing
 
 AI - Communication with models via Open AI API:
 

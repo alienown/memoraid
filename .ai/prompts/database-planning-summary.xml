@@ -3,7 +3,7 @@
     1. Enforce uniqueness on the users.email column.
     2. Use hard deletes for both users and flashcards without deletion logging.
     3. Implement audit columns (created_on, created_by, last_modified_on, last_modified_by) across all tables, with the application handling filling them.
-    4. Create a single flashcards table with a "source" column that restricts values to "Manual", "AI", or "AIEdited", and enforce VARCHAR limits on the front (500) and back (200) columns.
+    4. Create a single flashcards table with a "source" column that restricts values to "Manual", "AIFull", or "AIEdited", and enforce VARCHAR limits on the front (500) and back (200) columns.
     5. Set up a flashcard_ai_generations table with columns: id, user_id, ai_model, source_text (VARCHAR, maximum 10000 characters), all_flashcards_count, accepted_unedited_flashcards_count, accepted_edited_flashcards_count, plus the audit columns.
     6. Use foreign keys to link flashcards and flashcard_ai_generations to the users table without cascade deletes.
     7. Use foreign key to link flashcards to the flashcard_ai_generations table without cascade deletes. Allow null values for the foreign key to accommodate manually created flashcards.

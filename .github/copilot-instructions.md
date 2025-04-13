@@ -47,6 +47,7 @@ The application uses a PostgreSQL database.
 - Use C#'s expressive syntax (e.g., null-conditional operators, string interpolation)
 - Use 'var' for implicit typing when the type is obvious
 - Use dependency injection with scoped lifetime for request-specific services and singleton for stateless services
+- Do NOT use primary constructors
 
 ### Error Handling and Validation
   - Use exceptions for exceptional cases, not for control flow

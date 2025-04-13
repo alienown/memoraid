@@ -15,7 +15,7 @@
 - flashcard_ai_generation_id: INTEGER NULL CONSTRAINT fk_flashcards_flashcard_ai_generation_id FOREIGN KEY REFERENCES FLASHCARD_AI_GENERATIONS(id) ON DELETE NO ACTION
 - front: VARCHAR(500) NOT NULL
 - back: VARCHAR(200) NOT NULL
-- source: VARCHAR(20) NOT NULL CHECK (source IN ('Manual', 'AI', 'AIEdited'))
+- source: VARCHAR(20) NOT NULL CHECK (source IN ('Manual', 'AIFull', 'AIEdited'))
 - created_on: TIMESTAMP NOT NULL
 - created_by: VARCHAR(255) NOT NULL
 - last_modified_on: TIMESTAMP NULL

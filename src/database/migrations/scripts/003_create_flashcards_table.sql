@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS flashcards (
     created_by VARCHAR(255) NOT NULL,
     last_modified_on TIMESTAMP NULL,
     last_modified_by VARCHAR(255) NULL,
-    CONSTRAINT flashcards_source_check CHECK (source IN ('Manual', 'AI', 'AIEdited')),
+    CONSTRAINT flashcards_source_check CHECK (source IN ('Manual', 'AIFull', 'AIEdited')),
     CONSTRAINT flashcards_user_id_fkey FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION,
     CONSTRAINT flashcards_flashcard_ai_generation_id_fkey FOREIGN KEY (flashcard_ai_generation_id) REFERENCES flashcard_ai_generations (id) ON DELETE NO ACTION
 );
