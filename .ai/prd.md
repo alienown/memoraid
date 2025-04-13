@@ -8,7 +8,7 @@ Creating educational flashcards manually is a time-consuming process. Users who 
 
 ## 3. Functional Requirements
 1. AI-Generated Flashcards
-   - Provide a dedicated view where authenticated users can copy-paste large blocks of text.
+   - Provide a dedicated view where authenticated users can copy-paste large blocks of text (maximum 10000 characters).
    - Automatically generate flashcards from the text. Each flashcard comprises two fields:
      - Front: Required, maximum 500 characters.
      - Back: Required, maximum 200 characters.
@@ -68,7 +68,7 @@ Not included in MVP:
 ### US-002: AI Flashcard Generation
 - Description: As a logged in user, I want to paste input text and have the application generate flashcards automatically, so that I can save time.
 - Acceptance Criteria:
-  - Users can paste a block of text.
+  - Users can paste a block of text of maximum 5000 characters into a dedicated input field.
   - The system generates flashcards with a "Front" (max 500 characters) and "Back" (max 200 characters).
   - Generated flashcards are listed with options to review them.
 

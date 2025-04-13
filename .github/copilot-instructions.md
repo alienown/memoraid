@@ -2,6 +2,26 @@
 
 Memoraid is a web-based flashcard platform designed to simplify and accelerate the creation of high-quality educational flashcards. The application leverages AI to automatically generate flashcards from user-supplied text using a dedicated AI-generation view while providing a separate "My Flashcards" view for manual creation, review, editing, and deleting. The system also includes user account management and integrates with an existing spaced repetition algorithm for effective study sessions.
 
+# Database
+
+The application uses a PostgreSQL database.
+
+## Project structure
+- /src/database: root directory containing database-related files and scripts
+  - /migrations: migration scripts
+    - /scripts: migration scripts
+    - /rollback-scripts: rollback scripts for each migration
+
+## PostgreSQL guidelines
+- Use PostgreSQL naming conventions. Table names should be lowercased and plural. Constraint and index naming convention are as follows:
+  {tablename}_{columnname(s)}_{suffix}, where the suffix is one of the following:
+  - pkey for a Primary Key constraint
+  - key for a Unique constraint
+  - excl for an Exclusion constraint
+  - idx for any other kind of index
+  - fkey for a Foreign key
+  - check for a Check constraint
+
 # Backend
 
 ## Project structure
@@ -16,7 +36,6 @@ Memoraid is a web-based flashcard platform designed to simplify and accelerate t
     - /Persistence: Entity Framework Core data access configuration
       - /Entities: entity classes representing database tables
       - /EntityConfigurations: entity configuration classes for Fluent API configurations
-      - /Migrations: migration classes for database schema changes
   - /Memoraid.Tests.Unit: unit tests
 
 ## Guidelines for .NET

@@ -1,0 +1,30 @@
+<conversation_summary>
+  <decisions>
+    1. Enforce uniqueness on the users.email column.
+    2. Use hard deletes for both users and flashcards without deletion logging.
+    3. Implement audit columns (created_on, created_by, last_modified_on, last_modified_by) across all tables, with the application handling filling them.
+    4. Create a single flashcards table with a "source" column that restricts values to "Manual", "AI", or "AIEdited", and enforce VARCHAR limits on the front (500) and back (200) columns.
+    5. Set up a flashcard_ai_generations table with columns: id, user_id, ai_model, source_text (VARCHAR, maximum 10000 characters), all_flashcards_count, accepted_unedited_flashcards_count, accepted_edited_flashcards_count, plus the audit columns.
+    6. Use foreign keys to link flashcards and flashcard_ai_generations to the users table without cascade deletes.
+    7. Use foreign key to link flashcards to the flashcard_ai_generations table without cascade deletes. Allow null values for the foreign key to accommodate manually created flashcards.
+    8. Create indexes on primary keys and foreign key columns to optimize query performance.
+  </decisions>
+  <matched_recommendations>
+    1. Enforce the UNIQUE constraint on the users.email column with a unique index.
+    2. Use CHECK constraints on the flashcards.source column to strictly allow only the specified values.
+    3. Optimize query performance by indexing all primary keys and foreign key columns.
+    4. Rely on the application layer to handle transactional operations and audit column updates, rather than using database triggers.
+  </matched_recommendations>
+  <database_planning_summary>
+    The database schema for the MVP has been designed around three key entities: User, Flashcard, and Flashcard AI Generation Log.
+    The users table includes essential fields such as id, email, password, and audit columns, with email uniqueness enforced.
+    The flashcards table stores both AI-generated and manually created flashcards, differentiating them using a validated "source" column and enforcing character limits on the front (500) and back (200) fields.
+    All flashcards are associated with a user via a required foreign key, without cascade deletes.
+    AI-generated flashcards are associated with a flashcard_ai_generations via optional foreign key, without cascade deletes.
+    The flashcard_ai_generations table captures details of the AI flashcard generation process. It contains the source text (VARCHAR, maximum 10000 characters), counts for total, unedited, and edited flashcards, along with the necessary audit information and a required foreign key to users table.
+    Security is maintained via application-level logic, and scalability considerations are minimal for the MVP phase.
+  </database_planning_summary>
+  <unresolved_issues>
+    None.
+  </unresolved_issues>
+</conversation_summary>

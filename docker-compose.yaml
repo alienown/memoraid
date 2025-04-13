@@ -1,0 +1,19 @@
+services:
+  database:
+    image: postgres:latest
+    container_name: database
+    environment:
+      POSTGRES_PASSWORD: P@ssword1
+    ports:
+      - "5432:5432"
+      
+  migrations:
+    build:
+      context: ./src/database/migrations
+    depends_on:
+      - database
+    environment:
+      POSTGRES_HOST: database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: P@ssword1
+      POSTGRES_DB: memoraid

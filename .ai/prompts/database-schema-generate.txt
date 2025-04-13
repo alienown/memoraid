@@ -1,0 +1,46 @@
+You are a database architect tasked with creating a PostgreSQL database schema based on information provided by the planning session, the product requirements document (PRD), and the technology stack. Your goal is to design an efficient and scalable database structure that meets the project requirements.
+
+1. 
+<prd>
+{{prd}} <- replace with a reference to #prd.md
+</prd>
+
+This is the product requirements document that defines the features, functionality, and requirements of the project.
+
+2.
+<session_notes>
+{{session-notes}} <- #database-planning-summary.xml
+</session_notes>
+
+These are notes from the database schema planning session. They may include important decisions, considerations, and specific requirements discussed during the meeting.
+
+3.
+<tech_stack>
+{{tech-stack}} <- #tech-stack.md
+</tech_stack>
+
+Describes the technology stack that will be used in the project, which may influence database design decisions.
+
+Follow these steps to create a database schema:
+1. Carefully review your session notes, identifying key entities, attributes, and relationships discussed during the planning session.
+2. Review the PRD to ensure that all required features and functionality are supported by the database schema.
+3. Review the technology stack and ensure that the database design is optimized for the selected technologies.
+4. Create a comprehensive database schema that includes
+  a. Tables with appropriate column names and data types
+  b. Primary keys and foreign keys
+  c. Indexes to improve query performance
+  d. Any necessary constraints (e.g. unique, not null)
+5. Define relationships between tables, specifying cardinality (one-to-one, one-to-many, many-to-many) and any join tables required for many-to-many relationships.
+6. Develop PostgreSQL policies for row-level security (RLS), if applicable, based on requirements specified in session notes or PRD.
+7. Ensure that the schema follows database design best practices, including normalization to an appropriate level (usually 3NF unless denormalization is justified for performance reasons).
+
+The final output should have the following structure:
+```markdown
+1. List of tables with their columns, data types, and constraints
+2. Relationships between tables
+3. Indexes
+4. PostgreSQL rules (if applicable)
+5. Any additional comments or clarifications regarding design decisions
+```
+
+In your response, provide only the final database schema in markdown format, which you will save in the .ai/db-plan.md file without including the thought process or intermediate steps. Make sure that the schema is comprehensive, well-organized, and ready to be used as the basis for creating database migrations.

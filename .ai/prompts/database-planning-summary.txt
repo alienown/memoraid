@@ -1,0 +1,37 @@
+You are an AI assistant tasked with summarizing a conversation about database planning for an MVP and preparing a concise summary for the next stage of development. In the conversation history, you will find the following information:
+1. Product requirements document (PRD)
+2. Technology stack information
+3. Conversation history containing questions and answers
+4. Model recommendations
+
+Your task is to:
+1. Summarize the conversation history, focusing on all decisions related to database planning.
+2. Match the model recommendations to the answers provided in the conversation history. Identify which recommendations are relevant based on the discussion.
+3. Prepare a detailed conversation summary that includes:
+  a. Key database schema requirements
+  b. Key entities and their relationships
+  c. Important security and scalability issues
+  d. Any unresolved issues or areas requiring further clarification
+
+Format the results as follows:
+<conversation_summary>
+
+<decisions>
+[List the decisions made by the user, numbered].
+</decisions>
+
+<matched_recommendations>
+[List of the most important recommendations matched to the conversation, numbered]
+</matched_recommendations>
+
+<database_planning_summary> [Database planning summary]
+[Provide a detailed conversation summary, including the items listed in Step 3].
+</database_planning_summary>
+
+<unresolved_issues>
+[List any unresolved issues or areas requiring further clarification, if any]
+</unresolved_issues>
+
+</conversation_summary>
+
+The final output should contain only markdown content. Make sure your summary is clear, concise, and provides valuable information for the next phase of database planning.

@@ -5,7 +5,7 @@ Frontend - React with Vite:
 - Tailwind 4 allows for convenient application styling.
 - Shadcn/ui offers a library of accessible React components to build the UI.
 
-Backend - .NET API with built in JWT Auth and PostgreSQL as a database:
+Backend - .NET API and PostgreSQL as a database:
 
 - .NET has built in simple JWT authentication that is easy to set up
 - custom web API allows for further development of custom functionalities after MVP is delivered
