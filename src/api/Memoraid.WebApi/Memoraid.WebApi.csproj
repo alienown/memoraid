@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="OpenAI" />
@@ -15,13 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Configuration\" />
-    <Folder Include="Persistence\Entities\" />
-    <Folder Include="Persistence\EntityConfigurations\" />
-    <Folder Include="Persistence\Migrations\" />
     <Folder Include="Validation\" />
-    <Folder Include="Responses\" />
-    <Folder Include="Requests\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

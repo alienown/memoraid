@@ -1,8 +1,16 @@
+using Memoraid.WebApi.Configuration;
+using Memoraid.WebApi.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+builder.Services.Configure<ApplicationOptions>(builder.Configuration);
+
+builder.Services.AddDbContext<MemoraidDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
+        .UseSnakeCaseNamingConvention());
 
 var app = builder.Build();
 
@@ -14,28 +22,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
+app.MapGet("/dbtest", (MemoraidDbContext dbContext) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+    var flashcards = dbContext.Flashcards.ToList();
+    var flashcardAIGenerations = dbContext.FlashcardAIGenerations.ToList();
+    var users = dbContext.Users.ToList();
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+    return Results.Ok(new
+    {
+        Flashcards = flashcards,
+        FlashcardAIGenerations = flashcardAIGenerations,
+        Users = users
+    });
+});
 
 app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

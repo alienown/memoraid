@@ -7,10 +7,39 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memoraid.WebApi", "Memoraid
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\.github\copilot-instructions.md = ..\..\.github\copilot-instructions.md
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Memoraid.Tests.Unit", "Memoraid.Tests.Unit\Memoraid.Tests.Unit.csproj", "{ABDEE191-5B08-4063-A4D1-84978D8D2270}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".ai", ".ai", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.ai\api-plan.md = ..\..\.ai\api-plan.md
+		..\..\.ai\db-plan.md = ..\..\.ai\db-plan.md
+		..\..\.ai\mvp.md = ..\..\.ai\mvp.md
+		..\..\.ai\prd.md = ..\..\.ai\prd.md
+		..\..\.ai\tech-stack.md = ..\..\.ai\tech-stack.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prompts", "Prompts", "{3EB3EEB3-008E-40C8-BCAD-8D57BD62B10F}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\.ai\prompts\database-migrations-generate.md = ..\..\.ai\prompts\database-migrations-generate.md
+		..\..\.ai\prompts\database-planning-summary.txt = ..\..\.ai\prompts\database-planning-summary.txt
+		..\..\.ai\prompts\database-planning-summary.xml = ..\..\.ai\prompts\database-planning-summary.xml
+		..\..\.ai\prompts\database-planning.txt = ..\..\.ai\prompts\database-planning.txt
+		..\..\.ai\prompts\database-schema-generate.txt = ..\..\.ai\prompts\database-schema-generate.txt
+		..\..\.ai\prompts\generate-api-contracts.md = ..\..\.ai\prompts\generate-api-contracts.md
+		..\..\.ai\prompts\generate-api-plan.md = ..\..\.ai\prompts\generate-api-plan.md
+		..\..\.ai\prompts\poc-generate.txt = ..\..\.ai\prompts\poc-generate.txt
+		..\..\.ai\prompts\prd-generate.txt = ..\..\.ai\prompts\prd-generate.txt
+		..\..\.ai\prompts\prd-planning-summary.txt = ..\..\.ai\prompts\prd-planning-summary.txt
+		..\..\.ai\prompts\prd-planning-summary.xml = ..\..\.ai\prompts\prd-planning-summary.xml
+		..\..\.ai\prompts\prd-planning.txt = ..\..\.ai\prompts\prd-planning.txt
+		..\..\.ai\prompts\readme-generate.txt = ..\..\.ai\prompts\readme-generate.txt
+		..\..\.ai\prompts\tech-stack-analysis.txt = ..\..\.ai\prompts\tech-stack-analysis.txt
+		..\..\.ai\prompts\tech-stack-proposed.md = ..\..\.ai\prompts\tech-stack-proposed.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +58,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3EB3EEB3-008E-40C8-BCAD-8D57BD62B10F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D3CC0653-13A7-48AA-98B5-EC4BEE6C1B92}
