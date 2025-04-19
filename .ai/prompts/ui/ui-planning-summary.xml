@@ -1,0 +1,37 @@
+<conversation_summary>
+  <decisions>
+    1. All views (Registration, User Panel, Generate Flashcards, My Flashcards, Study) will be top-level routes with no nested hierarchy, sharing a common layout with a sticky top navigation bar.
+    2. If the user is unathenticated, they will be redirected to the Login view. If authenticated, they will be redirected to the Generate Flashcards view.
+    3. The navigation bar will remain always visible, with protected links currently displayed until authentication is implemented.
+    4. The flashcard generation view will include inline "Accept" (green) and "Reject" (red) buttons with an "Edit" button triggering a centered modal (using shadcn Dialog) that contains an explicit close button.
+    5. Form validations will display red, bold error messages directly below the respective fields.
+    6. The flashcards list view will support pagination with items per page, next/previous page controls, page numbers, and a simple integer total count displayed below the Data Table.
+    7. Each action triggering an API call will include a loading indicator integrated within buttons or forms, disabling only the relevant part (usually the button that triggered the action) when multiple submissions are allowed or the whole form for single-use scenarios.
+    8. Global notifications will be displayed using the Sonner Toast component positioned at the top right, auto-dismissing after a few seconds.
+    9. API integration and state handling will be managed using React’s useState hook and Context API, with the http client generated from the OpenAPI document, avoiding additional caching libraries.
+    10. Styling will rely on Tailwind CSS and shadcn/ui components for basic responsiveness and accessibility, with minimal theming (base neutral color) for the MVP.
+  </decisions>
+  <matched_recommendations>
+    1. The recommendation to use a universal layout with a sticky top navigation bar and top-level routing has been confirmed.
+    2. The plan to standardize UI components using shadcn/ui (including Input, Button, Card, Data Table, Dialog, Sonner Toast, and Form) aligns with the discussion.
+    3. Implementing inline buttons for Accept (green), Reject (red), and Edit (default) in the flashcard generation view with an explicit close button in the modal matches the user’s decision.
+    4. The approach of using Tailwind CSS for padding and layout, along with Sonner for toast notifications, is adopted.
+    5. Managing API call states with useState/Context and integrating loading indicators within action buttons or forms concur with the discussed strategy.
+  </matched_recommendations>
+  <ui_architecture_planning_summary>
+    The conversation established a clear UI architecture that mandates a universal layout with a sticky navigation bar at the top. All views are implemented as top-level routes, encompassing:
+    - Registration and Login (public)
+    - User Panel, Generate Flashcards, My Flashcards, and Study (protected, though currently accessible to all users until authentication is implemented).
+
+    If the user is unathenticated, they will be redirected to the Login view. If authenticated, they will be redirected to the Generate Flashcards view.
+    The Generate Flashcards view will allow users to paste text, and generate flashcards which can be inline accepted or rejected.
+    An Edit button on each flashcard opens a centered modal for modifications. The "Save flashcards" button will trigger the API call only for accepted flashcards.
+    For the My Flashcards view, a paginated Data Table will display flashcards along with controls for navigation and an integer total count below it.
+    API integration will be achieved using a generated HTTP client, with API state handled via React’s useState and Context API.
+    Error messages are shown as red, bold text under form fields, while global notifications and error toasts are managed by wrapping the Sonner Toast component.
+    Responsiveness and accessibility will be ensured by leveraging Tailwind’s spacing utilities and shadcn components, which provide out-of-the-box responsive and accessible UI elements, without additional special theming for the MVP.
+  </ui_architecture_planning_summary>
+  <unresolved_issues>
+    No unresolved issues were identified.
+  </unresolved_issues>
+</conversation_summary>
