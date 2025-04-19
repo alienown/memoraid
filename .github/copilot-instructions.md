@@ -56,6 +56,9 @@ The application uses a PostgreSQL database.
 ### ASP NET Core Web API
 
 - Use minimal APIs to reduce boilerplate code
+- Reference types in request classes should stay optional even though they are required in the endpoint specification
+- API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors.
+- FluentValidators should be invoked at the service level, not the API level
 
 ### Entity Framework Core
 
@@ -69,7 +72,6 @@ The application uses a PostgreSQL database.
   - Write unit tests using NUnit
   - Use Moq for mocking dependencies in unit tests
   - In each test write the Arrange, Act, Assert comments for clarity
-  - When mocking dependencies, 
   - Use Shouldly for assertions
 
 # Frontend

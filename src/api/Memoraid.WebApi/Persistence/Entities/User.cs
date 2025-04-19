@@ -1,8 +1,7 @@
-namespace Memoraid.WebApi.Persistence.Entities
+namespace Memoraid.WebApi.Persistence.Entities;
+
+public class User : EntityBase<long>
 {
-    public class User : EntityBase<long>
-    {
-        public required string Email { get; set; }
-        public required string Password { get; set; }
-    }
+    public required string Email { get; set; }
+    public required string Password { get; set; }
 }

@@ -1,3 +1,5 @@
+namespace Memoraid.WebApi.Requests;
+
 public class LoginUserRequest
 {
     public string? Email { get; set; }

@@ -1,4 +1,16 @@
 services:
+  api:
+    build:
+      context: ./src/api
+      dockerfile: ./Memoraid.WebApi/Dockerfile
+    container_name: api
+    ports:
+      - "5247:8080"
+    depends_on:
+      - database
+    environment:
+      ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
+
   database:
     image: postgres:latest
     container_name: database

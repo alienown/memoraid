@@ -1,29 +1,41 @@
-public class Response<T> where T : class
+namespace Memoraid.WebApi.Responses;
+
+public class Response
 {
-    public Response(T data)
+    public Response()
     {
-        Data = data;
         Errors = [];
     }
 
-    public Response(IReadOnlyList<Error> errors)
+    public Response(Error[] errors)
     {
         Errors = errors;
     }
 
-    public T? Data { get; }
-    public bool IsSuccess => Errors.Count == 0;
-    public IReadOnlyList<Error> Errors { get; }
+    public bool IsSuccess => Errors.Length == 0;
+    public Error[] Errors { get; }
 
     public class Error
     {
-        public Error(string message, string code)
+        public Error(string code, string message, string? propertyName = null)
         {
-            Message = message;
             Code = code;
+            Message = message;
+            PropertyName = propertyName;
         }
 
-        public string Message { get; }
         public string Code { get; }
+        public string Message { get; }
+        public string? PropertyName { get; }
     }
+}
+
+public class Response<T> : Response where T : class
+{
+    public Response(T data) : base()
+    {
+        Data = data;
+    }
+
+    public T? Data { get; }
 }

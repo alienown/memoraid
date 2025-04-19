@@ -1,3 +1,5 @@
+namespace Memoraid.WebApi.Responses;
+
 public class LoginUserResponse
 {
     public LoginUserResponse(string token)

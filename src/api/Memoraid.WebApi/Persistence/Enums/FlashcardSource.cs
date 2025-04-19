@@ -1,9 +1,8 @@
-namespace Memoraid.WebApi.Persistence.Enums
+namespace Memoraid.WebApi.Persistence.Enums;
+
+public enum FlashcardSource
 {
-    public enum FlashcardSource
-    {
-        Manual,
-        AIFull,
-        AIEdited
-    }
+    Manual,
+    AIFull,
+    AIEdited
 }

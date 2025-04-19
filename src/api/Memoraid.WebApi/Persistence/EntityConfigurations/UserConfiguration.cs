@@ -2,17 +2,16 @@ using Memoraid.WebApi.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Memoraid.WebApi.Persistence.EntityConfigurations
+namespace Memoraid.WebApi.Persistence.EntityConfigurations;
+
+public class UserConfiguration : EntityBaseConfiguration<User>
 {
-    public class UserConfiguration : IEntityTypeConfiguration<User>
+    protected override void ConfigureEntity(EntityTypeBuilder<User> builder)
     {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            builder.ToTable("users");
+        builder.ToTable("users");
 
-            builder.HasKey(x => x.Id);
+        builder.HasKey(x => x.Id);
 
-            builder.Property(x => x.Id).ValueGeneratedOnAdd();
-        }
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
     }
 }

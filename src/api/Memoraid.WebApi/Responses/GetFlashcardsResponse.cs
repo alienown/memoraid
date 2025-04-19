@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Memoraid.WebApi.Responses;
+
 public class GetFlashcardsResponse
 {
     public GetFlashcardsResponse(IReadOnlyList<Flashcard> items, int total)

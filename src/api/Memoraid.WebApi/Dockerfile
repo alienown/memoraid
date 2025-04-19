@@ -17,4 +17,4 @@ COPY --from=build /app/publish .
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
-ENTRYPOINT ["dotnet", "DockerCourseApi.dll"]
+ENTRYPOINT ["dotnet", "Memoraid.WebApi.dll"]

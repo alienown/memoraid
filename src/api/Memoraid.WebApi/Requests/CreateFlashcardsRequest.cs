@@ -1,3 +1,7 @@
+using System.Collections.Generic;
+
+namespace Memoraid.WebApi.Requests;
+
 public class CreateFlashcardsRequest
 {
     public IReadOnlyList<Flashcard>? Flashcards { get; set; }

@@ -1,23 +1,22 @@
 using Memoraid.WebApi.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace Memoraid.WebApi.Persistence
+namespace Memoraid.WebApi.Persistence;
+
+public class MemoraidDbContext : DbContext
 {
-    public class MemoraidDbContext : DbContext
+    public MemoraidDbContext(DbContextOptions<MemoraidDbContext> options) : base(options)
     {
-        public MemoraidDbContext(DbContextOptions<MemoraidDbContext> options) : base(options)
-        {
-        }
+    }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Flashcard> Flashcards { get; set; }
-        public DbSet<FlashcardAIGeneration> FlashcardAIGenerations { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Flashcard> Flashcards { get; set; }
+    public DbSet<FlashcardAIGeneration> FlashcardAIGenerations { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
 
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(Flashcard).Assembly);
-        }
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(Flashcard).Assembly);
     }
 }

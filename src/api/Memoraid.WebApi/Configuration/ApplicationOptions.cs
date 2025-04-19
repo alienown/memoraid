@@ -1,7 +1,6 @@
-namespace Memoraid.WebApi.Configuration
+namespace Memoraid.WebApi.Configuration;
+
+public class ApplicationOptions
 {
-    public class ApplicationOptions
-    {
-        public required string OpenAIApiKey { get; set; }
-    }
+    public required string OpenAIApiKey { get; set; }
 }

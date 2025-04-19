@@ -1,9 +1,13 @@
+using System.Collections.Generic;
+
+namespace Memoraid.WebApi.Responses;
+
 public class GenerateFlashcardsResponse
 {
     public IReadOnlyList<Flashcard> Flashcards { get; }
-    public int GenerationId { get; }
+    public long GenerationId { get; }
 
-    public GenerateFlashcardsResponse(IReadOnlyList<Flashcard> flashcards, int generationId)
+    public GenerateFlashcardsResponse(IReadOnlyList<Flashcard> flashcards, long generationId)
     {
         Flashcards = flashcards;
         GenerationId = generationId;
