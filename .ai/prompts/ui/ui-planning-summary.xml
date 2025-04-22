@@ -26,7 +26,7 @@
     If the user is unathenticated, they will be redirected to the Login view. If authenticated, they will be redirected to the Generate Flashcards view.
     The Generate Flashcards view will allow users to paste text, and generate flashcards which can be inline accepted or rejected.
     An Edit button on each flashcard opens a centered modal for modifications. The "Save flashcards" button will trigger the API call only for accepted flashcards.
-    For the My Flashcards view, a paginated Data Table will display flashcards along with controls for navigation and an integer total count below it.
+    For the My Flashcards view, a paginated Data Table will display flashcards along with controls for navigation and an integer total count below it. Each flashcard in the list can be edited or deleted, with a confirmation dialog for deletions. Additional sutton for manual flashcard creation will be available (button opens a modal with form). 
     API integration will be achieved using a generated HTTP client, with API state handled via React’s useState and Context API.
     Error messages are shown as red, bold text under form fields, while global notifications and error toasts are managed by wrapping the Sonner Toast component.
     Responsiveness and accessibility will be ensured by leveraging Tailwind’s spacing utilities and shadcn components, which provide out-of-the-box responsive and accessible UI elements, without additional special theming for the MVP.
