@@ -14,4 +14,3 @@ public class CreateFlashcardsRequest
         public long? GenerationId { get; set; }
     }
 }
-

@@ -31,6 +31,7 @@ The application uses a PostgreSQL database.
     - /Configuration: configuration classes initialized from appsettings.json
     - /Requests: request classes for API endpoints
     - /Responses: response classes for API endpoints
+    - /Middleware: API middleware classes (e.g. FluentValidation exception handling)
     - /Services: service classes for business logic, authentication and authorization, and data access
     - /Validation: validation classes for request models using Fluent Validation
     - /Persistence: Entity Framework Core data access configuration
@@ -57,7 +58,8 @@ The application uses a PostgreSQL database.
 
 - Use minimal APIs to reduce boilerplate code
 - Reference types in request classes should stay optional even though they are required in the endpoint specification
-- API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors.
+- API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors. If there is no data to be returned, use non-generic Response class.
+- FluentValidationExceptionMiddleware handles FluentValidation exceptions and returns a 422 status code with validation errors. So in most cases you don't need to handle validation errors yourself in the API (controller / endpoint) code.
 - FluentValidators should be invoked at the service level, not the API level
 
 ### Entity Framework Core

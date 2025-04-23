@@ -56,6 +56,7 @@ app.MapPost("/flashcards/generate", async (GenerateFlashcardsRequest request, IF
     var result = await generationService.GenerateFlashcardsAsync(request);
 
     return Results.Ok(new Response<GenerateFlashcardsResponse>(result));
-});
+})
+.WithName("GenerateFlashcards");
 
 app.Run();

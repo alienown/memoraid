@@ -26,7 +26,7 @@ Before we start, please review the following information:
 <implementation_rules>
 1. Reference types in request classes should stay optional even though they are required in the endpoint specification.
 2. Use FluentValidation for validating incoming requests according to the endpoint API specification.
-3. API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors.
+3. API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors. If there is no data to be returned, use non-generic Response class.
 4. FluentValidators should be invoked at the service level, not the API level
 </implementation_rules>
 
@@ -99,4 +99,4 @@ The end result should be a well-organized implementation plan in markdown format
 
 The final deliverables should consist solely of the implementation plan in markdown format and should not duplicate or repeat any of the work done in the analysis section.
 
-Be sure to save your implementation plan as .ai/view-implementation-plan.md. Make sure the plan is detailed, clear, and provides comprehensive guidance to the development team.
+Be sure to save your implementation plan as .ai/api/{view}-implementation-plan.md. Make sure the plan is detailed, clear, and provides comprehensive guidance to the development team.

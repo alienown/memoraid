@@ -271,10 +271,10 @@ export class Api<
      * No description
      *
      * @tags Memoraid.WebApi
-     * @name GenerateCreate
+     * @name GenerateFlashcards
      * @request POST:/flashcards/generate
      */
-    generateCreate: (
+    generateFlashcards: (
       data: GenerateFlashcardsRequest,
       params: RequestParams = {},
     ) =>
