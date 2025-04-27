@@ -47,12 +47,12 @@ public class FlashcardGenerationService : IFlashcardGenerationService
         return new GenerateFlashcardsResponse(flashcards, generationRecord.Id);
     }
 
-    private IReadOnlyList<GenerateFlashcardsResponse.Flashcard> GenerateRandomFlashcards()
+    private IReadOnlyList<GenerateFlashcardsResponse.GeneratedFlashcard> GenerateRandomFlashcards()
     {
         var count = _rng.Next(3, 7);
 
         return Enumerable.Range(1, count)
-            .Select(i => new GenerateFlashcardsResponse.Flashcard($"Front mock {i}", $"Back mock {i}"))
+            .Select(i => new GenerateFlashcardsResponse.GeneratedFlashcard($"Front mock {i}", $"Back mock {i}"))
             .ToList();
     }
 }

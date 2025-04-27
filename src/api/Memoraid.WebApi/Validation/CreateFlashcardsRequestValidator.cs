@@ -13,6 +13,12 @@ namespace Memoraid.WebApi.Validation;
 public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcardsRequest>
 {
     internal const string FlashcardsAreRequired = "At least one flashcard must be provided.";
+    internal const string InvalidSourceError = "Source must be one of: Manual, AIFull, or AIEdited.";
+    internal const string GenerationIdMustBeNullForFlashcardsWithManualSource = "GenerationId must be null for manually created flashcards.";
+    internal const string GenerationIdMustBeGreaterThanZeroError = "GenerationId must be greater than zero.";
+    internal const string GenerationIdsForAIGeneratedFlashcardsMustBeTheSame = "All AI-generated flashcards must have the same generationId.";
+    internal const string GenerationNotExistsError = "The specified AI generation does not exist.";
+
     private readonly MemoraidDbContext _dbContext;
 
     public CreateFlashcardsRequestValidator(MemoraidDbContext dbContext)
@@ -49,7 +55,7 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
 
         if (generationIds.Count > 1)
         {
-            context.AddFailure(nameof(request.Flashcards), "All AI-generated flashcards must have the same generationId.");
+            context.AddFailure(nameof(request.Flashcards), GenerationIdsForAIGeneratedFlashcardsMustBeTheSame);
         }
     }
 
@@ -78,32 +84,32 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
 
         if (!generationExists)
         {
-            context.AddFailure(nameof(CreateFlashcardsRequest.Flashcard.GenerationId),
-                "The specified AI generation does not exist.");
+            context.AddFailure(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId),
+                GenerationNotExistsError);
         }
     }
 
-    private class FlashcardValidator : AbstractValidator<CreateFlashcardsRequest.Flashcard>
+    private class FlashcardValidator : AbstractValidator<CreateFlashcardsRequest.CreateFlashcardData>
     {
         public FlashcardValidator()
         {
             RuleFor(x => x.Front)
                 .NotNull()
-                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Front)))
+                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front)))
                 .MaximumLength(500)
-                .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.Flashcard.Front), 500));
+                .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front), 500));
 
             RuleFor(x => x.Back)
                 .NotNull()
-                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Back)))
+                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back)))
                 .MaximumLength(200)
-                .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.Flashcard.Back), 200));
+                .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back), 200));
 
             RuleFor(x => x.Source)
                 .NotNull()
-                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Source)))
+                .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Source)))
                 .IsInEnum()
-                .WithMessage("Source must be one of: Manual, AIFull, or AIEdited.");
+                .WithMessage(InvalidSourceError);
 
             When(x => x.Source == FlashcardSource.Manual, () =>
             {
@@ -115,7 +121,7 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
             When(x => x.Source == FlashcardSource.AIFull || x.Source == FlashcardSource.AIEdited, () =>
             {
                 RuleFor(x => x.GenerationId)
-                    .NotNull().WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.GenerationId)))
+                    .NotNull().WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId)))
                     .GreaterThan(0).WithMessage("GenerationId must be greater than zero.");
             });
         }

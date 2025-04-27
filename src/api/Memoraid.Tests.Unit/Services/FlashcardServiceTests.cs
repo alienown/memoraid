@@ -59,7 +59,7 @@ public class FlashcardServiceTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.Manual },
                 new() { Front = "Front2", Back = "Back2", Source = FlashcardSource.AIFull, GenerationId = 123 },
@@ -106,7 +106,7 @@ public class FlashcardServiceTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = null, Source = FlashcardSource.Manual }
             }

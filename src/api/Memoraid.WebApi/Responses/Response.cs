@@ -1,19 +1,26 @@
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+
 namespace Memoraid.WebApi.Responses;
 
 public class Response
 {
+    [SetsRequiredMembers]
     public Response()
     {
         Errors = [];
     }
 
+    [SetsRequiredMembers]
     public Response(Error[] errors)
     {
         Errors = errors;
     }
 
     public bool IsSuccess => Errors.Length == 0;
-    public Error[] Errors { get; }
+
+    [Required]
+    public required Error[] Errors { get; init; }
 
     public class Error
     {
@@ -32,10 +39,12 @@ public class Response
 
 public class Response<T> : Response where T : class
 {
+    [SetsRequiredMembers]
     public Response(T data) : base()
     {
         Data = data;
     }
 
-    public T? Data { get; }
+    [Required]
+    public required T Data { get; init; }
 }

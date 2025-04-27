@@ -1,6 +1,7 @@
 using FluentValidation;
 using Memoraid.WebApi.Configuration;
 using Memoraid.WebApi.Middleware;
+using Memoraid.WebApi.OpenApi;
 using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
@@ -9,6 +10,7 @@ using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +19,10 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddSchemaTransformer<ResponseSchemaTransformer>();
+});
 
 builder.Services.Configure<ApplicationOptions>(builder.Configuration);
 
@@ -68,7 +73,8 @@ app.MapPost("/flashcards/generate", async (GenerateFlashcardsRequest request, IF
 
     return Results.Ok(new Response<GenerateFlashcardsResponse>(result));
 })
-.WithName("GenerateFlashcards");
+.WithName("GenerateFlashcards")
+.Produces<Response<GenerateFlashcardsResponse>>();
 
 app.MapPost("/flashcards", async (CreateFlashcardsRequest request, IFlashcardService flashcardService) =>
 {
@@ -76,6 +82,7 @@ app.MapPost("/flashcards", async (CreateFlashcardsRequest request, IFlashcardSer
 
     return Results.Created("/flashcards", new Response());
 })
-.WithName("CreateFlashcards");
+.WithName("CreateFlashcards")
+.Produces<Response>();
 
 app.Run();

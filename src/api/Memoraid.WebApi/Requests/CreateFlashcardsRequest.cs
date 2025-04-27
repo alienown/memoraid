@@ -5,9 +5,9 @@ namespace Memoraid.WebApi.Requests;
 
 public class CreateFlashcardsRequest
 {
-    public IReadOnlyList<Flashcard>? Flashcards { get; set; }
+    public IReadOnlyList<CreateFlashcardData>? Flashcards { get; set; }
 
-    public class Flashcard
+    public class CreateFlashcardData
     {
         public string? Front { get; set; }
         public string? Back { get; set; }

@@ -10,11 +10,13 @@
  * ---------------------------------------------------------------
  */
 
-export interface CreateFlashcardsRequest {
-  flashcards?: Flashcard[] | null;
+export enum NullableOfFlashcardSource {
+  Manual = "Manual",
+  AIFull = "AIFull",
+  AIEdited = "AIEdited",
 }
 
-export interface Flashcard {
+export interface CreateFlashcardData {
   front?: string | null;
   back?: string | null;
   source?: NullableOfFlashcardSource;
@@ -22,11 +24,42 @@ export interface Flashcard {
   generationId?: number | null;
 }
 
+export interface CreateFlashcardsRequest {
+  flashcards?: CreateFlashcardData[] | null;
+}
+
+export interface Error {
+  code: string;
+  message: string;
+  /** @default null */
+  propertyName?: string | null;
+}
+
+export interface GeneratedFlashcard {
+  front: string;
+  back: string;
+}
+
 export interface GenerateFlashcardsRequest {
   sourceText?: string | null;
 }
 
-export type NullableOfFlashcardSource = number | null;
+export interface GenerateFlashcardsResponse {
+  flashcards: GeneratedFlashcard[];
+  /** @format int64 */
+  generationId: number;
+}
+
+export interface Response {
+  isSuccess: boolean;
+  errors: Error[];
+}
+
+export interface ResponseOfGenerateFlashcardsResponse {
+  data: GenerateFlashcardsResponse;
+  isSuccess: boolean;
+  errors: Error[];
+}
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -80,7 +113,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://[::]:8080";
+  public baseUrl: string = "http://localhost:5247";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -275,7 +308,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title Memoraid.WebApi | v1
  * @version 1.0.0
- * @baseUrl http://[::]:8080
+ * @baseUrl http://localhost:5247
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -292,11 +325,12 @@ export class Api<
       data: GenerateFlashcardsRequest,
       params: RequestParams = {},
     ) =>
-      this.request<void, any>({
+      this.request<ResponseOfGenerateFlashcardsResponse, any>({
         path: `/flashcards/generate`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
 
@@ -311,11 +345,12 @@ export class Api<
       data: CreateFlashcardsRequest,
       params: RequestParams = {},
     ) =>
-      this.request<void, any>({
+      this.request<Response, any>({
         path: `/flashcards`,
         method: "POST",
         body: data,
         type: ContentType.Json,
+        format: "json",
         ...params,
       }),
   };

@@ -71,7 +71,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.Manual },
                 new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.AIEdited, GenerationId = 1 },
@@ -105,7 +105,7 @@ public class CreateFlashcardsRequestValidatorTests
     public async Task Validate_Should_HaveError_When_FlashcardsIsEmpty()
     {
         // Arrange
-        var request = new CreateFlashcardsRequest { Flashcards = new List<CreateFlashcardsRequest.Flashcard>() };
+        var request = new CreateFlashcardsRequest { Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>() };
 
         // Act
         var result = await _validator.TestValidateAsync(request);
@@ -122,7 +122,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = null, Back = "Back", Source = FlashcardSource.Manual }
             }
@@ -133,7 +133,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Front")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Front)))
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front)))
             .WithPropertyName("Flashcards[0].Front");
     }
 
@@ -144,7 +144,7 @@ public class CreateFlashcardsRequestValidatorTests
         var longFront = new string('a', 501);
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = longFront, Back = "Back", Source = FlashcardSource.Manual }
             }
@@ -155,7 +155,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Front")
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.Flashcard.Front), 500))
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front), 500))
             .WithPropertyName("Flashcards[0].Front");
     }
 
@@ -165,7 +165,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = null, Source = FlashcardSource.Manual }
             }
@@ -176,7 +176,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Back")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Back)))
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back)))
             .WithPropertyName("Flashcards[0].Back");
     }
 
@@ -187,7 +187,7 @@ public class CreateFlashcardsRequestValidatorTests
         var longBack = new string('a', 201);
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = longBack, Source = FlashcardSource.Manual }
             }
@@ -198,7 +198,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Back")
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.Flashcard.Back), 200))
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back), 200))
             .WithPropertyName("Flashcards[0].Back");
     }
 
@@ -208,7 +208,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = null }
             }
@@ -219,7 +219,28 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Source")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.Source)))
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Source)))
+            .WithPropertyName("Flashcards[0].Source");
+    }
+
+    [Test]
+    public async Task Validate_Should_HaveError_When_SourceIsNotDefined()
+    {
+        // Arrange
+        var request = new CreateFlashcardsRequest
+        {
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
+            {
+                new() { Front = "Front", Back = "Back", Source = (FlashcardSource)2137 }
+            }
+        };
+
+        // Act
+        var result = await _validator.TestValidateAsync(request);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor("Flashcards[0].Source")
+            .WithErrorMessage(CreateFlashcardsRequestValidator.InvalidSourceError)
             .WithPropertyName("Flashcards[0].Source");
     }
 
@@ -229,7 +250,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = FlashcardSource.Manual, GenerationId = 1 }
             }
@@ -240,7 +261,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage("GenerationId must be null for manually created flashcards.")
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeNullForFlashcardsWithManualSource)
             .WithPropertyName("Flashcards[0].GenerationId");
     }
 
@@ -250,7 +271,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = FlashcardSource.AIFull, GenerationId = null }
             }
@@ -261,7 +282,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.Flashcard.GenerationId)))
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId)))
             .WithPropertyName("Flashcards[0].GenerationId");
     }
 
@@ -271,7 +292,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = FlashcardSource.AIFull, GenerationId = 0 }
             }
@@ -282,7 +303,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage("GenerationId must be greater than zero.")
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeGreaterThanZeroError)
             .WithPropertyName("Flashcards[0].GenerationId");
     }
 
@@ -292,7 +313,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.AIFull, GenerationId = 1 },
                 new() { Front = "Front2", Back = "Back2", Source = FlashcardSource.AIEdited, GenerationId = 3 }
@@ -304,7 +325,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.Flashcards))
-            .WithErrorMessage("All AI-generated flashcards must have the same generationId.")
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdsForAIGeneratedFlashcardsMustBeTheSame)
             .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcards));
     }
 
@@ -314,7 +335,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = FlashcardSource.AIFull, GenerationId = 10 }
             }
@@ -324,9 +345,9 @@ public class CreateFlashcardsRequestValidatorTests
         var result = await _validator.TestValidateAsync(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.Flashcard.GenerationId))
-            .WithErrorMessage("The specified AI generation does not exist.")
-            .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcard.GenerationId));
+        result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId))
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError)
+            .WithPropertyName(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId));
     }
 
     [Test]
@@ -335,7 +356,7 @@ public class CreateFlashcardsRequestValidatorTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.Flashcard>
+            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
             {
                 new() { Front = "Front", Back = "Back", Source = FlashcardSource.AIFull, GenerationId = 2 }
             }
@@ -345,8 +366,8 @@ public class CreateFlashcardsRequestValidatorTests
         var result = await _validator.TestValidateAsync(request);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.Flashcard.GenerationId))
-            .WithErrorMessage("The specified AI generation does not exist.")
-            .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcard.GenerationId));
+        result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId))
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError)
+            .WithPropertyName(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId));
     }
 }
