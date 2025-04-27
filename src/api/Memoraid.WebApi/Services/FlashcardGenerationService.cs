@@ -3,7 +3,6 @@ using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Responses;
-using Memoraid.WebApi.Validation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,13 +17,14 @@ public interface IFlashcardGenerationService
 
 public class FlashcardGenerationService : IFlashcardGenerationService
 {
-    private readonly GenerateFlashcardsRequestValidator _validator = new();
     private readonly Random _rng = new();
     private readonly MemoraidDbContext _dbContext;
+    private readonly IValidator<GenerateFlashcardsRequest> _validator;
 
-    public FlashcardGenerationService(MemoraidDbContext dbContext)
+    public FlashcardGenerationService(MemoraidDbContext dbContext, IValidator<GenerateFlashcardsRequest> validator)
     {
         _dbContext = dbContext;
+        _validator = validator;
     }
 
     public async Task<GenerateFlashcardsResponse> GenerateFlashcardsAsync(GenerateFlashcardsRequest request)

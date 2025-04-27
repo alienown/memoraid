@@ -9,6 +9,7 @@ services:
     depends_on:
       - database
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
 
   database:
@@ -24,6 +25,18 @@ services:
       context: ./src/database/migrations
     depends_on:
       - database
+    environment:
+      POSTGRES_HOST: database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: P@ssword1
+      POSTGRES_DB: memoraid
+      
+  test-data-seed:
+    build:
+      context: ./src/database/test-data-seed
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: postgres

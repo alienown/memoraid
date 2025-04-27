@@ -11,7 +11,9 @@ public class GenerateFlashcardsRequestValidator : AbstractValidator<GenerateFlas
     public GenerateFlashcardsRequestValidator()
     {
         RuleFor(x => x.SourceText)
-            .NotEmpty().WithMessage(string.Format(REQUIRED, SourceTextFieldName))
-            .MaximumLength(10000).WithMessage(string.Format(MAX_LENGTH, SourceTextFieldName, 10000));
+            .NotEmpty()
+            .WithMessage(string.Format(REQUIRED, SourceTextFieldName))
+            .MaximumLength(10000)
+            .WithMessage(string.Format(MAX_LENGTH, SourceTextFieldName, 10000));
     }
 }

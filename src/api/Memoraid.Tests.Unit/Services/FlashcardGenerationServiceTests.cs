@@ -2,6 +2,7 @@ using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Services;
+using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
 using Shouldly;
 using System;
@@ -25,7 +26,8 @@ public class FlashcardGenerationServiceTests
             .Options;
 
         _dbContext = new MemoraidDbContext(options);
-        _service = new FlashcardGenerationService(_dbContext);
+
+        _service = new FlashcardGenerationService(_dbContext, new GenerateFlashcardsRequestValidator());
     }
 
     [TearDown]
@@ -50,7 +52,7 @@ public class FlashcardGenerationServiceTests
 
         var log = _dbContext.FlashcardAIGenerations.FirstOrDefault(g => g.Id == response.GenerationId);
         log.ShouldNotBeNull();
-        // assert user ID once we got auth
+        // TODO: assert user ID once we got auth
         log.AIModel.ShouldNotBeNullOrEmpty();
         log.SourceText.ShouldBe("Valid text");
         log.AcceptedEditedFlashcardsCount.ShouldBeNull();

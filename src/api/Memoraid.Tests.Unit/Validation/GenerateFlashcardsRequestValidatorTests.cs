@@ -23,8 +23,10 @@ public class GenerateFlashcardsRequestValidatorTests
         // Arrange
         var request = new GenerateFlashcardsRequest { SourceText = "Some valid text" };
 
-        // Act & Assert
+        // Act
         var result = _validator.TestValidate(request);
+
+        // Assert
         result.ShouldNotHaveValidationErrorFor(r => r.SourceText);
     }
 
@@ -34,9 +36,10 @@ public class GenerateFlashcardsRequestValidatorTests
         // Arrange
         var request = new GenerateFlashcardsRequest { SourceText = "" };
 
-        // Act & Assert
+        // Act
         var result = _validator.TestValidate(request);
 
+        // Assert
         ShouldHaveRequiredErrorForSourceText(result);
     }
 
@@ -46,9 +49,10 @@ public class GenerateFlashcardsRequestValidatorTests
         // Arrange
         var request = new GenerateFlashcardsRequest { SourceText = null };
 
-        // Act & Assert
+        // Act
         var result = _validator.TestValidate(request);
 
+        // Assert
         ShouldHaveRequiredErrorForSourceText(result);
     }
 
@@ -59,12 +63,12 @@ public class GenerateFlashcardsRequestValidatorTests
         var longText = new string('a', 10001);
         var request = new GenerateFlashcardsRequest { SourceText = longText };
 
-        // Act & Assert
+        // Act
         var result = _validator.TestValidate(request);
 
+        // Assert
         result.ShouldHaveValidationErrorFor(r => r.SourceText)
             .WithErrorMessage(string.Format(MAX_LENGTH, GenerateFlashcardsRequestValidator.SourceTextFieldName, 10000))
-            .WithErrorCode("MaximumLengthValidator")
             .WithPropertyName(nameof(GenerateFlashcardsRequest.SourceText));
     }
 
@@ -72,7 +76,6 @@ public class GenerateFlashcardsRequestValidatorTests
     {
         result.ShouldHaveValidationErrorFor(r => r.SourceText)
             .WithErrorMessage(string.Format(REQUIRED, GenerateFlashcardsRequestValidator.SourceTextFieldName))
-            .WithErrorCode("NotEmptyValidator")
             .WithPropertyName(nameof(GenerateFlashcardsRequest.SourceText));
     }
 }

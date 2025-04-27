@@ -80,7 +80,7 @@
         {
           "front": "string, required, max 500 chars",
           "back": "string, required, max 200 chars",
-          "source": "string, required, one of ['Manual', 'AIFull', 'AIEdited']",
+          "source": "enum, required, one of ['Manual', 'AIFull', 'AIEdited']",
           "generationId": "big integer, optional, required if source is 'AIFull' or 'AIEdited', should be null if source is 'Manual'. The generationId must be the same for all AI-generated flashcards in the request."
         },
       // ... additional flashcards ...

@@ -10,9 +10,23 @@
  * ---------------------------------------------------------------
  */
 
+export interface CreateFlashcardsRequest {
+  flashcards?: Flashcard[] | null;
+}
+
+export interface Flashcard {
+  front?: string | null;
+  back?: string | null;
+  source?: NullableOfFlashcardSource;
+  /** @format int64 */
+  generationId?: number | null;
+}
+
 export interface GenerateFlashcardsRequest {
   sourceText?: string | null;
 }
+
+export type NullableOfFlashcardSource = number | null;
 
 export type QueryParamsType = Record<string | number, any>;
 export type ResponseFormat = keyof Omit<Body, "body" | "bodyUsed">;
@@ -66,7 +80,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:5247";
+  public baseUrl: string = "http://[::]:8080";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -261,7 +275,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title Memoraid.WebApi | v1
  * @version 1.0.0
- * @baseUrl http://localhost:5247
+ * @baseUrl http://[::]:8080
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -280,6 +294,25 @@ export class Api<
     ) =>
       this.request<void, any>({
         path: `/flashcards/generate`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name CreateFlashcards
+     * @request POST:/flashcards
+     */
+    createFlashcards: (
+      data: CreateFlashcardsRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/flashcards`,
         method: "POST",
         body: data,
         type: ContentType.Json,
