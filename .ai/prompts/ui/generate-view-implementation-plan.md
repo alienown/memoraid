@@ -1,129 +1,163 @@
-As a senior frontend developer, your job is to create a detailed plan for implementing a new view in a web application. This plan should be comprehensive and clear enough for another frontend developer to implement the view correctly and efficiently.
-
-First, review the following information:
-
-1. Product Requirements Document (PRD):
-<prd>
-{{prd}} <- replace with a reference to the @prd.md file
-</prd>
-
-2. View Description:
-<view_description>
-{{view-description}} <- paste the description of the implemented view from ui-plan.md
-</view_description>
-
-3. User Stories:
-<user_stories>
-{{user-stories}} <- paste the user stories from @prd.md that will be addressed by the view
-</user_stories>
-
-4. Endpoint Description:
-<endpoint_description>
-{{endpoint-description}} <- paste the descriptions of the endpoints from api-plan.md that the view will use
-</endpoint_description>
-
-5. Backend API HTTP Client & Type definitions:
-<endpoint_implementation>
-{{http-client-and-type-definitions}} <- replace with a reference to the http client and type definitions
-</endpoint_implementation>
-
-6. Tech Stack:
-<tech_stack>
-{{tech-stack}} <- replace with a reference to the @tech-stack.md file
-</tech_stack>
-
-Before creating the final implementation plan, do some analysis and planning inside the <implementation_breakdown> tags in your thinking block. This section can be quite long because it's important to be thorough.
-
-In your implementation breakdown, do the following:
-
-1. For each input section (PRD, User Stories, Endpoint Description, Backend API HTTP Client & Type Definitions, Tech Stack):
-  - Summarize key points
-  - List any requirements or constraints
-  - Highlight any potential challenges or important issues
-2. Extract and list key requirements from the PRD
-3. List all the major components needed, along with a brief description of their description, types needed, supported events, and validation conditions
-4. Create a high-level component tree diagram
-5. Identify the required DTOs and custom ViewModel types for each view component. Explain these new types in detail, breaking down their fields and related types.
-6. Identify potential state variables and custom hooks, explaining their purpose and how they are used
-7. List required API calls and their corresponding frontend actions
-8. Map each user story to specific implementation details, components, or functions
-9. List user interactions and their expected outcomes
-10. List the conditions required by the API and how to verify them at the component level
-11. Identify potential error scenarios and suggest how to handle them
-12. List potential challenges in implementing this view and suggest possible solutions
-
-After conducting the analysis, deliver an implementation plan in Markdown format with the following sections:
-
-1. Overview: A brief summary of the view and its purpose.
-2. View routing: Defining the path along which the view should be accessible.
-3. Component structure: Outline the main components and their hierarchy.
-4. Component Details: For each component, describe:
-  - Description of the component, its purpose, and what it consists of
-  - Main HTML elements and child components that build the component
-  - Events handled
-  - Validation conditions (detailed conditions, according to the API)
-  - Types (DTOs and ViewModels) required by the component
-  - Props that the component accepts from the parent (component interface)
-5. Types: Detailed description of the types required to implement the view, including a detailed breakdown of any new types or view models by fields and types.
-6. State Management: Detailed description of how state is managed in the view, whether a custom hook is required.
-7. API Integration: Explain how to integrate with the provided endpoint. Precisely indicate the types of request and response.
-8. User Interactions: Detailed description of user interactions and how they are handled.
-9. Conditions and Validation: Describe what conditions are validated by the interface, which components they apply to, and how they affect the state of the interface
-10. Error Handling: Describe how to handle potential errors or edge cases.
-11. Implementation Steps: Step-by-step guide to implementing the view.
-
-Make sure your plan is consistent with the PRD, user stories, and takes into account the provided technology stack.
-
-The final results should be in English and written in a file named .ai/ui/{view-name}-view-implementation-plan.md. Do not include any analysis or planning in the final result.
-
-Here is an example of what the output file should look like (content is replaceable):
-
-```markdown
-# View Implementation Plan [View Name]
+# View Implementation Plan: Flashcard Generation
 
 ## 1. Overview
-[A short description of the view and its purpose]
+This view allows authenticated users to paste a block of text (up to 10,000 characters) to generate flashcards via AI. Users can review generated flashcards, accept or reject individual cards, and modify flashcards via an inline edit modal before submitting all accepted cards.
 
 ## 2. View Routing
-[The path where the view should be available]
+- URL Path: `/generate`
 
 ## 3. Component Structure
-[Outline of the main components and their hierarchy]
+- **GenerateView** (page-level container)
+  - **TextArea**: Large textarea for pasting text.
+  - **GenerateFlashcardsButton**: Triggers AI generation via the API.
+  - **FlashcardList**: Displays flashcard cards generated by the AI.
+    - **FlashcardListItem**: Represents each flashcard with "Front" and "Back" along with Accept, Reject, and Edit controls.
+  - **EditFlashcardModal**: Modal dialog to edit flashcard details.
+  - **SubmitFlashcardsButton**: Bulk save accepted flashcards.
+  - **ToastNotifications**: Displays success/error messages.
 
 ## 4. Component Details
-### [Component Name 1]
-- Component Description [description]
-- Main Elements: [description]
-- Supported Interactions: [list]
-- Supported Validation: [list, detailed]
-- Types: [list]
-- Props: [list]
 
-### [Component Name 2]
-[...]
+### GenerateView
+- **Description:** Main container managing state for source text, generated flashcards, accepted cards, and modal visibility.
+- **Main Elements:** TextArea, FlashcardList, Buttons (including GenerateFlashcardsButton, and SubmitFlashcardsButton), EditFlashcardModal.
+- **Events:**: this component will react for the following events of its children:
+  - On text input change, update local state.
+  - On accept/reject/edit actions, update flashcards state:
+    - Accept: mark flashcard as accepted.
+    - Reject: remove flashcard from the list.
+    - Edit: update flashcard in the list with new values.
+  - On “Generate” click, call the generate API.
+  - On “Submit flashcards” click, call the create flashcards API.
+- **Validation:** Text length up to 10,000 characters.
+- **Types:** `GeneratedFlashcardData` (custom type defined by the component that includes fields such as: `front` and `back` and `source` enum, `generationId`, and `isAccepted` flag). Also the component will use `CreateFlashcardsRequest` and `GenerateFlashcardsRequest`, `ResponseOfGenerateFlashcardsResponse`, and `Response` for API calls.
+- **Props:** None (top-level page component).
+
+### TextArea
+- **Description:** A textarea for pasting user text.
+- **Main Elements:** `<textarea>`.
+- **Events:** OnChange to call the onChange handler with the new value
+- **Validation:** Limit input to 10,000 characters. Validation handled by the parent component (GenerateView).
+- **Types:** Simple string.
+- **Props:** Value, onChange handler.
+
+### GenerateFlashcardsButton
+- **Description:** Button to trigger flashcard generation.
+- **Main Elements:** A single button element.
+- **Events:** OnClick calls onGenerate handler.
+- **Validation:** none
+- **Types:** none
+- **Props:** onGenerate handler, isDisabled flag - to disable when API call is in progress or no text in the textarea.
+
+### FlashcardList & FlashcardListItem
+- **Description:** List rendering generated flashcards; each card shows flashcard details and actions.
+- **Main Elements:** FlashcardListItems as Card UI structures with front and back text, action buttons (Accept, Reject, Edit). Back is hidden and revealed on click.
+- **Events:**
+  - Accept: called when the user clicks the Accept button
+  - Reject: called when the user clicks the Reject button
+  - Edit: opens EditFlashcardModal with the selected flashcard data
+- **Validation:** none
+- **Types:** `FlashcardListItemData` containing "front", "back", and a status flag (is accepted or not).
+- **Props:** Generated flashcards, onAccept, onReject, onEdit callbacks.
+
+### EditFlashcardModal
+- **Description:** Modal to modify a chosen flashcard.
+- **Main Elements:** Form with text inputs for front and back.
+- **Events:** 
+  - On input change.
+  - On submit, validate fields and if valid run onSave callback passing updated data to it
+- **Validation:** Front: max 500 chars, Back: max 200 chars, both required.
+- **Types:** `EditFlashcardData` (contains front and back fields).
+- **Props:** Flashcard to edit, onSave callback.
+
+### SubmitFlashcardsButton
+- **Description:** Button to submit all accepted flashcards.
+- **Main Elements:** A single button element.
+- **Events:** OnClick calls onSubmit handler.
+- **Validation:**: none
+- **Types:**: none
+- **Props:** onSubmit handler, isDisabled flag - to disable when api call is in progress or no accepted flashcards.
+
+### ToastNotifications
+- **Description:** Component to display transient messages.
+- **Main Elements:** Notification container.
+- **Events:** Auto-dismiss after a timeout.
+- **Validation:** None.
+- **Types:** Toast message model (text, type).
+- **Props:** Message text, type (success/error).
 
 ## 5. Types
-[Detailed description of required types]
+
+- **GeneratedFlashcardData:**
+  - front: string (max 500)
+  - back: string (max 200)
+  - source: 'AIFull' | 'AIEdited' (for AI-generated flashcards)
+  - generationId?: number (required for AI flashcards; same across all flashcards in a session)
+  - isAccepted: boolean (flag for accepted cards)
+
+- **FlashcardListItemData:**
+  - front: string (max 500)
+  - back: string (max 200)
+  - isAccepted: boolean (flag for accepted cards)
+
+- **EditFlashcardData:**  
+  - front: string (required, max 500)
+  - back: string (required, max 200)
+
+- **CreateFlashcardsRequest:**: a type from `api.ts` that contains the request body for creating flashcards.
+
+- **GenerateFlashcardsRequest:**: a type from `api.ts` that contains the request body for generating flashcards.
+
+- **ResponseOfGenerateFlashcardsResponse:**: a type from `api.ts` that contains the response body for generating flashcards.
+
+- **Response:**: a type from `api.ts` that contains the response body for creating flashcards.
 
 ## 6. State Management
-[Description of state management in the view]
+- **Local State Variables:**
+  - sourceText (string)
+  - generatedFlashcards (GeneratedFlashcardData[])
+  - modalState (object containing isOpen flag and flashcard to edit)
+  - loading & error flags for API calls
+- **Custom Hooks:**
+  - useFlashcardGeneration for handling API calls and flashcard state management.
+  - useModal for managing the edit modal open/close state.
 
 ## 7. API Integration
-[Explaining the integration with the provided endpoint, indicating the types of request and response]
+- **Generate Flashcards API (POST /flashcards/generate)**
+  - Request Type: `GenerateFlashcardsRequest`
+  - Response Type: `ResponseOfGenerateFlashcardsResponse`
+- **Create Flashcards API (POST /flashcards)**
+  - Request Type: `CreateFlashcardsRequest`
+  - Response Type: `Response`
+- Integration via the provided `api.ts` HTTP client with method calls respectively.
 
 ## 8. User Interactions
-[Detailed description of user interactions]
+- User enters text into the textarea; The textarea is limited to 10,000 characters with inline validation.
+- On clicking “Generate”, a loading state is triggered and the generate API is called; flashcards are populated on success.
+- Users review generated cards:
+  - Accepting sets a flag in the flashcard state.
+  - Rejecting removes the card from the list.
+  - Editing opens the modal where the fields can be updated. Upon saving, changes update the corresponding card.
+- Clicking “Submit flashcards” sends only accepted flashcards to the create API. Appropriate toasts are shown on success or failure.
 
 ## 9. Conditions and Validation
-[Detailed description of conditions and their validation]
+- TextArea: Maximum 10,000 characters. Required field.
+- Edit Modal: Ensure “Front” not exceeding 500 characters, “Back” not exceeding 200 characters. Both fields are required.
+- Inline error messaging for validation issues immediately.
 
-## 10. Handling errors
-[Description of handling potential errors]
+## 10. Handling Errors
+- Display toast notifications for server errors.
+- Show inline error messages next to the text area or modal fields if validation fails.
+- Handle network/API errors with a toast message and reset loading state (enable buttons again).
 
-## 11. Implementation steps
-1. [Step 1]
-2. [Step 2]
-3. [...]
-```
-
-Start analyzing and planning now. Your final output should consist solely of an implementation plan in English in markdown format, which you will save in the file .ai/ui/{view-name}-view-implementation-plan.md and should not duplicate or repeat any work done in the implementation split.
+## 11. Implementation Steps
+1. Create a new route `/generate` that renders the GenerateView component.
+2. Build the GenerateView component with local state for text, flashcards, and modal visibility.
+3. Implement TextArea ensuring character limit validation.
+4. Integrate a button that calls the generate API using the provided API client; update flashcard list state upon success.
+5. Render the FlashcardList component, mapping each flashcard to a FlashcardListItem component.
+6. Add inline Accept, Reject, and Edit controls in each FlashcardListItem to update state.
+7. Implement the EditFlashcardModal with form validation; on submission, update the corresponding flashcard state.
+8. Add the SubmitFlashcardsButton that when clicked, will trigger posting accepted flashcards using the create API.
+9. Integrate ToastNotifications for feedback success or error messages.
+10. Write unit tests (using Vitest/React Testing Library) to validate interactions, state updates, and API integration.
