@@ -19,7 +19,7 @@ A modular React-based UI utilizing functional components, hooks, shadcn/ui for r
   - **Key View Components:** Input fields, Button, Form, Toast notifications for success/error messages.
   - **UX, Accessibility, and Security Considerations:** Clear form validations, accessible labels, HTTPS secure submissions.
 
-- **AI Flashcard Generation**
+- **Flashcard Generation**
   - **View Path:** /generate
   - **Primary Purpose:** Allow users to paste text (up to 10000 characters) and generate flashcards via AI.
   - **Key Information to Display:** Large text input, dynamically generated flashcards with “Front” and “Back” fields, and possibility to inline Accept/Reject/Edit options. Edit option opens a Modal that contains form with two fields "front" (max 500 characters) and "back" (max 200 characters). One button "Submit flashcards" to bulk save all accepted flashcards.

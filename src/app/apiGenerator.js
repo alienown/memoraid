@@ -7,7 +7,7 @@ try {
     fileName: "api.ts",
     url: "http://localhost:5247/openapi/v1.json",
     output: path.join(process.cwd(), "src", "api"),
-    httpClientType: "fetch"
+    httpClientType: "fetch",
   });
 
   console.log("API generated successfully!");

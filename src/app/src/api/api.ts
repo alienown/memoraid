@@ -10,7 +10,7 @@
  * ---------------------------------------------------------------
  */
 
-export enum NullableOfFlashcardSource {
+export enum FlashcardSource {
   Manual = "Manual",
   AIFull = "AIFull",
   AIEdited = "AIEdited",
@@ -19,7 +19,7 @@ export enum NullableOfFlashcardSource {
 export interface CreateFlashcardData {
   front?: string | null;
   back?: string | null;
-  source?: NullableOfFlashcardSource;
+  source?: FlashcardSource;
   /** @format int64 */
   generationId?: number | null;
 }

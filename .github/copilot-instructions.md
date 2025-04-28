@@ -87,6 +87,7 @@ The application uses a PostgreSQL database.
       - /ui: shadcn components
     - /pages: page components
     - /lib: code used by third-party libraries and APIs
+    - /api/api.ts: contains HTTP client code for making backend API calls along with the API DTO types
 
 ## Guidelines for REACT
 
