@@ -83,7 +83,7 @@ The application uses a PostgreSQL database.
 - /src/app: root directory containing source code and configuration files for the React application
   - /src: the actual source code for the application
     - /assets: static assets like images and fonts
-    - /components: contains reusable components
+    - /components: contains reusable components across different pages
       - /ui: shadcn components
     - /pages: page components
     - /lib: code used by third-party libraries and APIs

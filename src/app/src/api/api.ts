@@ -113,7 +113,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:5247";
+  public baseUrl: string = "http://localhost:7000";
   private securityData: SecurityDataType | null = null;
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"];
   private abortControllers = new Map<CancelToken, AbortController>();
@@ -308,7 +308,7 @@ export class HttpClient<SecurityDataType = unknown> {
 /**
  * @title Memoraid.WebApi | v1
  * @version 1.0.0
- * @baseUrl http://localhost:5247
+ * @baseUrl http://localhost:7000
  */
 export class Api<
   SecurityDataType extends unknown,

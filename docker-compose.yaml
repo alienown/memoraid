@@ -5,7 +5,7 @@ services:
       dockerfile: ./Memoraid.WebApi/Dockerfile
     container_name: api
     ports:
-      - "5247:8080"
+      - "7000:8080"
     depends_on:
       - database
     environment:
@@ -18,7 +18,7 @@ services:
     environment:
       POSTGRES_PASSWORD: P@ssword1
     ports:
-      - "5432:5432"
+      - "7001:5432"
       
   migrations:
     build:

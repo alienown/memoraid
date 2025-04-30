@@ -9,6 +9,7 @@ using Memoraid.WebApi.Responses;
 using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,20 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:7003")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddOpenApi(options =>
 {
-    options.AddSchemaTransformer<ResponseSchemaTransformer>()
+    options.AddDocumentTransformer<DocumentTransformer>()
+        .AddSchemaTransformer<ResponseSchemaTransformer>()
         .AddSchemaTransformer<NonNullableEnumSchemaTransformer>();
 });
 
@@ -45,6 +57,8 @@ builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcards
 var app = builder.Build();
 
 app.UseMiddleware<FluentValidationExceptionMiddleware>();
+
+app.UseCors();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

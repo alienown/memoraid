@@ -1,9 +1,13 @@
 import "./App.css";
+import { Toaster } from "./components/ui/sonner";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./lib/router";
 
 function App() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
+      <RouterProvider router={router} />
+      <Toaster />
     </>
   );
 }

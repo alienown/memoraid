@@ -5,7 +5,7 @@ import { generateApi } from "swagger-typescript-api";
 try {
   await generateApi({
     fileName: "api.ts",
-    url: "http://localhost:5247/openapi/v1.json",
+    url: "http://localhost:7000/openapi/v1.json",
     output: path.join(process.cwd(), "src", "api"),
     httpClientType: "fetch",
   });
