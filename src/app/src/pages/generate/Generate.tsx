@@ -125,7 +125,9 @@ const Generate = () => {
   // Function to handle rejecting a flashcard
   const handleRejectFlashcard = (index: number) => {
     setGeneratedFlashcards((currentCards) =>
-      currentCards.filter((_, i) => i !== index)
+      currentCards.map((card, i) =>
+        i === index ? { ...card, isAccepted: false } : card
+      )
     );
   };
 
@@ -230,7 +232,7 @@ const Generate = () => {
   ).length;
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
+    <div className="container mx-auto p-4 max-w-7xl">
       <h1 className="text-3xl font-bold mb-6">Generate Flashcards</h1>
 
       <div className="mb-6 space-y-2">
@@ -261,7 +263,7 @@ const Generate = () => {
       </Button>
 
       {generatedFlashcards.length > 0 && (
-        <div className="mb-6">
+        <div className="mb-6 w-full">
           <FlashcardList
             flashcards={generatedFlashcards}
             onAccept={handleAcceptFlashcard}

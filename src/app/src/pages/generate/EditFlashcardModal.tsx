@@ -84,7 +84,7 @@ export function EditFlashcardModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[900px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Edit Flashcard</DialogTitle>
@@ -100,7 +100,7 @@ export function EditFlashcardModal({
                 value={front}
                 onChange={handleFrontChange}
                 placeholder="Enter the question or term (max 500 characters)"
-                className="resize-y"
+                className="resize-y h-30"
                 maxLength={500}
               />
               {frontError && (

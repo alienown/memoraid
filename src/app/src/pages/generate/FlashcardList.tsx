@@ -32,18 +32,19 @@ export function FlashcardList({
         Generated Flashcards ({flashcards.length})
       </h2>
 
-      {flashcards.map((card, index) => (
-        <FlashcardListItem
-          key={index}
-          front={card.front}
-          back={card.back}
-          source={card.source}
-          isAccepted={card.isAccepted}
-          onAccept={() => onAccept(index)}
-          onReject={() => onReject(index)}
-          onEdit={() => onEdit(index)}
-        />
-      ))}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {flashcards.map((card, index) => (
+          <FlashcardListItem
+            key={index}
+            front={card.front}
+            back={card.back}
+            isAccepted={card.isAccepted}
+            onAccept={() => onAccept(index)}
+            onReject={() => onReject(index)}
+            onEdit={() => onEdit(index)}
+          />
+        ))}
+      </div>
     </div>
   );
 }

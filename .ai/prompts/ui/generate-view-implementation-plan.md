@@ -25,7 +25,7 @@ This view allows authenticated users to paste a block of text (up to 10,000 char
   - On text input change, update local state.
   - On accept/reject/edit actions, update flashcards state:
     - Accept: mark flashcard as accepted.
-    - Reject: remove flashcard from the list.
+    - Reject: mark flashcard as not accepted.
     - Edit: update flashcard in the list with new values.
   - On “Generate” click, call the generate API.
   - On “Submit flashcards” click, call the create flashcards API.
@@ -135,8 +135,8 @@ This view allows authenticated users to paste a block of text (up to 10,000 char
 - User enters text into the textarea; The textarea is limited to 10,000 characters with inline validation.
 - On clicking “Generate”, a loading state is triggered and the generate API is called; flashcards are populated on success.
 - Users review generated cards:
-  - Accepting sets a flag in the flashcard state.
-  - Rejecting removes the card from the list.
+  - Accepting sets a flag in the flashcard state (isAccepted = true).
+  - Rejecting sets a flag in the flashcard state (isAccepted = false).
   - Editing opens the modal where the fields can be updated. Upon saving, changes update the corresponding card.
 - Clicking “Submit flashcards” sends only accepted flashcards to the create API. Appropriate toasts are shown on success or failure.
 
