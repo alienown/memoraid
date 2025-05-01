@@ -7,6 +7,8 @@ using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Moq;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,7 @@ public class FlashcardServiceTests
     private FlashcardService _flashcardService;
     private MemoraidDbContext _dbContext;
     private IValidator<CreateFlashcardsRequest> _validator;
+    private Mock<IFlashcardGenerationService> _mockFlashcardGenerationService;
 
     [SetUp]
     public async Task Setup()
@@ -28,6 +31,7 @@ public class FlashcardServiceTests
         var options = new DbContextOptionsBuilder<MemoraidDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
             .AddInterceptors(new SaveEntityBaseInterceptor())
+            .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
         _dbContext = new MemoraidDbContext(options);
@@ -43,8 +47,13 @@ public class FlashcardServiceTests
         await _dbContext.SaveChangesAsync();
 
         _validator = new CreateFlashcardsRequestValidator(_dbContext);
+        
+        _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
+        _mockFlashcardGenerationService
+            .Setup(s => s.UpdateGenerationMetricsAsync(It.IsAny<IEnumerable<long>>()))
+            .Returns(Task.CompletedTask);
 
-        _flashcardService = new FlashcardService(_dbContext, _validator);
+        _flashcardService = new FlashcardService(_dbContext, _validator, _mockFlashcardGenerationService.Object);
     }
 
     [TearDown]
@@ -54,17 +63,17 @@ public class FlashcardServiceTests
     }
 
     [Test]
-    public async Task CreateFlashcardsAsync_Should_SaveFlashcardsOfManualAndAISources_When_GenerationWithGivenIdExists()
+    public async Task CreateFlashcardsAsync_Should_SaveFlashcardsOfManualAndAISourcesAndUpdateGenerationMetrics_When_ValidData()
     {
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
-            {
+            Flashcards =
+            [
                 new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.Manual },
                 new() { Front = "Front2", Back = "Back2", Source = FlashcardSource.AIFull, GenerationId = 123 },
                 new() { Front = "Front3", Back = "Back3", Source = FlashcardSource.AIEdited, GenerationId = 123 }
-            }
+            ]
         };
 
         // Act
@@ -98,6 +107,10 @@ public class FlashcardServiceTests
         aiEditedFlashcard.FlashcardAIGenerationId.ShouldBe(123);
         // TODO: assert user ID once we got auth
         aiEditedFlashcard.UserId.ShouldBe(1);
+        
+        _mockFlashcardGenerationService.Verify(
+            s => s.UpdateGenerationMetricsAsync(It.Is<IEnumerable<long>>(ids => ids.Contains(123))), 
+            Times.Once);
     }
 
     [Test]
@@ -106,14 +119,36 @@ public class FlashcardServiceTests
         // Arrange
         var request = new CreateFlashcardsRequest
         {
-            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
-            {
+            Flashcards =
+            [
                 new() { Front = "Front", Back = null, Source = FlashcardSource.Manual }
-            }
+            ]
         };
 
         // Act & Assert
         Should.ThrowAsync<ValidationException>(() =>
             _flashcardService.CreateFlashcardsAsync(request));
+    }
+    
+    [Test]
+    public async Task CreateFlashcardsAsync_Should_NotCallUpdateGenerationMetrics_When_NoGenerationIdsExist()
+    {
+        // Arrange
+        var request = new CreateFlashcardsRequest
+        {
+            Flashcards =
+            [
+                new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.Manual },
+                new() { Front = "Front2", Back = "Back2", Source = FlashcardSource.Manual }
+            ]
+        };
+
+        // Act
+        await _flashcardService.CreateFlashcardsAsync(request);
+
+        // Assert
+        _mockFlashcardGenerationService.Verify(
+            s => s.UpdateGenerationMetricsAsync(It.IsAny<IEnumerable<long>>()),
+            Times.Never);
     }
 }

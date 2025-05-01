@@ -16,7 +16,6 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
     internal const string InvalidSourceError = "Source must be one of: Manual, AIFull, or AIEdited.";
     internal const string GenerationIdMustBeNullForFlashcardsWithManualSource = "GenerationId must be null for manually created flashcards.";
     internal const string GenerationIdMustBeGreaterThanZeroError = "GenerationId must be greater than zero.";
-    internal const string GenerationIdsForAIGeneratedFlashcardsMustBeTheSame = "All AI-generated flashcards must have the same generationId.";
     internal const string GenerationNotExistsError = "The specified AI generation does not exist.";
 
     private readonly MemoraidDbContext _dbContext;
@@ -33,30 +32,7 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
             .SetValidator(new FlashcardValidator());
 
         RuleFor(x => x)
-            .Custom(ValidateAIFlashcardsHaveSameGenerationId);
-
-        RuleFor(x => x)
             .CustomAsync(ValidateAIFlashcardGenerationExistsAsync);
-    }
-
-    private void ValidateAIFlashcardsHaveSameGenerationId(CreateFlashcardsRequest request, ValidationContext<CreateFlashcardsRequest> context)
-    {
-        if (request.Flashcards == null || !request.Flashcards.Any())
-            return;
-
-        var aiFlashcards = request.Flashcards.Where(f =>
-            f.Source == FlashcardSource.AIFull ||
-            f.Source == FlashcardSource.AIEdited).ToList();
-
-        if (!aiFlashcards.Any())
-            return;
-
-        var generationIds = aiFlashcards.Select(f => f.GenerationId).Distinct().ToList();
-
-        if (generationIds.Count > 1)
-        {
-            context.AddFailure(nameof(request.Flashcards), GenerationIdsForAIGeneratedFlashcardsMustBeTheSame);
-        }
     }
 
     private async Task ValidateAIFlashcardGenerationExistsAsync(

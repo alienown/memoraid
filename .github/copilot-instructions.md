@@ -72,9 +72,11 @@ The application uses a PostgreSQL database.
 
 ### Testing
   - Write unit tests using NUnit
-  - Use Moq for mocking dependencies in unit tests
+  - We are using EF Core InMemory database for unit tests
+  - If necessary, use Moq for mocking dependencies in unit tests
   - In each test write the Arrange, Act, Assert comments for clarity
-  - Use Shouldly for assertions
+  - Use Shouldly package for assertions
+  - Use the following naming convention for test methods: TestedMethodName_Should_WhatShoudBeDone_When_UnderWhatCondition
 
 # Frontend
 

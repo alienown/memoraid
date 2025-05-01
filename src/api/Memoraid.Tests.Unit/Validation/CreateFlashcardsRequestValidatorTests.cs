@@ -308,28 +308,6 @@ public class CreateFlashcardsRequestValidatorTests
     }
 
     [Test]
-    public async Task Validate_Should_HaveError_When_AIFlashcardsHaveDifferentGenerationIds()
-    {
-        // Arrange
-        var request = new CreateFlashcardsRequest
-        {
-            Flashcards = new List<CreateFlashcardsRequest.CreateFlashcardData>
-            {
-                new() { Front = "Front1", Back = "Back1", Source = FlashcardSource.AIFull, GenerationId = 1 },
-                new() { Front = "Front2", Back = "Back2", Source = FlashcardSource.AIEdited, GenerationId = 3 }
-            }
-        };
-
-        // Act
-        var result = await _validator.TestValidateAsync(request);
-
-        // Assert
-        result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.Flashcards))
-            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdsForAIGeneratedFlashcardsMustBeTheSame)
-            .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcards));
-    }
-
-    [Test]
     public async Task Validate_Should_HaveError_When_AIGenerationDoesNotExist()
     {
         // Arrange
