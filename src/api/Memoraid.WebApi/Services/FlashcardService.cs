@@ -12,7 +12,7 @@ public interface IFlashcardService
     Task CreateFlashcardsAsync(CreateFlashcardsRequest request);
 }
 
-public class FlashcardService : IFlashcardService
+internal class FlashcardService : IFlashcardService
 {
     private readonly MemoraidDbContext _dbContext;
     private readonly IValidator<CreateFlashcardsRequest> _validator;

@@ -16,6 +16,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +48,13 @@ builder.Services.AddDbContext<MemoraidDbContext>(options =>
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+
+builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>((serviceProvider, client) =>
+{
+    var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ApplicationOptions>>().Value;
+    client.BaseAddress = new Uri(options.OpenRouter.ApiBaseUrl);
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();

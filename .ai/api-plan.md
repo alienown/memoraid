@@ -159,7 +159,7 @@
 - **Business Logic Implementation:**
   - User account actions (register, login, password change, deletion) include secure handling and encrypted password storage.
   - Flashcard creation and editing enforce input validation via FluentValidation.
-  - AI flashcard generation endpoint integrates with an external AI service (e.g., via Open AI API) and returns a set of candidate flashcards for review.
+  - AI flashcard generation endpoint integrates with an external AI service (e.g., via Open Router API) and returns a set of candidate flashcards for review.
   - Review allow inline acceptance/rejection or modification via an edit modal to match the PRD requirements.
   - Use pagination for list endpoints to optimize performance.
   - All endpoints return appropriate HTTP status codes (e.g., 200, 201, 400, 401, 403, 404) and error messages reflecting validation and business rule violations.

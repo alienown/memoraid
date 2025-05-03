@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.Results;
 using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Enums;
@@ -8,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Memoraid.WebApi.Services;
@@ -18,15 +20,35 @@ public interface IFlashcardGenerationService
     Task UpdateGenerationMetricsAsync(IEnumerable<long> generationIds);
 }
 
-public class FlashcardGenerationService : IFlashcardGenerationService
+internal class FlashcardGenerationService : IFlashcardGenerationService
 {
-    private readonly Random _rng = new();
+    internal const string AIModel = "openai/gpt-4o-mini";
+    internal const string GenerationPrompt = """
+        You are an expert educator specializing in creating effective flashcards for learning.
+    
+        Guidelines for creating high-quality flashcards:
+        - Create concise, clear flashcards from the provided text enclosed in <sourceText></sourceText> tags
+        - Do not use your internal knowledge or external sources for creating flashcards. Use only the provided <sourceText> and nothing else
+        - Each flashcard should have a question or concept on the front and a brief, accurate answer on the back
+        - Front side should contain a specific question, term, concept, or prompt that tests recall
+        - Back side should provide a concise, complete answer (preferably 1-3 sentences)
+        - Focus on key concepts, definitions, facts, and relationships from the source text
+        - Use simple, clear language and avoid overly complex terminology unless essential
+        - For complex topics, break them down into multiple focused flashcards
+        - Flashcards must be created in the same language as the source text
+        """;
+
     private readonly MemoraidDbContext _dbContext;
+    private readonly IOpenRouterService _openRouterService;
     private readonly IValidator<GenerateFlashcardsRequest> _validator;
 
-    public FlashcardGenerationService(MemoraidDbContext dbContext, IValidator<GenerateFlashcardsRequest> validator)
+    public FlashcardGenerationService(
+        MemoraidDbContext dbContext,
+        IOpenRouterService openRouterService,
+        IValidator<GenerateFlashcardsRequest> validator)
     {
         _dbContext = dbContext;
+        _openRouterService = openRouterService;
         _validator = validator;
     }
 
@@ -34,12 +56,12 @@ public class FlashcardGenerationService : IFlashcardGenerationService
     {
         _validator.ValidateAndThrow(request);
 
-        var flashcards = GenerateRandomFlashcards();
+        var flashcards = await GenerateFlashcardsUsingAIAsync(request.SourceText!);
 
         var generationRecord = new FlashcardAIGeneration
         {
-            UserId = 1,
-            AIModel = "Mock",
+            UserId = 1, // In a real application, this would come from authentication
+            AIModel = AIModel,
             SourceText = request.SourceText!,
             AllFlashcardsCount = flashcards.Count,
         };
@@ -50,13 +72,65 @@ public class FlashcardGenerationService : IFlashcardGenerationService
         return new GenerateFlashcardsResponse(flashcards, generationRecord.Id);
     }
 
-    private IReadOnlyList<GenerateFlashcardsResponse.GeneratedFlashcard> GenerateRandomFlashcards()
+    private async Task<IReadOnlyList<GenerateFlashcardsResponse.GeneratedFlashcard>> GenerateFlashcardsUsingAIAsync(string sourceText)
     {
-        var count = _rng.Next(3, 7);
+        var schema = JsonDocument.Parse(@"{
+            ""type"": ""object"",
+            ""properties"": {
+                ""flashcards"": {
+                    ""type"": ""array"",
+                    ""items"": {
+                        ""type"": ""object"",
+                        ""properties"": {
+                            ""front"": { ""type"": ""string"" },
+                            ""back"": { ""type"": ""string"" }
+                        },
+                        ""required"": [""front"", ""back""],
+                        ""additionalProperties"": false
+                    }
+                }
+            },
+            ""required"": [""flashcards""],
+            ""additionalProperties"": false
+        }");
 
-        return Enumerable.Range(1, count)
-            .Select(i => new GenerateFlashcardsResponse.GeneratedFlashcard($"Front mock {i}", $"Back mock {i}"))
-            .ToList();
+        var request = new CompleteWithStructuredOutputRequest
+        {
+            Model = AIModel,
+            Messages =
+            [
+                new()
+                {
+                    Role = ChatRole.System,
+                    Content = GenerationPrompt
+                },
+                new()
+                {
+                    Role = ChatRole.User,
+                    Content = $"<sourceText>{sourceText}</sourceText>"
+                }
+            ],
+            JsonSchema = new()
+            {
+                Name = "flashcardGeneration",
+                Schema = schema.RootElement
+            }
+        };
+
+        try
+        {
+            var result = await _openRouterService.CompleteWithStructuredOutputAsync<FlashcardGenerationResult>(request);
+
+            CutStringLengthsIfExceedLimits(result);
+
+            return [.. result.Flashcards.Select(f => new GenerateFlashcardsResponse.GeneratedFlashcard(f.Front, f.Back))];
+        }
+        catch (Exception)
+        {
+            throw new ValidationException(
+                "Failed to generate flashcards",
+                [new ValidationFailure() { ErrorMessage = "Failed to generate flashcards" }]);
+        }
     }
 
     public async Task UpdateGenerationMetricsAsync(IEnumerable<long> generationIds)
@@ -97,5 +171,32 @@ public class FlashcardGenerationService : IFlashcardGenerationService
         }
 
         await _dbContext.SaveChangesAsync();
+    }
+
+    private void CutStringLengthsIfExceedLimits(FlashcardGenerationResult result)
+    {
+        foreach (var flashcard in result.Flashcards)
+        {
+            if (flashcard.Front.Length > 500)
+            {
+                flashcard.Front = flashcard.Front[..500];
+            }
+
+            if (flashcard.Back.Length > 200)
+            {
+                flashcard.Back = flashcard.Back[..200];
+            }
+        }
+    }
+
+    internal class FlashcardGenerationResult
+    {
+        public required List<Flashcard> Flashcards { get; set; }
+
+        public class Flashcard
+        {
+            public required string Front { get; set; }
+            public required string Back { get; set; }
+        }
     }
 }

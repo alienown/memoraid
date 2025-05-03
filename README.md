@@ -62,11 +62,13 @@ Alternatively, you can run applications without Docker. To do that you need to i
    dotnet restore
    dotnet build
    ```
-3. Update your appsettings.json with Open AI API key
+3. Update your appsettings.json with Open AIRouter API key
    ```
    {
-    ...
-    "OpenAIApiKey": "INSERT YOUR OPEN AI API KEY HERE",
+    "OpenRouter": {
+      "ApiKey": "INSERT YOUR OPEN ROUTER API KEY HERE",
+      ...
+    },
     ...
    }
    ```

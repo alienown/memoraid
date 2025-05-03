@@ -13,9 +13,8 @@ Backend - .NET API and PostgreSQL as a database:
 - Entity Framework Core for easy database access and migrations
 - NUnit and Shouldly for testing
 
-AI - Communication with models via Open AI API:
-
-- has .NET SDK that allows for easy integration with the API
+AI - Communication with models via Open Router API:
+- single point of entry for multiple AI models
 
 CI/CD and Hosting:
 
