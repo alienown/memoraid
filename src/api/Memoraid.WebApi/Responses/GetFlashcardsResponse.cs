@@ -15,14 +15,14 @@ public class GetFlashcardsResponse
 
     public class FlashcardsListItem
     {
-        public FlashcardsListItem(int id, string front, string back)
+        public FlashcardsListItem(long id, string front, string back)
         {
             Id = id;
             Front = front;
             Back = back;
         }
 
-        public int Id { get; }
+        public long Id { get; }
         public string Front { get; }
         public string Back { get; }
     }

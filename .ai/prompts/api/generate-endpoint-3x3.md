@@ -11,7 +11,10 @@ First, review the provided implementation plan carefully:
 </types>
 
 <implementation_rules>
-{{backend-rules}} <- add references to backend rules (e.g. #shared.mdc, #backend.mdc, #astro.mdc)
+1. Reference types in request classes should stay optional even though they are required in the endpoint specification.
+2. Use FluentValidation for validating incoming requests according to the endpoint API specification.
+3. API responses should be of type Response<T> where T is the response class. Response<T> is a generic class that holds the data and errors. If there is no data to be returned, use non-generic Response class.
+4. FluentValidators should be invoked at the service level, not the API level
 </implementation_rules>
 
 <implementation_approach>

@@ -99,4 +99,4 @@ The end result should be a well-organized implementation plan in markdown format
 
 The final deliverables should consist solely of the implementation plan in markdown format and should not duplicate or repeat any of the work done in the analysis section.
 
-Be sure to save your implementation plan as .ai/api/{view}-implementation-plan.md. Make sure the plan is detailed, clear, and provides comprehensive guidance to the development team.
+Be sure to save your implementation plan as .ai/prompts/api/{view}-implementation-plan.md. Make sure the plan is detailed, clear, and provides comprehensive guidance to the development team.

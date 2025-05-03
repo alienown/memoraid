@@ -61,6 +61,7 @@ builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationServi
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcardsRequestValidator>();
+builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
 
 var app = builder.Build();
 
@@ -107,5 +108,14 @@ app.MapPost("/flashcards", async (CreateFlashcardsRequest request, IFlashcardSer
 })
 .WithName("CreateFlashcards")
 .Produces<Response>();
+
+app.MapGet("/flashcards", async ([AsParameters] GetFlashcardsRequest request, IFlashcardService flashcardService) =>
+{
+    var result = await flashcardService.GetFlashcardsAsync(request);
+
+    return Results.Ok(result);
+})
+.WithName("GetFlashcards")
+.Produces<Response<GetFlashcardsResponse>>();
 
 app.Run();

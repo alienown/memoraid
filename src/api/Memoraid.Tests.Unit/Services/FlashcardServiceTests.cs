@@ -4,6 +4,7 @@ using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Enums;
 using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
+using Memoraid.WebApi.Responses;
 using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
@@ -47,13 +48,14 @@ public class FlashcardServiceTests
         await _dbContext.SaveChangesAsync();
 
         _validator = new CreateFlashcardsRequestValidator(_dbContext);
-        
-        _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
-        _mockFlashcardGenerationService
-            .Setup(s => s.UpdateGenerationMetricsAsync(It.IsAny<IEnumerable<long>>()))
-            .Returns(Task.CompletedTask);
 
-        _flashcardService = new FlashcardService(_dbContext, _validator, _mockFlashcardGenerationService.Object);
+        _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
+
+        _flashcardService = new FlashcardService(
+            _dbContext,
+            _validator,
+            new GetFlashcardsRequestValidator(),
+            _mockFlashcardGenerationService.Object);
     }
 
     [TearDown]
@@ -75,6 +77,10 @@ public class FlashcardServiceTests
                 new() { Front = "Front3", Back = "Back3", Source = FlashcardSource.AIEdited, GenerationId = 123 }
             ]
         };
+
+        _mockFlashcardGenerationService
+            .Setup(s => s.UpdateGenerationMetricsAsync(new List<long> { 123 }))
+            .Returns(Task.CompletedTask);
 
         // Act
         await _flashcardService.CreateFlashcardsAsync(request);
@@ -107,14 +113,14 @@ public class FlashcardServiceTests
         aiEditedFlashcard.FlashcardAIGenerationId.ShouldBe(123);
         // TODO: assert user ID once we got auth
         aiEditedFlashcard.UserId.ShouldBe(1);
-        
+
         _mockFlashcardGenerationService.Verify(
-            s => s.UpdateGenerationMetricsAsync(It.Is<IEnumerable<long>>(ids => ids.Contains(123))), 
+            s => s.UpdateGenerationMetricsAsync(It.Is<IEnumerable<long>>(ids => ids.SequenceEqual(new List<long> { 123 }))),
             Times.Once);
     }
 
     [Test]
-    public void CreateFlashcardsAsync_Should_Throw_When_ValidationFails()
+    public async Task CreateFlashcardsAsync_Should_Throw_When_ValidationFails()
     {
         // Arrange
         var request = new CreateFlashcardsRequest
@@ -126,10 +132,9 @@ public class FlashcardServiceTests
         };
 
         // Act & Assert
-        Should.ThrowAsync<ValidationException>(() =>
-            _flashcardService.CreateFlashcardsAsync(request));
+        await Should.ThrowAsync<ValidationException>(() => _flashcardService.CreateFlashcardsAsync(request));
     }
-    
+
     [Test]
     public async Task CreateFlashcardsAsync_Should_NotCallUpdateGenerationMetrics_When_NoGenerationIdsExist()
     {
@@ -150,5 +155,119 @@ public class FlashcardServiceTests
         _mockFlashcardGenerationService.Verify(
             s => s.UpdateGenerationMetricsAsync(It.IsAny<IEnumerable<long>>()),
             Times.Never);
+    }
+
+    [Test]
+    public async Task GetFlashcardsAsync_Should_ReturnFlashcardsOfCurrentUserAndResultShoulBePaginated_When_PaginationParametersAreSpecified()
+    {
+        // Arrange
+        var userId = 1;
+        var flashcards = new List<Flashcard>();
+        for (int i = 0; i < 20; i++)
+        {
+            flashcards.Add(new Flashcard
+            {
+                UserId = userId,
+                Front = $"Front {i + 1}",
+                Back = $"Back {i + 1}",
+                Source = FlashcardSource.Manual,
+                CreatedOn = DateTime.UtcNow.AddMinutes(i - 19)
+            });
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            flashcards.Add(new Flashcard
+            {
+                UserId = userId + 1,
+                Front = $"Other user front {i + 1}",
+                Back = $"Other user back {i + 1}",
+                Source = FlashcardSource.Manual
+            });
+        }
+
+        await _dbContext.Flashcards.AddRangeAsync(flashcards);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new GetFlashcardsRequest
+        {
+            PageNumber = 2,
+            PageSize = 5
+        };
+
+        var expectedFlashcards = new List<GetFlashcardsResponse.FlashcardsListItem>();
+        for (int i = 14; i >= 10; i--)
+        {
+            expectedFlashcards.Add(new GetFlashcardsResponse.FlashcardsListItem(
+                flashcards[i].Id,
+                flashcards[i].Front,
+                flashcards[i].Back
+            ));
+        }
+
+        // Act
+        var result = await _flashcardService.GetFlashcardsAsync(request);
+
+        // Assert
+        ShouldHaveReturnedExpectedFlashcards(result, expectedTotalCount: 20, expectedFlashcards);
+    }
+
+    [Test]
+    public async Task GetFlashcardsAsync_Should_UseDefaultPagination_When_NoPaginationParametersSpecified()
+    {
+        // Arrange
+        var userId = 1;
+        var flashcards = new List<Flashcard>();
+        for (int i = 0; i < 20; i++)
+        {
+            flashcards.Add(new Flashcard
+            {
+                UserId = userId,
+                Front = $"Front {i + 1}",
+                Back = $"Back {i + 1}",
+                Source = FlashcardSource.Manual,
+                CreatedOn = DateTime.UtcNow.AddMinutes(i - 19)
+            });
+        }
+
+        await _dbContext.Flashcards.AddRangeAsync(flashcards);
+        await _dbContext.SaveChangesAsync();
+
+        var request = new GetFlashcardsRequest();
+
+        var expectedFlashcards = new List<GetFlashcardsResponse.FlashcardsListItem>();
+        for (int i = 19; i >= 10; i--)
+        {
+            expectedFlashcards.Add(new GetFlashcardsResponse.FlashcardsListItem(
+                flashcards[i].Id,
+                flashcards[i].Front,
+                flashcards[i].Back
+            ));
+        }
+
+        // Act
+        var result = await _flashcardService.GetFlashcardsAsync(request);
+
+        // Assert
+        ShouldHaveReturnedExpectedFlashcards(result, expectedTotalCount: 20, expectedFlashcards);
+    }
+
+    private void ShouldHaveReturnedExpectedFlashcards(Response<GetFlashcardsResponse> response, int expectedTotalCount, List<GetFlashcardsResponse.FlashcardsListItem> expectedFlashcards)
+    {
+        response.ShouldNotBeNull();
+        response.Data.ShouldNotBeNull();
+        response.Data.Total.ShouldBe(expectedTotalCount);
+        response.Data.Items.ShouldNotBeNull();
+        response.Data.Items.Count.ShouldBe(expectedFlashcards.Count);
+
+        for (int i = 0; i < response.Data.Items.Count; i++)
+        {
+            var actualFlashcard = response.Data.Items[i];
+            var expectedFlashcard = expectedFlashcards[i];
+
+            actualFlashcard.Id.ShouldBe(expectedFlashcard.Id);
+            actualFlashcard.Front.ShouldBe(expectedFlashcard.Front);
+            actualFlashcard.Back.ShouldBe(expectedFlashcard.Back);
+        }
     }
 }

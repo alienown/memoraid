@@ -18,13 +18,27 @@ internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
             {
                 if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Added)
                 {
-                    entry.Entity.CreatedOn = DateTime.UtcNow;
-                    entry.Entity.CreatedBy = "User"; // TODO: Get the current user
+                    if (entry.Entity.CreatedOn == default)
+                    {
+                        entry.Entity.CreatedOn = DateTime.UtcNow;
+                    }
+
+                    if (entry.Entity.CreatedBy == null)
+                    {
+                        entry.Entity.CreatedBy = "User"; // TODO: Get the current user
+                    }
                 }
                 else if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Modified)
                 {
-                    entry.Entity.LastModifiedOn = DateTime.UtcNow;
-                    entry.Entity.LastModifiedBy = "User"; // TODO: Get the current user
+                    if (entry.Entity.LastModifiedOn == default)
+                    {
+                        entry.Entity.LastModifiedOn = DateTime.UtcNow;
+                    }
+
+                    if (entry.Entity.LastModifiedBy == null)
+                    {
+                        entry.Entity.LastModifiedBy = "User"; // TODO: Get the current user
+                    }
                 }
             }
         }
