@@ -64,6 +64,7 @@ builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashc
 builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<long>, DeleteFlashcardRequestValidator>();
+builder.Services.AddScoped<IValidator<UpdateFlashcardRequest>, UpdateFlashcardRequestValidator>();
 
 var app = builder.Build();
 
@@ -134,6 +135,22 @@ app.MapDelete("/flashcards/{id}", async (long id, IFlashcardService flashcardSer
     return Results.NoContent();
 })
 .WithName("DeleteFlashcard")
+.Produces<Response>();
+
+app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, IFlashcardService flashcardService) =>
+{
+    var response = await flashcardService.UpdateFlashcardAsync(id, request);
+
+    if (!response.IsSuccess)
+    {
+        var flashcardNotFound = response.Errors.All(x => x.Code == IFlashcardService.ErrorCodes.FlashcardNotFound);
+
+        return flashcardNotFound ? Results.NotFound(response) : Results.UnprocessableEntity(response);
+    }
+
+    return Results.NoContent();
+})
+.WithName("UpdateFlashcard")
 .Produces<Response>();
 
 app.Run();

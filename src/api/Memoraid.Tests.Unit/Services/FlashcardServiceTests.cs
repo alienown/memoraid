@@ -27,6 +27,7 @@ public class FlashcardServiceTests
     private IValidator<CreateFlashcardsRequest> _createFlashcardsValidator;
     private IValidator<GetFlashcardsRequest> _getFlashcardsValidator;
     private IValidator<long> _deleteFlashcardValidator;
+    private IValidator<UpdateFlashcardRequest> _updateFlashcardValidator;
     private Mock<IFlashcardGenerationService> _mockFlashcardGenerationService;
 
     [SetUp]
@@ -49,18 +50,22 @@ public class FlashcardServiceTests
         });
 
         await _dbContext.SaveChangesAsync();
+        _dbContext.ChangeTracker.Clear();
 
         _createFlashcardsValidator = new CreateFlashcardsRequestValidator(_dbContext);
         _getFlashcardsValidator = new GetFlashcardsRequestValidator();
         _deleteFlashcardValidator = new DeleteFlashcardRequestValidator();
+        _updateFlashcardValidator = new UpdateFlashcardRequestValidator();
 
         _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
 
+        // Create service with all validators
         _flashcardService = new FlashcardService(
             _dbContext,
             _createFlashcardsValidator,
             _getFlashcardsValidator,
             _deleteFlashcardValidator,
+            _updateFlashcardValidator,
             _mockFlashcardGenerationService.Object);
     }
 
@@ -361,7 +366,93 @@ public class FlashcardServiceTests
         errors[0].ErrorMessage.ShouldBe(DeleteFlashcardRequestValidator.InvalidFlashcardIdMessage);
     }
 
-    private void ShouldHaveReturnedExpectedFlashcards(Response<GetFlashcardsResponse> response, int expectedTotalCount, List<GetFlashcardsResponse.FlashcardsListItem> expectedFlashcards)
+    [Test]
+    public async Task UpdateFlashcardAsync_Should_UpdateFlashcardAndReturnSuccessResponse_When_FlashcardExistsAndBelongsToTheCurrentUser()
+    {
+        // Arrange
+        var flashcard = await CreateTestFlashcard();
+
+        var request = new UpdateFlashcardRequest
+        {
+            Front = "Updated front",
+            Back = "Updated back"
+        };
+
+        // Act
+        var response = await _flashcardService.UpdateFlashcardAsync(flashcard.Id, request);
+
+        // Assert
+        response.IsSuccess.ShouldBeTrue();
+        var updatedFlashcard = await _dbContext.Flashcards.FindAsync(flashcard.Id);
+        updatedFlashcard.ShouldNotBeNull();
+        updatedFlashcard.Front.ShouldBe("Updated front");
+        updatedFlashcard.Back.ShouldBe("Updated back");
+    }
+
+    [Test]
+    public async Task UpdateFlashcardAsync_Should_ReturnErrorResponse_When_FlashcardDoesNotExist()
+    {
+        // Arrange
+        var request = new UpdateFlashcardRequest
+        {
+            Front = "Updated front",
+            Back = "Updated back"
+        };
+
+        // Act
+        var response = await _flashcardService.UpdateFlashcardAsync(id: 999, request);
+
+        // Assert
+        response.IsSuccess.ShouldBeFalse();
+        response.Errors.Length.ShouldBe(1);
+        response.Errors[0].Code.ShouldBe(IFlashcardService.ErrorCodes.FlashcardNotFound);
+        response.Errors[0].Message.ShouldBe(FlashcardService.FlashcardNotFoundMessage);
+        response.Errors[0].PropertyName.ShouldBe("id");
+    }
+
+    [Test]
+    public async Task UpdateFlashcardAsync_Should_ReturnErrorResponse_When_FlashcardBelongsToAnotherUser()
+    {
+        // Arrange
+        var otherUserFlashcardId = 2;
+        var flashcard = await CreateTestFlashcard(otherUserFlashcardId);
+
+        var request = new UpdateFlashcardRequest
+        {
+            Front = "Updated front",
+            Back = "Updated back"
+        };
+
+        // Act
+        var response = await _flashcardService.UpdateFlashcardAsync(flashcard.Id, request);
+
+        // Assert
+        response.IsSuccess.ShouldBeFalse();
+        response.Errors.Length.ShouldBe(1);
+        response.Errors[0].Code.ShouldBe(IFlashcardService.ErrorCodes.FlashcardNotFound);
+        response.Errors[0].Message.ShouldBe(FlashcardService.FlashcardNotFoundMessage);
+    }
+
+    [Test]
+    public async Task UpdateFlashcardAsync_Should_ThrowValidationException_When_ValidationFails()
+    {
+        // Arrange
+        var request = new UpdateFlashcardRequest
+        {
+            Front = "",
+            Back = "Updated back"
+        };
+
+        // Act & Assert
+        var exception = await Should.ThrowAsync<ValidationException>(() =>
+            _flashcardService.UpdateFlashcardAsync(id: 999, request));
+        var errors = exception.Errors.ToList();
+        errors.Count.ShouldBe(1);
+        errors[0].ErrorMessage.ShouldBe(string.Format(ErrorMessages.REQUIRED, nameof(UpdateFlashcardRequest.Front)));
+        errors[0].PropertyName.ShouldBe(nameof(UpdateFlashcardRequest.Front));
+    }
+
+    private static void ShouldHaveReturnedExpectedFlashcards(Response<GetFlashcardsResponse> response, int expectedTotalCount, List<GetFlashcardsResponse.FlashcardsListItem> expectedFlashcards)
     {
         response.ShouldNotBeNull();
         response.Data.ShouldNotBeNull();
@@ -378,5 +469,39 @@ public class FlashcardServiceTests
             actualFlashcard.Front.ShouldBe(expectedFlashcard.Front);
             actualFlashcard.Back.ShouldBe(expectedFlashcard.Back);
         }
+    }
+
+    private async Task<Flashcard> CreateTestFlashcard()
+    {
+        await _flashcardService.CreateFlashcardsAsync(new CreateFlashcardsRequest
+        {
+            Flashcards =
+            [
+                new() { Front = "Front", Back = "Back", Source = FlashcardSource.Manual }
+            ]
+        });
+
+        var flashcard = await _dbContext.Flashcards.SingleAsync(f => f.Front == "Front" && f.Back == "Back");
+
+        return flashcard;
+    }
+
+    private async Task<Flashcard> CreateTestFlashcard(int userId)
+    {
+        await _flashcardService.CreateFlashcardsAsync(new CreateFlashcardsRequest
+        {
+            Flashcards =
+            [
+                new() { Front = "Front", Back = "Back", Source = FlashcardSource.Manual }
+            ]
+        });
+
+        var flashcard = await _dbContext.Flashcards.SingleAsync(f => f.Front == "Front" && f.Back == "Back");
+
+        flashcard.UserId = userId;
+
+        await _dbContext.SaveChangesAsync();
+
+        return flashcard;
     }
 }

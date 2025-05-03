@@ -106,8 +106,7 @@
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
-    - 403 if unauthorized.
-    - 404 if flashcard not found
+    - 404 if flashcard not found or not owned by the user
     - 422 for business rule violations (front or back too long, etc.)
 
 - **DELETE /flashcards/{id}**

@@ -14,6 +14,7 @@ public interface IFlashcardService
     Task CreateFlashcardsAsync(CreateFlashcardsRequest request);
     Task<Response<GetFlashcardsResponse>> GetFlashcardsAsync(GetFlashcardsRequest request);
     Task<Response> DeleteFlashcardAsync(long id);
+    Task<Response> UpdateFlashcardAsync(long id, UpdateFlashcardRequest request);
 
     public static class ErrorCodes
     {
@@ -28,6 +29,7 @@ internal class FlashcardService : IFlashcardService
     private readonly IFlashcardGenerationService _flashcardGenerationService;
     private readonly IValidator<GetFlashcardsRequest>? _getFlashcardsValidator;
     private readonly IValidator<long>? _deleteFlashcardValidator;
+    private readonly IValidator<UpdateFlashcardRequest>? _updateFlashcardValidator;
 
     internal const string FlashcardNotFoundMessage = "Flashcard not found.";
 
@@ -46,12 +48,14 @@ internal class FlashcardService : IFlashcardService
         IValidator<CreateFlashcardsRequest> validator,
         IValidator<GetFlashcardsRequest> getFlashcardsValidator,
         IValidator<long>? deleteFlashcardValidator,
+        IValidator<UpdateFlashcardRequest>? updateFlashcardValidator,
         IFlashcardGenerationService flashcardGenerationService)
     {
         _dbContext = dbContext;
         _validator = validator;
         _getFlashcardsValidator = getFlashcardsValidator;
         _deleteFlashcardValidator = deleteFlashcardValidator;
+        _updateFlashcardValidator = updateFlashcardValidator;
         _flashcardGenerationService = flashcardGenerationService;
     }
 
@@ -132,6 +136,29 @@ internal class FlashcardService : IFlashcardService
         }
 
         _dbContext.Flashcards.Remove(flashcard);
+
+        await _dbContext.SaveChangesAsync();
+
+        return new Response();
+    }
+    
+    public async Task<Response> UpdateFlashcardAsync(long id, UpdateFlashcardRequest request)
+    {
+        _updateFlashcardValidator.ValidateAndThrow(request);
+
+        int userId = 1; // Assume user ID is 1 for now
+
+        var flashcard = await _dbContext.Flashcards
+            .Where(f => f.Id == id && f.UserId == userId)
+            .SingleOrDefaultAsync();
+
+        if (flashcard == null)
+        {
+            return new Response([new Response.Error(IFlashcardService.ErrorCodes.FlashcardNotFound, FlashcardNotFoundMessage, nameof(id))]);
+        }
+
+        flashcard.Front = request.Front!;
+        flashcard.Back = request.Back!;
 
         await _dbContext.SaveChangesAsync();
 
