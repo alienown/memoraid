@@ -13,6 +13,12 @@ public interface IFlashcardService
 {
     Task CreateFlashcardsAsync(CreateFlashcardsRequest request);
     Task<Response<GetFlashcardsResponse>> GetFlashcardsAsync(GetFlashcardsRequest request);
+    Task<Response> DeleteFlashcardAsync(long id);
+
+    public static class ErrorCodes
+    {
+        public const string FlashcardNotFound = "FlashcardNotFound";
+    }
 }
 
 internal class FlashcardService : IFlashcardService
@@ -21,6 +27,9 @@ internal class FlashcardService : IFlashcardService
     private readonly IValidator<CreateFlashcardsRequest> _validator;
     private readonly IFlashcardGenerationService _flashcardGenerationService;
     private readonly IValidator<GetFlashcardsRequest>? _getFlashcardsValidator;
+    private readonly IValidator<long>? _deleteFlashcardValidator;
+
+    internal const string FlashcardNotFoundMessage = "Flashcard not found.";
 
     public FlashcardService(
         MemoraidDbContext dbContext,
@@ -36,11 +45,13 @@ internal class FlashcardService : IFlashcardService
         MemoraidDbContext dbContext,
         IValidator<CreateFlashcardsRequest> validator,
         IValidator<GetFlashcardsRequest> getFlashcardsValidator,
+        IValidator<long>? deleteFlashcardValidator,
         IFlashcardGenerationService flashcardGenerationService)
     {
         _dbContext = dbContext;
         _validator = validator;
         _getFlashcardsValidator = getFlashcardsValidator;
+        _deleteFlashcardValidator = deleteFlashcardValidator;
         _flashcardGenerationService = flashcardGenerationService;
     }
 
@@ -78,6 +89,8 @@ internal class FlashcardService : IFlashcardService
 
     public async Task<Response<GetFlashcardsResponse>> GetFlashcardsAsync(GetFlashcardsRequest request)
     {
+        _getFlashcardsValidator.ValidateAndThrow(request);
+
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
         int userId = 1; // Assume user ID is 1 for now
@@ -101,5 +114,27 @@ internal class FlashcardService : IFlashcardService
         var response = new GetFlashcardsResponse(flashcards, totalCount);
 
         return new Response<GetFlashcardsResponse>(response);
+    }
+
+    public async Task<Response> DeleteFlashcardAsync(long id)
+    {
+        _deleteFlashcardValidator.ValidateAndThrow(id);
+
+        int userId = 1; // Assume user ID is 1 for now
+
+        var flashcard = await _dbContext.Flashcards
+            .Where(f => f.Id == id && f.UserId == userId)
+            .SingleOrDefaultAsync();
+
+        if (flashcard == null)
+        {
+            return new Response([new Response.Error(IFlashcardService.ErrorCodes.FlashcardNotFound, FlashcardNotFoundMessage, nameof(id))]);
+        }
+
+        _dbContext.Flashcards.Remove(flashcard);
+
+        await _dbContext.SaveChangesAsync();
+
+        return new Response();
     }
 }

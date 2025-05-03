@@ -116,7 +116,6 @@
     - 204 No Content
   - Error responses:
     - 401 if unauthenticated
-    - 403 if unauthorized
     - 404 if flashcard not found
 
 ### FLASHCARD_AI_GENERATIONS Resource

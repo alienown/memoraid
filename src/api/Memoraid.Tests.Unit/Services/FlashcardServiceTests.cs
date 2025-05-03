@@ -1,4 +1,5 @@
 using FluentValidation;
+using Memoraid.WebApi.Constants;
 using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Enums;
@@ -23,7 +24,9 @@ public class FlashcardServiceTests
 {
     private FlashcardService _flashcardService;
     private MemoraidDbContext _dbContext;
-    private IValidator<CreateFlashcardsRequest> _validator;
+    private IValidator<CreateFlashcardsRequest> _createFlashcardsValidator;
+    private IValidator<GetFlashcardsRequest> _getFlashcardsValidator;
+    private IValidator<long> _deleteFlashcardValidator;
     private Mock<IFlashcardGenerationService> _mockFlashcardGenerationService;
 
     [SetUp]
@@ -47,14 +50,17 @@ public class FlashcardServiceTests
 
         await _dbContext.SaveChangesAsync();
 
-        _validator = new CreateFlashcardsRequestValidator(_dbContext);
+        _createFlashcardsValidator = new CreateFlashcardsRequestValidator(_dbContext);
+        _getFlashcardsValidator = new GetFlashcardsRequestValidator();
+        _deleteFlashcardValidator = new DeleteFlashcardRequestValidator();
 
         _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
 
         _flashcardService = new FlashcardService(
             _dbContext,
-            _validator,
-            new GetFlashcardsRequestValidator(),
+            _createFlashcardsValidator,
+            _getFlashcardsValidator,
+            _deleteFlashcardValidator,
             _mockFlashcardGenerationService.Object);
     }
 
@@ -250,6 +256,109 @@ public class FlashcardServiceTests
 
         // Assert
         ShouldHaveReturnedExpectedFlashcards(result, expectedTotalCount: 20, expectedFlashcards);
+    }
+
+    [Test]
+    public async Task GetFlashcardsAsync_Should_ThrowValidationError_When_PageNumberIsLessThanOne()
+    {
+        // Arrange
+        var request = new GetFlashcardsRequest
+        {
+            PageNumber = 0,
+            PageSize = 5
+        };
+
+        // Act & Assert
+        var exception = await Should.ThrowAsync<ValidationException>(() => _flashcardService.GetFlashcardsAsync(request));
+        var errors = exception.Errors.ToList();
+        errors.Count.ShouldBe(1);
+        errors[0].ErrorMessage.ShouldBe(string.Format(ErrorMessages.GREATER_THAN, nameof(GetFlashcardsRequest.PageNumber), 0));
+        errors[0].PropertyName.ShouldBe(nameof(GetFlashcardsRequest.PageNumber));
+    }
+
+    [Test]
+    public async Task DeleteFlashcardAsync_Should_DeleteFlashcard_When_FlashcardExists()
+    {
+        // Arrange
+        var flashcardId = 1;
+
+        await _dbContext.Flashcards.AddAsync(new Flashcard
+        {
+            Id = flashcardId,
+            UserId = 1,
+            Front = "Test Front",
+            Back = "Test Back",
+            Source = FlashcardSource.Manual
+        });
+
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _flashcardService.DeleteFlashcardAsync(flashcardId);
+
+        // Assert
+        result.IsSuccess.ShouldBeTrue();
+
+        var flashcardExists = await _dbContext.Flashcards.AnyAsync(f => f.Id == flashcardId);
+        flashcardExists.ShouldBeFalse();
+    }
+
+    [Test]
+    public async Task DeleteFlashcardAsync_Should_ReturnNotFoundError_When_FlashcardDoesNotExist()
+    {
+        // Arrange
+        var id = 999;
+
+        // Act
+        var result = await _flashcardService.DeleteFlashcardAsync(id);
+
+        // Assert
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.Length.ShouldBe(1);
+        var error = result.Errors.Single();
+        error.Code.ShouldBe(IFlashcardService.ErrorCodes.FlashcardNotFound);
+        error.Message.ShouldBe(FlashcardService.FlashcardNotFoundMessage);
+        error.PropertyName.ShouldBe(nameof(id));
+    }
+
+    [Test]
+    public async Task DeleteFlashcardAsync_Should_ReturnNotFoundError_When_FlashcardBelongsToAnotherUser()
+    {
+        // Arrange
+        var id = 2;
+
+        await _dbContext.Flashcards.AddAsync(new Flashcard
+        {
+            Id = id,
+            UserId = 2,
+            Front = "Other User Front",
+            Back = "Other User Back",
+            Source = FlashcardSource.Manual
+        });
+
+        await _dbContext.SaveChangesAsync();
+
+        // Act
+        var result = await _flashcardService.DeleteFlashcardAsync(id);
+
+        // Assert
+        result.IsSuccess.ShouldBeFalse();
+        result.Errors.Length.ShouldBe(1);
+        var error = result.Errors.Single();
+        error.Code.ShouldBe(IFlashcardService.ErrorCodes.FlashcardNotFound);
+        error.Message.ShouldBe(FlashcardService.FlashcardNotFoundMessage);
+        error.PropertyName.ShouldBe(nameof(id));
+    }
+
+    [Test]
+    public async Task DeleteFlashcardAsync_Should_ReturnValidationError_When_IdIsInvalid()
+    {
+        // Arrange & Act & Assert
+        var exception = await Should.ThrowAsync<ValidationException>(
+            () => _flashcardService.DeleteFlashcardAsync(0));
+        var errors = exception.Errors.ToList();
+        errors.Count.ShouldBe(1);
+        errors[0].ErrorMessage.ShouldBe(DeleteFlashcardRequestValidator.InvalidFlashcardIdMessage);
     }
 
     private void ShouldHaveReturnedExpectedFlashcards(Response<GetFlashcardsResponse> response, int expectedTotalCount, List<GetFlashcardsResponse.FlashcardsListItem> expectedFlashcards)

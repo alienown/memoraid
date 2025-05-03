@@ -184,10 +184,10 @@ public class FlashcardGenerationServiceTests
     {
         // Arrange
         var request = new GenerateFlashcardsRequest { SourceText = "Valid text" };
-   
+
         var longFrontText = new string('A', 600);
         var longBackText = new string('B', 250);
-        
+
         var flashcards = new List<FlashcardGenerationService.FlashcardGenerationResult.Flashcard>
         {
             new() { Front = new string('A', 600), Back = new string('B', 250) },

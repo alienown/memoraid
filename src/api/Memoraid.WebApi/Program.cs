@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +63,7 @@ builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
+builder.Services.AddScoped<IValidator<long>, DeleteFlashcardRequestValidator>();
 
 var app = builder.Build();
 
@@ -117,5 +119,21 @@ app.MapGet("/flashcards", async ([AsParameters] GetFlashcardsRequest request, IF
 })
 .WithName("GetFlashcards")
 .Produces<Response<GetFlashcardsResponse>>();
+
+app.MapDelete("/flashcards/{id}", async (long id, IFlashcardService flashcardService) =>
+{
+    var response = await flashcardService.DeleteFlashcardAsync(id);
+
+    if (!response.IsSuccess)
+    {
+        var flashcardNotFound = response.Errors.All(x => x.Code == IFlashcardService.ErrorCodes.FlashcardNotFound);
+
+        return flashcardNotFound ? Results.NotFound(response) : Results.UnprocessableEntity(response);
+    }
+
+    return Results.NoContent();
+})
+.WithName("DeleteFlashcard")
+.Produces<Response>();
 
 app.Run();
