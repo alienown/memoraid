@@ -35,6 +35,13 @@ export interface Error {
   propertyName?: string | null;
 }
 
+export interface FlashcardsListItem {
+  /** @format int64 */
+  id: number;
+  front: string;
+  back: string;
+}
+
 export interface GeneratedFlashcard {
   front: string;
   back: string;
@@ -50,6 +57,12 @@ export interface GenerateFlashcardsResponse {
   generationId: number;
 }
 
+export interface GetFlashcardsResponse {
+  items: FlashcardsListItem[];
+  /** @format int32 */
+  total: number;
+}
+
 export interface Response {
   isSuccess: boolean;
   errors: Error[];
@@ -59,6 +72,17 @@ export interface ResponseOfGenerateFlashcardsResponse {
   data: GenerateFlashcardsResponse;
   isSuccess: boolean;
   errors: Error[];
+}
+
+export interface ResponseOfGetFlashcardsResponse {
+  data: GetFlashcardsResponse;
+  isSuccess: boolean;
+  errors: Error[];
+}
+
+export interface UpdateFlashcardRequest {
+  front?: string | null;
+  back?: string | null;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -348,6 +372,66 @@ export class Api<
       this.request<Response, any>({
         path: `/flashcards`,
         method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name GetFlashcards
+     * @request GET:/flashcards
+     */
+    getFlashcards: (
+      query?: {
+        /** @format int32 */
+        PageNumber?: number;
+        /** @format int32 */
+        PageSize?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ResponseOfGetFlashcardsResponse, any>({
+        path: `/flashcards`,
+        method: "GET",
+        query: query,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name DeleteFlashcard
+     * @request DELETE:/flashcards/{id}
+     */
+    deleteFlashcard: (id: number, params: RequestParams = {}) =>
+      this.request<Response, any>({
+        path: `/flashcards/${id}`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name UpdateFlashcard
+     * @request PUT:/flashcards/{id}
+     */
+    updateFlashcard: (
+      id: number,
+      data: UpdateFlashcardRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<Response, any>({
+        path: `/flashcards/${id}`,
+        method: "PUT",
         body: data,
         type: ContentType.Json,
         format: "json",

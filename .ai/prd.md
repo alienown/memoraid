@@ -82,7 +82,7 @@ Not included in MVP:
 ### US-004: Viewing Flashcards
 - Description: As a logged in user, I want to view a list of only my flashcards so that I can manage my study material securely.
 - Acceptance Criteria:
-  - Users can see a paginated list or grid of flashcards that they own.
+  - Users can see a paginated list of flashcards that they own.
   - Each flashcard displays the "Front" by default.
   - Clicking a flashcard reveals the "Back".
   - Each flashcard has options to edit or delete it.
@@ -99,7 +99,7 @@ Not included in MVP:
 - Description: As a logged in user, I want to edit my flashcards so that I can correct errors or update information.
 - Acceptance Criteria:
   - User flashcards list includes a button to edit the flashcard.
-  - Users can open an edit modal or inline editor for a flashcard.
+  - Users can open an edit modal for a flashcard.
   - A form allows manual entry of flashcard "Front" (max 500 characters) and "Back" (max 200 characters). Both fields are required.
   - Changes are saved and reflected in the flashcard list.
 

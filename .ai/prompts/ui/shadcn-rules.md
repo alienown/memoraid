@@ -72,6 +72,7 @@ Some popular components are:
 - Hover Card
 - Menubar
 - Navigation Menu
+- Pagination
 - Popover
 - Progress
 - Radio Group

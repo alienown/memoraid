@@ -1,15 +1,7 @@
 import { FlashcardListItem } from "./FlashcardListItem";
-import { FlashcardSource } from "../../api/api";
+import { FlashcardData } from "./types";
 
-export interface FlashcardData {
-  front: string;
-  back: string;
-  source: FlashcardSource;
-  generationId?: number;
-  isAccepted: boolean;
-}
-
-interface FlashcardListProps {
+export interface FlashcardListProps {
   flashcards: FlashcardData[];
   onAccept: (index: number) => void;
   onReject: (index: number) => void;

@@ -9,9 +9,10 @@ import {
   CreateFlashcardsRequest,
   GenerateFlashcardsRequest,
   Api,
-} from "../../api/api";
-import { FlashcardList, FlashcardData } from "./FlashcardList";
+} from "@/api/api";
+import { FlashcardList } from "./FlashcardList";
 import { EditFlashcardModal } from "./EditFlashcardModal";
+import { FlashcardData } from "./types";
 
 // Initialize the API client
 const apiClient = new Api();

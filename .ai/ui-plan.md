@@ -29,8 +29,8 @@ A modular React-based UI utilizing functional components, hooks, shadcn/ui for r
 - **My Flashcards**
   - **View Path:** /flashcards
   - **Primary Purpose:** Manage user-owned flashcards via CRUD operations.
-  - **Key Information to Display:** Paginated list or grid of flashcards with "front" and "back" columns, plus action buttons for editing and deletion of each flashcard. Also includes a button to manually create new flashcards which opens a modal with a form to create a new flashcard with "front" (max 500 characters) and "back" (max 200 characters) fields.
-  - **Key View Components:** Data Table, Pagination Controls, Action Buttons (Create, Edit, Delete), Confirmation Prompts, Creation Modal, Toast notifications for success/error messages.
+  - **Key Information to Display:** Paginated list of flashcards Card components with "front" and "back" fields, plus action buttons for editing and deletion of each flashcard. Also includes a button to manually create new flashcards which opens a modal with a form to create a new flashcard with "front" (max 500 characters) and "back" (max 200 characters) fields.
+  - **Key View Components:** Card, Pagination, Action Buttons (Create, Edit, Delete), Confirmation Prompts, Creation Modal, Toast notifications for success/error messages.
   - **UX, Accessibility, and Security Considerations:** Accessible layouts, clear interactive elements with focus states, confirmation dialogs for destructive actions.
 
 - **Study Mode**
