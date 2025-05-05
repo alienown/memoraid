@@ -60,11 +60,13 @@ builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>((servicePr
 
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<long>, DeleteFlashcardRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateFlashcardRequest>, UpdateFlashcardRequestValidator>();
+builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
 
 var app = builder.Build();
 
@@ -151,6 +153,15 @@ app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, I
     return Results.Ok(response);
 })
 .WithName("UpdateFlashcard")
+.Produces<Response>();
+
+app.MapPost("/users/register", async (RegisterUserRequest request, IUserService userService) =>
+{
+    var result = await userService.RegisterUserAsync(request);
+    return Results.Created("/users/register", result);
+})
+.WithName("RegisterUser")
+.WithOpenApi()
 .Produces<Response>();
 
 app.Run();

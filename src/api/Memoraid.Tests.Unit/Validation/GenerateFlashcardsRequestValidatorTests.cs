@@ -1,5 +1,4 @@
 using FluentValidation.TestHelper;
-using Memoraid.Tests.Unit.Common;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Validation;
 using static Memoraid.WebApi.Constants.ErrorMessages;
@@ -68,14 +67,12 @@ public class GenerateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(r => r.SourceText)
-            .WithErrorMessage(string.Format(MAX_LENGTH, GenerateFlashcardsRequestValidator.SourceTextFieldName, 10000))
-            .WithPropertyName(nameof(GenerateFlashcardsRequest.SourceText));
+            .WithErrorMessage(string.Format(MAX_LENGTH, GenerateFlashcardsRequestValidator.SourceTextFieldName, 10000));
     }
 
     private static void ShouldHaveRequiredErrorForSourceText(TestValidationResult<GenerateFlashcardsRequest> result)
     {
         result.ShouldHaveValidationErrorFor(r => r.SourceText)
-            .WithErrorMessage(string.Format(REQUIRED, GenerateFlashcardsRequestValidator.SourceTextFieldName))
-            .WithPropertyName(nameof(GenerateFlashcardsRequest.SourceText));
+            .WithErrorMessage(string.Format(REQUIRED, GenerateFlashcardsRequestValidator.SourceTextFieldName));
     }
 }

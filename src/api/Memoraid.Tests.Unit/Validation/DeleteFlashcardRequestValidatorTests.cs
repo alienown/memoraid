@@ -1,7 +1,6 @@
 using FluentValidation.TestHelper;
 using Memoraid.WebApi.Constants;
 using Memoraid.WebApi.Validation;
-using NUnit.Framework;
 
 namespace Memoraid.Tests.Unit.Validation;
 
@@ -38,6 +37,6 @@ public class DeleteFlashcardRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x)
-            .WithErrorMessage("Flashcard ID must be greater than zero.");
+            .WithErrorMessage(string.Format(ErrorMessages.GREATER_THAN, nameof(id), 0));
     }
 }

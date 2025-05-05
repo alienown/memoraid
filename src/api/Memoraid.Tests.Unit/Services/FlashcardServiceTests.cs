@@ -363,7 +363,7 @@ public class FlashcardServiceTests
             () => _flashcardService.DeleteFlashcardAsync(0));
         var errors = exception.Errors.ToList();
         errors.Count.ShouldBe(1);
-        errors[0].ErrorMessage.ShouldBe(DeleteFlashcardRequestValidator.InvalidFlashcardIdMessage);
+        errors[0].ErrorMessage.ShouldBe(string.Format(ErrorMessages.GREATER_THAN, "id", 0));
     }
 
     [Test]

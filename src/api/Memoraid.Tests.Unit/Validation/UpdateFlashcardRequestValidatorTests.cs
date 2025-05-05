@@ -1,9 +1,6 @@
 using FluentValidation.TestHelper;
-using Memoraid.Tests.Unit.Common;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Validation;
-using NUnit.Framework;
-using System.Threading.Tasks;
 using static Memoraid.WebApi.Constants.ErrorMessages;
 
 namespace Memoraid.Tests.Unit.Validation;
@@ -52,8 +49,7 @@ public class UpdateFlashcardRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Front)
-            .WithErrorMessage(string.Format(REQUIRED, nameof(UpdateFlashcardRequest.Front)))
-            .WithPropertyName(nameof(UpdateFlashcardRequest.Front));
+            .WithErrorMessage(string.Format(REQUIRED, nameof(UpdateFlashcardRequest.Front)));
     }
 
     [Test]
@@ -72,8 +68,7 @@ public class UpdateFlashcardRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Front)
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(UpdateFlashcardRequest.Front), 500))
-            .WithPropertyName(nameof(UpdateFlashcardRequest.Front));
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(UpdateFlashcardRequest.Front), 500));
     }
 
     [TestCase(null)]
@@ -92,8 +87,7 @@ public class UpdateFlashcardRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Back)
-            .WithErrorMessage(string.Format(REQUIRED, nameof(UpdateFlashcardRequest.Back)))
-            .WithPropertyName(nameof(UpdateFlashcardRequest.Back));
+            .WithErrorMessage(string.Format(REQUIRED, nameof(UpdateFlashcardRequest.Back)));
     }
 
     [Test]
@@ -112,7 +106,6 @@ public class UpdateFlashcardRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.Back)
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(UpdateFlashcardRequest.Back), 200))
-            .WithPropertyName(nameof(UpdateFlashcardRequest.Back));
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(UpdateFlashcardRequest.Back), 200));
     }
 }

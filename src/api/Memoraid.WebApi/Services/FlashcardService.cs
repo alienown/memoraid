@@ -141,7 +141,7 @@ internal class FlashcardService : IFlashcardService
 
         return new Response();
     }
-    
+
     public async Task<Response> UpdateFlashcardAsync(long id, UpdateFlashcardRequest request)
     {
         _updateFlashcardValidator.ValidateAndThrow(request);

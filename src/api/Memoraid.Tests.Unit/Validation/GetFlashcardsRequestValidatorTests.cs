@@ -1,5 +1,4 @@
 using FluentValidation.TestHelper;
-using Memoraid.Tests.Unit.Common;
 using Memoraid.WebApi.Constants;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Validation;
@@ -63,8 +62,7 @@ public class GetFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PageNumber)
-            .WithErrorMessage(string.Format(ErrorMessages.GREATER_THAN, nameof(GetFlashcardsRequest.PageNumber), 0))
-            .WithPropertyName(nameof(GetFlashcardsRequest.PageNumber));
+            .WithErrorMessage(string.Format(ErrorMessages.GREATER_THAN, nameof(GetFlashcardsRequest.PageNumber), 0));
     }
 
     [Test]
@@ -82,7 +80,6 @@ public class GetFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(x => x.PageSize)
-            .WithErrorMessage(string.Format(ErrorMessages.GREATER_THAN, nameof(GetFlashcardsRequest.PageSize), 0))
-            .WithPropertyName(nameof(GetFlashcardsRequest.PageSize));
+            .WithErrorMessage(string.Format(ErrorMessages.GREATER_THAN, nameof(GetFlashcardsRequest.PageSize), 0));
     }
 }

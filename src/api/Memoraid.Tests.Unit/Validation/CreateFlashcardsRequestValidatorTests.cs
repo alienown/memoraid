@@ -1,5 +1,4 @@
 using FluentValidation.TestHelper;
-using Memoraid.Tests.Unit.Common;
 using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Enums;
@@ -97,8 +96,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(r => r.Flashcards)
-            .WithErrorMessage(CreateFlashcardsRequestValidator.FlashcardsAreRequired)
-            .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcards));
+            .WithErrorMessage(CreateFlashcardsRequestValidator.FlashcardsAreRequired);
     }
 
     [Test]
@@ -112,8 +110,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(r => r.Flashcards)
-            .WithErrorMessage(CreateFlashcardsRequestValidator.FlashcardsAreRequired)
-            .WithPropertyName(nameof(CreateFlashcardsRequest.Flashcards));
+            .WithErrorMessage(CreateFlashcardsRequestValidator.FlashcardsAreRequired);
     }
 
     [Test]
@@ -133,8 +130,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Front")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front)))
-            .WithPropertyName("Flashcards[0].Front");
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front)));
     }
 
     [Test]
@@ -155,8 +151,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Front")
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front), 500))
-            .WithPropertyName("Flashcards[0].Front");
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front), 500));
     }
 
     [Test]
@@ -176,8 +171,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Back")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back)))
-            .WithPropertyName("Flashcards[0].Back");
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back)));
     }
 
     [Test]
@@ -198,8 +192,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Back")
-            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back), 200))
-            .WithPropertyName("Flashcards[0].Back");
+            .WithErrorMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back), 200));
     }
 
     [Test]
@@ -219,8 +212,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Source")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Source)))
-            .WithPropertyName("Flashcards[0].Source");
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Source)));
     }
 
     [Test]
@@ -240,8 +232,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].Source")
-            .WithErrorMessage(CreateFlashcardsRequestValidator.InvalidSourceError)
-            .WithPropertyName("Flashcards[0].Source");
+            .WithErrorMessage(CreateFlashcardsRequestValidator.InvalidSourceError);
     }
 
     [Test]
@@ -261,8 +252,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeNullForFlashcardsWithManualSource)
-            .WithPropertyName("Flashcards[0].GenerationId");
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeNullForFlashcardsWithManualSource);
     }
 
     [Test]
@@ -282,8 +272,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId)))
-            .WithPropertyName("Flashcards[0].GenerationId");
+            .WithErrorMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId)));
     }
 
     [Test]
@@ -303,8 +292,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor("Flashcards[0].GenerationId")
-            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeGreaterThanZeroError)
-            .WithPropertyName("Flashcards[0].GenerationId");
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationIdMustBeGreaterThanZeroError);
     }
 
     [Test]
@@ -324,8 +312,7 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId))
-            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError)
-            .WithPropertyName(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId));
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError);
     }
 
     [Test]
@@ -345,7 +332,6 @@ public class CreateFlashcardsRequestValidatorTests
 
         // Assert
         result.ShouldHaveValidationErrorFor(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId))
-            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError)
-            .WithPropertyName(nameof(CreateFlashcardsRequest.CreateFlashcardData.GenerationId));
+            .WithErrorMessage(CreateFlashcardsRequestValidator.GenerationNotExistsError);
     }
 }
