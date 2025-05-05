@@ -16,8 +16,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +28,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:7003")
+        policy.WithOrigins("http://localhost:7002")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -58,15 +60,42 @@ builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>((servicePr
     client.Timeout = TimeSpan.FromSeconds(60);
 });
 
+builder.Services
+    .AddAuthentication()
+    .AddJwtBearer(options =>
+    {
+        var key = Encoding.ASCII.GetBytes(builder.Configuration.GetRequiredSection("Jwt:Secret").Value!);
+        var issuer = builder.Configuration.GetRequiredSection("Jwt:Issuer").Value!;
+        var audience = builder.Configuration.GetRequiredSection("Jwt:Audience").Value!;
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+            ValidateAudience = true,
+            ValidAudience = audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// Add services
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 builder.Services.AddScoped<IUserService, UserService>();
+
+// Add validators
 builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<long>, DeleteFlashcardRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateFlashcardRequest>, UpdateFlashcardRequestValidator>();
 builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
+builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
 
 var app = builder.Build();
 
@@ -82,19 +111,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.MapGet("/dbtest", (MemoraidDbContext dbContext) =>
-//{
-//    var flashcards = dbContext.Flashcards.ToList();
-//    var flashcardAIGenerations = dbContext.FlashcardAIGenerations.ToList();
-//    var users = dbContext.Users.ToList();
-
-//    return Results.Ok(new
-//    {
-//        Flashcards = flashcards,
-//        FlashcardAIGenerations = flashcardAIGenerations,
-//        Users = users
-//    });
-//});
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapPost("/flashcards/generate", async (GenerateFlashcardsRequest request, IFlashcardGenerationService generationService) =>
 {
@@ -161,7 +179,24 @@ app.MapPost("/users/register", async (RegisterUserRequest request, IUserService 
     return Results.Created("/users/register", result);
 })
 .WithName("RegisterUser")
-.WithOpenApi()
 .Produces<Response>();
+
+app.MapPost("/users/login", async (LoginUserRequest request, IUserService userService) =>
+{
+    var response = await userService.LoginUserAsync(request);
+
+    if (!response.IsSuccess)
+    {
+        var invalidCredentials = response.Errors.All(x => x.Code == IUserService.ErrorCodes.InvalidCredentials);
+
+        return invalidCredentials
+            ? Results.Json(response, statusCode: StatusCodes.Status401Unauthorized)
+            : Results.UnprocessableEntity(response);
+    }
+
+    return Results.Ok(response);
+})
+.WithName("LoginUser")
+.Produces<Response<LoginUserResponse>>();
 
 app.Run();

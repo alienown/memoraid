@@ -33,10 +33,16 @@ public class OpenRouterServiceTests
         var optionsMock = new Mock<IOptions<ApplicationOptions>>();
         optionsMock.Setup(o => o.Value).Returns(new ApplicationOptions
         {
-            OpenRouter = new OpenRouterOptions
+            OpenRouter = new OpenRouter
             {
                 ApiKey = "test_api_key",
                 ApiBaseUrl = "https://openrouter.ai/api/v1"
+            },
+            Jwt = new Jwt
+            {
+                Secret = "",
+                Issuer = "",
+                Audience = ""
             }
         });
 

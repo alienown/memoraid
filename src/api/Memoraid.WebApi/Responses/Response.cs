@@ -45,6 +45,12 @@ public class Response<T> : Response where T : class
         Data = data;
     }
 
+    [SetsRequiredMembers]
+    public Response(Error[] errors) : base(errors)
+    {
+        Data = null;
+    }
+
     [Required]
-    public required T Data { get; init; }
+    public required T? Data { get; init; }
 }
