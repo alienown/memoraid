@@ -7,7 +7,7 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
 - Route: `/flashcards`
 
 ## 3. Component Structure
-- **MyFlashcardsPage** (container page)
+- **Flashcards** (container page)
   - **FlashcardsList** (list/grid of flashcard cards)
     - **FlashcardListItem** (individual card component)  
   - **Pagination** (navigates pages)
@@ -16,7 +16,7 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
   - **ConfirmationDialog** (for delete confirmation)
 
 ## 4. Component Details
-### MyFlashcardsPage
+### Flashcards
 - **Description:** Main page container that loads and displays user flashcards; manages create/edit/delete actions and pagination.
 - **Main Elements:** Header with "Create" button, list of flashcards, pagination control.
 - **Events Handled:**  
@@ -63,8 +63,8 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
 - **Types:** `CreateFlashcardData` (contains front and back fields).
 - **Props:**:
   - isOpen: boolean
-  - onSave callback
-  - onCancel callback
+  - onSave: (data: CreateFlashcardData) => void
+  - onCancel: () => void
 
 ### EditFlashcardModal
 - **Description:** Modal to modify a chosen flashcard.
@@ -76,9 +76,9 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
 - **Types:** `EditFlashcardData` (contains front and back fields).
 - **Props:**:
   - isOpen: boolean
-  - Flashcard to edit
-  - onSave callback
-  - onCancel callback
+  - EditFlashcardData: EditFlashcardData (contains front and back fields)
+  - onSave: (data: EditFlashcardData) => void (callback contains updated data)
+  - onCancel: () => void
 
 ### Pagination
 - **Description:** Component to navigate through pages of flashcards.
@@ -143,10 +143,10 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
   - onCancel: () => void (required)
 - **UpdateFlashcardRequest:** (for sending API flashcard update request - type taken from `api.ts`)  
   - front: string (required, cannot exceed 500 characters)
-  - back: string (required, cannot excee 200 characters)
+  - back: string (required, cannot exceed 200 characters)
 
 ## 6. State Management
-- Local state in MyFlashcardsPage for:
+- Local state in Flashcards for:
   - flashcards: `GetFlashcardsResponse`
   - loading and error flags
   - current page number and total items (for pagination)
@@ -199,7 +199,7 @@ Create a "My Flashcards" view that allows authenticated users to manage their ow
 - Handle network errors and display a user-friendly message.
 
 ## 11. Implementation Steps
-1. Create the MyFlashcardsPage component in the `/src/app/src/pages/flashcards` folder.
+1. Create the Flashcards component in the `/src/app/src/pages/flashcards` folder.
 2. Integrate the API client to fetch flashcards on component mount and on page change.
 3. Implement the FlashcardsList view using the FlashcardListItem component. Both of these components are already used in `/generate` view. Check if it is reasonable to move them to shared catalog and reusing them.
 4. Add a Pagination component at the bottom of the view; handle page navigation.

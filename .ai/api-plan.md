@@ -68,7 +68,7 @@
   - Description: Retrieve a paginated list of user-owned flashcards.
   - Query Parameters: pageNumber (Optional, default 1), pageSize (Optional, default 10, maximum 50)
   - Success response:
-    - 200 OK with response: { "items": [ { id, front, back } ], "total": "number" }
+    - 200 OK with response: Response<GetFlashcardsResponse>
   - Error responses:
     - 401 if unauthenticated
 
@@ -87,7 +87,7 @@
       ]
     }
   - Success response:
-    - 201 Created
+    - 201 Created with response: Response
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
@@ -96,13 +96,8 @@
 
 - **PUT /flashcards/{id}**
   - Description: Update flashcard content.
-  - Request:
-    {
-      "front": "string, required, max 500 chars",
-      "back": "string, required, max 200 chars"
-    }
   - Success response:
-    - 204 No Content
+    - 200 OK with response: Response
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
@@ -112,7 +107,7 @@
 - **DELETE /flashcards/{id}**
   - Description: Delete a specified flashcard.
   - Success response:
-    - 204 No Content
+    - 200 OK with response: Response
   - Error responses:
     - 401 if unauthenticated
     - 404 if flashcard not found
@@ -126,7 +121,7 @@
       "sourceText": "string, required, maximum 10000 characters"
     }
   - Success response:
-    - 200 OK with response: { "flashcards": [ { "front": "string, max 500 chars", "back": "string, max 200 chars" }, ... ], "generationId": "integer" }
+    - 200 OK with response: Response<GenerateFlashcardsResponse>
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
@@ -161,3 +156,18 @@
   - Review allow inline acceptance/rejection or modification via an edit modal to match the PRD requirements.
   - Use pagination for list endpoints to optimize performance.
   - All endpoints return appropriate HTTP status codes (e.g., 200, 201, 400, 401, 403, 404) and error messages reflecting validation and business rule violations.
+
+## 5. Types
+
+- The Response type has the following JSON structure:
+  - For a non-generic Response:
+    {
+      "Errors": [ { "Code": "string", "Message": "string", "PropertyName": "string | null" }, ... ],
+      "IsSuccess": boolean
+    }
+  - For a generic Response<T>:
+    {
+      "Data": T, // an instance of a class of type T
+      "Errors": [ { "Code": "string", "Message": "string", "PropertyName": "string | null" }, ... ],
+      "IsSuccess": boolean
+    }

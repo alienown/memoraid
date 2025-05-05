@@ -132,7 +132,7 @@ app.MapDelete("/flashcards/{id}", async (long id, IFlashcardService flashcardSer
         return flashcardNotFound ? Results.NotFound(response) : Results.UnprocessableEntity(response);
     }
 
-    return Results.NoContent();
+    return Results.Ok(response);
 })
 .WithName("DeleteFlashcard")
 .Produces<Response>();
@@ -148,7 +148,7 @@ app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, I
         return flashcardNotFound ? Results.NotFound(response) : Results.UnprocessableEntity(response);
     }
 
-    return Results.NoContent();
+    return Results.Ok(response);
 })
 .WithName("UpdateFlashcard")
 .Produces<Response>();
