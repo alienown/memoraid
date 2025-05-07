@@ -22,20 +22,28 @@ namespace Memoraid.Tests.Unit.Services;
 [TestFixture]
 public class FlashcardServiceTests
 {
+    private const long TEST_USER_ID = 1;
+
     private FlashcardService _flashcardService;
     private MemoraidDbContext _dbContext;
-    private IValidator<CreateFlashcardsRequest> _createFlashcardsValidator;
-    private IValidator<GetFlashcardsRequest> _getFlashcardsValidator;
-    private IValidator<long> _deleteFlashcardValidator;
-    private IValidator<UpdateFlashcardRequest> _updateFlashcardValidator;
+    private Mock<IUserContext> _mockUserContext;
     private Mock<IFlashcardGenerationService> _mockFlashcardGenerationService;
+    private IValidator<CreateFlashcardsRequest> _createFlashcardsRequestValidator;
+    private IValidator<GetFlashcardsRequest> _getFlashcardsRequestValidator;
+    private IValidator<long> _deleteFlashcardRequestValidator;
+    private IValidator<UpdateFlashcardRequest> _updateFlashcardRequestValidator;
 
     [SetUp]
     public async Task Setup()
     {
+        _mockUserContext = new Mock<IUserContext>();
+        _mockUserContext.Setup(x => x.UserId).Returns(TEST_USER_ID);
+        _mockUserContext.Setup(x => x.GetUserIdOrThrow()).Returns(TEST_USER_ID);
+        _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
+
         var options = new DbContextOptionsBuilder<MemoraidDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .AddInterceptors(new SaveEntityBaseInterceptor())
+            .AddInterceptors(new SaveEntityBaseInterceptor(_mockUserContext.Object))
             .ConfigureWarnings(warnings => warnings.Ignore(InMemoryEventId.TransactionIgnoredWarning))
             .Options;
 
@@ -44,7 +52,7 @@ public class FlashcardServiceTests
         _dbContext.FlashcardAIGenerations.Add(new FlashcardAIGeneration
         {
             Id = 123,
-            UserId = 1,
+            UserId = TEST_USER_ID,
             AIModel = "TestModel1",
             SourceText = "Test text 1"
         });
@@ -52,20 +60,18 @@ public class FlashcardServiceTests
         await _dbContext.SaveChangesAsync();
         _dbContext.ChangeTracker.Clear();
 
-        _createFlashcardsValidator = new CreateFlashcardsRequestValidator(_dbContext);
-        _getFlashcardsValidator = new GetFlashcardsRequestValidator();
-        _deleteFlashcardValidator = new DeleteFlashcardRequestValidator();
-        _updateFlashcardValidator = new UpdateFlashcardRequestValidator();
+        _createFlashcardsRequestValidator = new CreateFlashcardsRequestValidator(_mockUserContext.Object, _dbContext);
+        _getFlashcardsRequestValidator = new GetFlashcardsRequestValidator();
+        _deleteFlashcardRequestValidator = new DeleteFlashcardRequestValidator();
+        _updateFlashcardRequestValidator = new UpdateFlashcardRequestValidator();
 
-        _mockFlashcardGenerationService = new Mock<IFlashcardGenerationService>();
-
-        // Create service with all validators
         _flashcardService = new FlashcardService(
+            _mockUserContext.Object,
             _dbContext,
-            _createFlashcardsValidator,
-            _getFlashcardsValidator,
-            _deleteFlashcardValidator,
-            _updateFlashcardValidator,
+            _createFlashcardsRequestValidator,
+            _getFlashcardsRequestValidator,
+            _deleteFlashcardRequestValidator,
+            _updateFlashcardRequestValidator,
             _mockFlashcardGenerationService.Object);
     }
 
@@ -106,24 +112,21 @@ public class FlashcardServiceTests
         manualFlashcard.Back.ShouldBe("Back1");
         manualFlashcard.Source.ShouldBe(FlashcardSource.Manual);
         manualFlashcard.FlashcardAIGenerationId.ShouldBeNull();
-        // TODO: assert user ID once we got auth
-        manualFlashcard.UserId.ShouldBe(1);
+        manualFlashcard.UserId.ShouldBe(TEST_USER_ID);
 
         var aiFullFlashcard = savedFlashcards.FirstOrDefault(f => f.Front == "Front2");
         aiFullFlashcard.ShouldNotBeNull();
         aiFullFlashcard.Back.ShouldBe("Back2");
         aiFullFlashcard.Source.ShouldBe(FlashcardSource.AIFull);
         aiFullFlashcard.FlashcardAIGenerationId.ShouldBe(123);
-        // TODO: assert user ID once we got auth
-        aiFullFlashcard.UserId.ShouldBe(1);
+        aiFullFlashcard.UserId.ShouldBe(TEST_USER_ID);
 
         var aiEditedFlashcard = savedFlashcards.FirstOrDefault(f => f.Front == "Front3");
         aiEditedFlashcard.ShouldNotBeNull();
         aiEditedFlashcard.Back.ShouldBe("Back3");
         aiEditedFlashcard.Source.ShouldBe(FlashcardSource.AIEdited);
         aiEditedFlashcard.FlashcardAIGenerationId.ShouldBe(123);
-        // TODO: assert user ID once we got auth
-        aiEditedFlashcard.UserId.ShouldBe(1);
+        aiEditedFlashcard.UserId.ShouldBe(TEST_USER_ID);
 
         _mockFlashcardGenerationService.Verify(
             s => s.UpdateGenerationMetricsAsync(It.Is<IEnumerable<long>>(ids => ids.SequenceEqual(new List<long> { 123 }))),
@@ -172,13 +175,12 @@ public class FlashcardServiceTests
     public async Task GetFlashcardsAsync_Should_ReturnFlashcardsOfCurrentUserAndResultShoulBePaginated_When_PaginationParametersAreSpecified()
     {
         // Arrange
-        var userId = 1;
         var flashcards = new List<Flashcard>();
         for (int i = 0; i < 20; i++)
         {
             flashcards.Add(new Flashcard
             {
-                UserId = userId,
+                UserId = TEST_USER_ID,
                 Front = $"Front {i + 1}",
                 Back = $"Back {i + 1}",
                 Source = FlashcardSource.Manual,
@@ -190,7 +192,7 @@ public class FlashcardServiceTests
         {
             flashcards.Add(new Flashcard
             {
-                UserId = userId + 1,
+                UserId = TEST_USER_ID + 1,
                 Front = $"Other user front {i + 1}",
                 Back = $"Other user back {i + 1}",
                 Source = FlashcardSource.Manual
@@ -227,13 +229,12 @@ public class FlashcardServiceTests
     public async Task GetFlashcardsAsync_Should_UseDefaultPagination_When_NoPaginationParametersSpecified()
     {
         // Arrange
-        var userId = 1;
         var flashcards = new List<Flashcard>();
         for (int i = 0; i < 20; i++)
         {
             flashcards.Add(new Flashcard
             {
-                UserId = userId,
+                UserId = TEST_USER_ID,
                 Front = $"Front {i + 1}",
                 Back = $"Back {i + 1}",
                 Source = FlashcardSource.Manual,
@@ -290,7 +291,7 @@ public class FlashcardServiceTests
         await _dbContext.Flashcards.AddAsync(new Flashcard
         {
             Id = flashcardId,
-            UserId = 1,
+            UserId = TEST_USER_ID,
             Front = "Test Front",
             Back = "Test Back",
             Source = FlashcardSource.Manual

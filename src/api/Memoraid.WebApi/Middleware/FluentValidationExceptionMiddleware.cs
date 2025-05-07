@@ -26,7 +26,7 @@ public class FluentValidationExceptionMiddleware
             context.Response.StatusCode = 422;
 
             var errors = ex.Errors
-                .Select(err => new Response.Error("VALIDATION_ERROR", err.ErrorMessage, err.PropertyName))
+                .Select(err => new Response.Error(err.ErrorCode, err.ErrorMessage, err.PropertyName))
                 .ToArray();
 
             var response = new Response(errors);

@@ -20,22 +20,30 @@ namespace Memoraid.Tests.Unit.Services;
 [TestFixture]
 public class FlashcardGenerationServiceTests
 {
+    private const long TEST_USER_ID = 1;
+
     private FlashcardGenerationService _service;
     private MemoraidDbContext _dbContext;
     private Mock<IOpenRouterService> _mockOpenRouterService;
+    private Mock<IUserContext> _mockUserContext;
 
     [SetUp]
     public void Setup()
     {
+        _mockUserContext = new Mock<IUserContext>();
+        _mockUserContext.Setup(x => x.UserId).Returns(TEST_USER_ID);
+        _mockUserContext.Setup(x => x.GetUserIdOrThrow()).Returns(TEST_USER_ID);
+        _mockOpenRouterService = new Mock<IOpenRouterService>();
+
         var options = new DbContextOptionsBuilder<MemoraidDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .AddInterceptors(new SaveEntityBaseInterceptor())
+            .AddInterceptors(new SaveEntityBaseInterceptor(_mockUserContext.Object))
             .Options;
 
         _dbContext = new MemoraidDbContext(options);
-        _mockOpenRouterService = new Mock<IOpenRouterService>();
 
         _service = new FlashcardGenerationService(
+            _mockUserContext.Object,
             _dbContext,
             _mockOpenRouterService.Object,
             new GenerateFlashcardsRequestValidator());
@@ -80,6 +88,7 @@ public class FlashcardGenerationServiceTests
         log.AcceptedEditedFlashcardsCount.ShouldBeNull();
         log.AcceptedUneditedFlashcardsCount.ShouldBeNull();
         log.AllFlashcardsCount.ShouldBe(response.Flashcards.Count);
+        log.UserId.ShouldBe(TEST_USER_ID);
     }
 
     [Test]
@@ -124,13 +133,13 @@ public class FlashcardGenerationServiceTests
         {
             new() {
                 Id = generationId1,
-                UserId = 1,
+                UserId = TEST_USER_ID,
                 AIModel = "TestModel1",
                 SourceText = "Test text 1"
             },
             new() {
                 Id = generationId2,
-                UserId = 1,
+                UserId = TEST_USER_ID,
                 AIModel = "TestModel2",
                 SourceText = "Test text 2"
             }
@@ -140,18 +149,18 @@ public class FlashcardGenerationServiceTests
 
         var flashcards = new List<Flashcard>
         {
-            new() { UserId = 1, Front = "Gen1-1", Back = "Back1", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId1 },
-            new() { UserId = 1, Front = "Gen1-2", Back = "Back2", Source = FlashcardSource.AIEdited, FlashcardAIGenerationId = generationId1 },
-            new() { UserId = 1, Front = "Gen2-1", Back = "Back3", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId2 },
-            new() { UserId = 1, Front = "Gen2-2", Back = "Back4", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId2 },
-            new() { UserId = 1, Front = "Gen2-3", Back = "Back5", Source = FlashcardSource.AIEdited, FlashcardAIGenerationId = generationId2 }
+            new() { UserId = TEST_USER_ID, Front = "Gen1-1", Back = "Back1", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId1 },
+            new() { UserId = TEST_USER_ID, Front = "Gen1-2", Back = "Back2", Source = FlashcardSource.AIEdited, FlashcardAIGenerationId = generationId1 },
+            new() { UserId = TEST_USER_ID, Front = "Gen2-1", Back = "Back3", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId2 },
+            new() { UserId = TEST_USER_ID, Front = "Gen2-2", Back = "Back4", Source = FlashcardSource.AIFull, FlashcardAIGenerationId = generationId2 },
+            new() { UserId = TEST_USER_ID, Front = "Gen2-3", Back = "Back5", Source = FlashcardSource.AIEdited, FlashcardAIGenerationId = generationId2 }
         };
 
         await _dbContext.Flashcards.AddRangeAsync(flashcards);
         await _dbContext.SaveChangesAsync();
 
         // Act
-        await _service.UpdateGenerationMetricsAsync(new List<long> { generationId1, generationId2 });
+        await _service.UpdateGenerationMetricsAsync([generationId1, generationId2]);
 
         // Assert
         var updatedGeneration1 = generations[0];
@@ -169,14 +178,14 @@ public class FlashcardGenerationServiceTests
     public async Task UpdateGenerationMetricsAsync_Should_DoNothing_When_EmptyList()
     {
         // Arrange & Act & Assert
-        await _service.UpdateGenerationMetricsAsync(new List<long>());
+        await _service.UpdateGenerationMetricsAsync([]);
     }
 
     [Test]
     public async Task UpdateGenerationMetricsAsync_Should_HandleGracefully_When_GenerationDoesNotExist()
     {
         // Arrange & Act & Assert
-        await _service.UpdateGenerationMetricsAsync(new List<long> { 999 });
+        await _service.UpdateGenerationMetricsAsync([999]);
     }
 
     [Test]

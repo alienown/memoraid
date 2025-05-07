@@ -7,6 +7,7 @@ using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Moq;
 using Shouldly;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,19 +24,23 @@ public class UserServiceTests
     private LoginUserRequestValidator _loginUserValidator = null!;
     private UserService _userService = null!;
     private IOptions<ApplicationOptions> _appOptions = null!;
+    private Mock<IUserContext> _mockUserContext;
 
     [SetUp]
     public void Setup()
     {
+        _mockUserContext = new Mock<IUserContext>();
+        _mockUserContext.Setup(x => x.UserId).Returns((long?)null);
+
         var options = new DbContextOptionsBuilder<MemoraidDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .AddInterceptors(new SaveEntityBaseInterceptor())
+            .AddInterceptors(new SaveEntityBaseInterceptor(_mockUserContext.Object))
             .Options;
 
         _dbContext = new MemoraidDbContext(options);
         _registerUserValidator = new RegisterUserRequestValidator(_dbContext);
         _loginUserValidator = new LoginUserRequestValidator();
-        
+
         // Configure application options with test JWT settings
         var appOptions = new ApplicationOptions
         {
@@ -51,13 +56,13 @@ public class UserServiceTests
                 ApiBaseUrl = ""
             }
         };
-        
+
         _appOptions = Options.Create(appOptions);
-        
+
         _userService = new UserService(
-            _dbContext, 
-            _registerUserValidator, 
-            _loginUserValidator, 
+            _dbContext,
+            _registerUserValidator,
+            _loginUserValidator,
             _appOptions);
     }
 
@@ -224,7 +229,7 @@ public class UserServiceTests
         await _userService.RegisterUserAsync(registerRequest);
 
         var user = await _dbContext.Users.SingleAsync(u => u.Email == email);
-        
+
         var loginRequest = new LoginUserRequest
         {
             Email = email,
@@ -238,25 +243,25 @@ public class UserServiceTests
         result.IsSuccess.ShouldBeTrue();
         result.Data.ShouldNotBeNull();
         result.Data.Token.ShouldNotBeNullOrEmpty();
-        
+
         // Verify token format and payload
         var tokenHandler = new JwtSecurityTokenHandler();
         tokenHandler.CanReadToken(result.Data.Token).ShouldBeTrue();
-        
+
         var jwtToken = tokenHandler.ReadJwtToken(result.Data.Token);
-        
+
         // Verify token has required claims
         jwtToken.Claims.ShouldContain(c => c.Type == "sub" && c.Value == user.Id.ToString());
         jwtToken.Claims.ShouldContain(c => c.Type == "iss" && c.Value == _appOptions.Value.Jwt.Issuer);
         jwtToken.Claims.ShouldContain(c => c.Type == "aud" && c.Value == _appOptions.Value.Jwt.Audience);
-        
+
         // Verify expiration time is set correctly - should be around 1 hour in the future
         var expectedExpiration = DateTime.UtcNow.AddHours(1);
         var actualExpiration = jwtToken.ValidTo;
-        
+
         // Allow small time deviation (few seconds) between test execution and token generation
         Math.Abs((actualExpiration - expectedExpiration).TotalMinutes).ShouldBeLessThan(1);
-        
+
         // Verify algorithm is correct
         jwtToken.SignatureAlgorithm.ShouldBe("HS256");
     }

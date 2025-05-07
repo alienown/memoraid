@@ -24,48 +24,43 @@ public interface IFlashcardService
 
 internal class FlashcardService : IFlashcardService
 {
+    private readonly IUserContext _userContext;
     private readonly MemoraidDbContext _dbContext;
-    private readonly IValidator<CreateFlashcardsRequest> _validator;
     private readonly IFlashcardGenerationService _flashcardGenerationService;
-    private readonly IValidator<GetFlashcardsRequest>? _getFlashcardsValidator;
-    private readonly IValidator<long>? _deleteFlashcardValidator;
-    private readonly IValidator<UpdateFlashcardRequest>? _updateFlashcardValidator;
+    private readonly IValidator<CreateFlashcardsRequest> _createFlashcardsRequestValidator;
+    private readonly IValidator<GetFlashcardsRequest>? _getFlashcardsRequestValidator;
+    private readonly IValidator<long>? _deleteFlashcardRequestValidator;
+    private readonly IValidator<UpdateFlashcardRequest>? _updateFlashcardRequestValidator;
 
     internal const string FlashcardNotFoundMessage = "Flashcard not found.";
 
     public FlashcardService(
+        IUserContext userContext,
         MemoraidDbContext dbContext,
-        IValidator<CreateFlashcardsRequest> validator,
-        IFlashcardGenerationService flashcardGenerationService)
-    {
-        _dbContext = dbContext;
-        _validator = validator;
-        _flashcardGenerationService = flashcardGenerationService;
-    }
-
-    public FlashcardService(
-        MemoraidDbContext dbContext,
-        IValidator<CreateFlashcardsRequest> validator,
+        IValidator<CreateFlashcardsRequest> createFlashcardsRequestValidator,
         IValidator<GetFlashcardsRequest> getFlashcardsValidator,
         IValidator<long>? deleteFlashcardValidator,
         IValidator<UpdateFlashcardRequest>? updateFlashcardValidator,
         IFlashcardGenerationService flashcardGenerationService)
     {
         _dbContext = dbContext;
-        _validator = validator;
-        _getFlashcardsValidator = getFlashcardsValidator;
-        _deleteFlashcardValidator = deleteFlashcardValidator;
-        _updateFlashcardValidator = updateFlashcardValidator;
+        _createFlashcardsRequestValidator = createFlashcardsRequestValidator;
+        _getFlashcardsRequestValidator = getFlashcardsValidator;
+        _deleteFlashcardRequestValidator = deleteFlashcardValidator;
+        _updateFlashcardRequestValidator = updateFlashcardValidator;
         _flashcardGenerationService = flashcardGenerationService;
+        _userContext = userContext;
     }
 
     public async Task CreateFlashcardsAsync(CreateFlashcardsRequest request)
     {
-        await _validator.ValidateAndThrowAsync(request);
+        await _createFlashcardsRequestValidator.ValidateAndThrowAsync(request);
+
+        var userId = _userContext.GetUserIdOrThrow();
 
         var flashcards = request.Flashcards!.Select(f => new Flashcard
         {
-            UserId = 1, // Assume user ID is 1 for now
+            UserId = userId,
             Front = f.Front!,
             Back = f.Back!,
             Source = f.Source!.Value,
@@ -93,11 +88,11 @@ internal class FlashcardService : IFlashcardService
 
     public async Task<Response<GetFlashcardsResponse>> GetFlashcardsAsync(GetFlashcardsRequest request)
     {
-        _getFlashcardsValidator.ValidateAndThrow(request);
+        _getFlashcardsRequestValidator.ValidateAndThrow(request);
 
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
-        int userId = 1; // Assume user ID is 1 for now
+        long userId = _userContext.GetUserIdOrThrow();
 
         var query = _dbContext.Flashcards
             .Where(f => f.UserId == userId)
@@ -122,9 +117,9 @@ internal class FlashcardService : IFlashcardService
 
     public async Task<Response> DeleteFlashcardAsync(long id)
     {
-        _deleteFlashcardValidator.ValidateAndThrow(id);
+        _deleteFlashcardRequestValidator.ValidateAndThrow(id);
 
-        int userId = 1; // Assume user ID is 1 for now
+        long userId = _userContext.GetUserIdOrThrow();
 
         var flashcard = await _dbContext.Flashcards
             .Where(f => f.Id == id && f.UserId == userId)
@@ -144,9 +139,9 @@ internal class FlashcardService : IFlashcardService
 
     public async Task<Response> UpdateFlashcardAsync(long id, UpdateFlashcardRequest request)
     {
-        _updateFlashcardValidator.ValidateAndThrow(request);
+        _updateFlashcardRequestValidator.ValidateAndThrow(request);
 
-        int userId = 1; // Assume user ID is 1 for now
+        long userId = _userContext.GetUserIdOrThrow();
 
         var flashcard = await _dbContext.Flashcards
             .Where(f => f.Id == id && f.UserId == userId)

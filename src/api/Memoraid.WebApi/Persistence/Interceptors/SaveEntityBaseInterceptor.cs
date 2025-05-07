@@ -1,4 +1,5 @@
 ﻿using Memoraid.WebApi.Persistence.Entities;
+using Memoraid.WebApi.Services;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System;
 using System.Threading;
@@ -8,6 +9,15 @@ namespace Memoraid.WebApi.Persistence.Interceptors;
 
 internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
 {
+    private const string System = "System";
+
+    private readonly IUserContext _userContext;
+
+    public SaveEntityBaseInterceptor(IUserContext userContext)
+    {
+        _userContext = userContext;
+    }
+
     public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
     {
         if (eventData.Context != null)
@@ -25,7 +35,7 @@ internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
 
                     if (entry.Entity.CreatedBy == null)
                     {
-                        entry.Entity.CreatedBy = "User"; // TODO: Get the current user
+                        entry.Entity.CreatedBy = _userContext.UserId?.ToString() ?? System;
                     }
                 }
                 else if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Modified)
@@ -37,7 +47,7 @@ internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
 
                     if (entry.Entity.LastModifiedBy == null)
                     {
-                        entry.Entity.LastModifiedBy = "User"; // TODO: Get the current user
+                        entry.Entity.LastModifiedBy = _userContext.UserId?.ToString() ?? System;
                     }
                 }
             }

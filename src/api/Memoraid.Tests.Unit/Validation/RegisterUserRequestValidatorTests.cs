@@ -4,8 +4,10 @@ using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
+using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
 using System.Threading.Tasks;
 
@@ -16,13 +18,17 @@ public class RegisterUserRequestValidatorTests
 {
     private RegisterUserRequestValidator _validator;
     private MemoraidDbContext _dbContext;
+    private Mock<IUserContext> _mockUserContext;
 
     [SetUp]
     public void Setup()
     {
+        _mockUserContext = new Mock<IUserContext>();
+        _mockUserContext.Setup(x => x.UserId).Returns((long?)null);
+
         var options = new DbContextOptionsBuilder<MemoraidDbContext>()
             .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-            .AddInterceptors(new SaveEntityBaseInterceptor())
+            .AddInterceptors(new SaveEntityBaseInterceptor(_mockUserContext.Object))
             .Options;
 
         _dbContext = new MemoraidDbContext(options);

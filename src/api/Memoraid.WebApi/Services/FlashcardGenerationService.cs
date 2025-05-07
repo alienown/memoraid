@@ -38,29 +38,33 @@ internal class FlashcardGenerationService : IFlashcardGenerationService
         - Flashcards must be created in the same language as the source text
         """;
 
+    private readonly IUserContext _userContext;
     private readonly MemoraidDbContext _dbContext;
     private readonly IOpenRouterService _openRouterService;
-    private readonly IValidator<GenerateFlashcardsRequest> _validator;
+    private readonly IValidator<GenerateFlashcardsRequest> _generateFlashcardsRequestValidator;
 
     public FlashcardGenerationService(
+        IUserContext userContext,
         MemoraidDbContext dbContext,
         IOpenRouterService openRouterService,
-        IValidator<GenerateFlashcardsRequest> validator)
+        IValidator<GenerateFlashcardsRequest> generateFlashcardsRequestValidator)
     {
+        _userContext = userContext;
         _dbContext = dbContext;
         _openRouterService = openRouterService;
-        _validator = validator;
+        _generateFlashcardsRequestValidator = generateFlashcardsRequestValidator;
     }
 
     public async Task<GenerateFlashcardsResponse> GenerateFlashcardsAsync(GenerateFlashcardsRequest request)
     {
-        _validator.ValidateAndThrow(request);
+        _generateFlashcardsRequestValidator.ValidateAndThrow(request);
 
         var flashcards = await GenerateFlashcardsUsingAIAsync(request.SourceText!);
+        var userId = _userContext.GetUserIdOrThrow();
 
         var generationRecord = new FlashcardAIGeneration
         {
-            UserId = 1, // In a real application, this would come from authentication
+            UserId = userId,
             AIModel = AIModel,
             SourceText = request.SourceText!,
             AllFlashcardsCount = flashcards.Count,

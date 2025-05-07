@@ -2,6 +2,7 @@ using FluentValidation;
 using Memoraid.WebApi.Persistence;
 using Memoraid.WebApi.Persistence.Enums;
 using Memoraid.WebApi.Requests;
+using Memoraid.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
@@ -18,10 +19,12 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
     internal const string GenerationIdMustBeGreaterThanZeroError = "GenerationId must be greater than zero.";
     internal const string GenerationNotExistsError = "The specified AI generation does not exist.";
 
+    private readonly IUserContext _userContext;
     private readonly MemoraidDbContext _dbContext;
 
-    public CreateFlashcardsRequestValidator(MemoraidDbContext dbContext)
+    public CreateFlashcardsRequestValidator(IUserContext userContext, MemoraidDbContext dbContext)
     {
+        _userContext = userContext;
         _dbContext = dbContext;
 
         RuleFor(x => x.Flashcards)
@@ -55,8 +58,10 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
         if (!generationId.HasValue)
             return;
 
+        var userId = _userContext.GetUserIdOrThrow();
+
         var generationExists = await _dbContext.FlashcardAIGenerations
-            .AnyAsync(g => g.Id == generationId && g.UserId == 1, cancellationToken);
+            .AnyAsync(g => g.Id == generationId && g.UserId == userId, cancellationToken);
 
         if (!generationExists)
         {

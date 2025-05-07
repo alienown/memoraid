@@ -43,10 +43,12 @@ builder.Services.AddOpenApi(options =>
 
 builder.Services.Configure<ApplicationOptions>(builder.Configuration);
 
-builder.Services.AddDbContext<MemoraidDbContext>(options =>
+builder.Services.AddDbContext<MemoraidDbContext>((sp, options) =>
+{
     options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres"))
         .UseSnakeCaseNamingConvention()
-        .AddInterceptors(new SaveEntityBaseInterceptor()));
+        .AddInterceptors(new SaveEntityBaseInterceptor(sp.GetRequiredService<IUserContext>()));
+});
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -64,6 +66,8 @@ builder.Services
     .AddAuthentication()
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
+
         var key = Encoding.ASCII.GetBytes(builder.Configuration.GetRequiredSection("Jwt:Secret").Value!);
         var issuer = builder.Configuration.GetRequiredSection("Jwt:Issuer").Value!;
         var audience = builder.Configuration.GetRequiredSection("Jwt:Audience").Value!;
@@ -81,12 +85,15 @@ builder.Services
         };
     });
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddAuthorization();
 
 // Add services
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IUserContext, UserContext>();
 
 // Add validators
 builder.Services.AddScoped<IValidator<GenerateFlashcardsRequest>, GenerateFlashcardsRequestValidator>();
@@ -100,6 +107,7 @@ builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidat
 var app = builder.Build();
 
 app.UseMiddleware<FluentValidationExceptionMiddleware>();
+app.UseMiddleware<UserNotAuthenticatedExceptionMiddleware>();
 
 app.UseCors();
 
@@ -121,7 +129,8 @@ app.MapPost("/flashcards/generate", async (GenerateFlashcardsRequest request, IF
     return Results.Ok(new Response<GenerateFlashcardsResponse>(result));
 })
 .WithName("GenerateFlashcards")
-.Produces<Response<GenerateFlashcardsResponse>>();
+.Produces<Response<GenerateFlashcardsResponse>>()
+.RequireAuthorization();
 
 app.MapPost("/flashcards", async (CreateFlashcardsRequest request, IFlashcardService flashcardService) =>
 {
@@ -130,7 +139,8 @@ app.MapPost("/flashcards", async (CreateFlashcardsRequest request, IFlashcardSer
     return Results.Created("/flashcards", new Response());
 })
 .WithName("CreateFlashcards")
-.Produces<Response>();
+.Produces<Response>()
+.RequireAuthorization();
 
 app.MapGet("/flashcards", async ([AsParameters] GetFlashcardsRequest request, IFlashcardService flashcardService) =>
 {
@@ -139,7 +149,8 @@ app.MapGet("/flashcards", async ([AsParameters] GetFlashcardsRequest request, IF
     return Results.Ok(result);
 })
 .WithName("GetFlashcards")
-.Produces<Response<GetFlashcardsResponse>>();
+.Produces<Response<GetFlashcardsResponse>>()
+.RequireAuthorization();
 
 app.MapDelete("/flashcards/{id}", async (long id, IFlashcardService flashcardService) =>
 {
@@ -155,7 +166,8 @@ app.MapDelete("/flashcards/{id}", async (long id, IFlashcardService flashcardSer
     return Results.Ok(response);
 })
 .WithName("DeleteFlashcard")
-.Produces<Response>();
+.Produces<Response>()
+.RequireAuthorization();
 
 app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, IFlashcardService flashcardService) =>
 {
@@ -171,7 +183,8 @@ app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, I
     return Results.Ok(response);
 })
 .WithName("UpdateFlashcard")
-.Produces<Response>();
+.Produces<Response>()
+.RequireAuthorization();
 
 app.MapPost("/users/register", async (RegisterUserRequest request, IUserService userService) =>
 {
