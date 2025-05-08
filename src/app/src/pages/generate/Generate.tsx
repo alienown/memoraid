@@ -76,7 +76,7 @@ const Generate = () => {
             front: card.front,
             back: card.back,
             source: FlashcardSource.AIFull,
-            generationId: response.data.data.generationId,
+            generationId: response.data.data!.generationId,
             isAccepted: false,
           })
         );

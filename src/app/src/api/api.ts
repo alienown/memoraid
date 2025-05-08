@@ -51,16 +51,30 @@ export interface GenerateFlashcardsRequest {
   sourceText?: string | null;
 }
 
-export interface GenerateFlashcardsResponse {
+export type GenerateFlashcardsResponse = {
   flashcards: GeneratedFlashcard[];
   /** @format int64 */
   generationId: number;
-}
+} | null;
 
-export interface GetFlashcardsResponse {
+export type GetFlashcardsResponse = {
   items: FlashcardsListItem[];
   /** @format int32 */
   total: number;
+} | null;
+
+export interface LoginUserRequest {
+  email?: string | null;
+  password?: string | null;
+}
+
+export type LoginUserResponse = {
+  token: string;
+} | null;
+
+export interface RegisterUserRequest {
+  email?: string | null;
+  password?: string | null;
 }
 
 export interface Response {
@@ -76,6 +90,12 @@ export interface ResponseOfGenerateFlashcardsResponse {
 
 export interface ResponseOfGetFlashcardsResponse {
   data: GetFlashcardsResponse;
+  isSuccess: boolean;
+  errors: Error[];
+}
+
+export interface ResponseOfLoginUserResponse {
+  data: LoginUserResponse;
   isSuccess: boolean;
   errors: Error[];
 }
@@ -432,6 +452,41 @@ export class Api<
       this.request<Response, any>({
         path: `/flashcards/${id}`,
         method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+  };
+  users = {
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name RegisterUser
+     * @request POST:/users/register
+     */
+    registerUser: (data: RegisterUserRequest, params: RequestParams = {}) =>
+      this.request<Response, any>({
+        path: `/users/register`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name LoginUser
+     * @request POST:/users/login
+     */
+    loginUser: (data: LoginUserRequest, params: RequestParams = {}) =>
+      this.request<ResponseOfLoginUserResponse, any>({
+        path: `/users/login`,
+        method: "POST",
         body: data,
         type: ContentType.Json,
         format: "json",

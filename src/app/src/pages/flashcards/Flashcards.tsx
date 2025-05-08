@@ -46,7 +46,7 @@ export function Flashcards() {
         PageSize: pageSize,
       });
 
-      if (response.data.isSuccess) {
+      if (response.data.isSuccess && response.data.data) {
         setFlashcards(response.data.data);
       } else {
         setError("Failed to load flashcards");

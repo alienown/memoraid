@@ -7,10 +7,10 @@ A modular React-based UI utilizing functional components, hooks, shadcn/ui for r
 
 - **Register View**
   - **View Path:** /register
-  - **Primary Purpose:** Enable user registration and automatic login after successful registration.
+  - **Primary Purpose:** Enable user registration so that they can later log in and use authorized features of the app.
   - **Key Information to Display:** Email/password fields, validation messages, and submit action feedback.
   - **Key View Components:** Input fields, Button, Form, Toast notifications for success/error messages.
-  - **UX, Accessibility, and Security Considerations:** Clear form validations, accessible labels, HTTPS secure submissions.
+  - **UX, Accessibility, and Security Considerations:** Inline field validations, accessible labels, HTTPS secure submissions.
 
 - **Authentication View**
   - **View Path:** /login
