@@ -126,4 +126,4 @@ Here is an example of what the output file should look like (content is replacea
 3. [...]
 ```
 
-Start analyzing and planning now. Your final output should consist solely of an implementation plan in English in markdown format, which you will save in the file .ai/ui/{view-name}-view-implementation-plan.md and should not duplicate or repeat any work done in the implementation split.
+Start analyzing and planning now. Your final output should consist solely of an implementation plan in English in markdown format, which you will save in the file .ai/prompts/ui/{view-name}-view-implementation-plan.md and should not duplicate or repeat any work done in the implementation split.

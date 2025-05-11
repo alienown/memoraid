@@ -63,7 +63,9 @@ Not included in MVP:
   - Both fields are validated for requireness.
   - Email format is validated.
   - User data is securely stored.
-  - A login form allows access upon successful registration.
+  - User is redirected to the login page after successful registration.
+  - User provides email and password to log in.
+  - Successful login redirects the user to the flashcard generation view.
 
 ### US-002: AI Flashcard Generation
 - Description: As a logged in user, I want to paste input text and have the application generate flashcards automatically, so that I can save time.

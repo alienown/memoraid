@@ -1,7 +1,10 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useNavigate } from "react-router-dom";
+import { LoginUserRequest } from "@/api/api";
+import { Api } from "@/api/api";
+import { toast } from "sonner";
 import {
   Card,
   CardContent,
@@ -10,42 +13,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Api } from "../api/api";
 
-export const Registration: React.FC = () => {
+const apiClient = new Api();
+
+export default function Login() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | undefined>(undefined);
+  const [passwordError, setPasswordError] = useState<string | undefined>(
+    undefined
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const api = new Api();
+  // Handlers
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setEmailError(undefined);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setPasswordError(undefined);
+  };
 
   const validateForm = (): boolean => {
     let isValid = true;
 
-    // Validate email
-    if (!email) {
+    if (!email.trim()) {
       setEmailError("Email is required");
       isValid = false;
-    } else {
-      setEmailError(null);
     }
 
-    // Validate password
-    if (!password) {
+    if (!password.trim()) {
       setPasswordError("Password is required");
       isValid = false;
-    } else {
-      setPasswordError(null);
     }
 
     return isValid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -55,18 +64,14 @@ export const Registration: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.users.registerUser({
-        email,
-        password,
-      });
-
+      const request: LoginUserRequest = { email, password };
+      const response = await apiClient.users.loginUser(request);
       if (response.data.isSuccess) {
-        toast.success("Registration successful! Please log in.");
-        navigate("/login");
+        toast.success("Login successful!");
+        navigate("/generate");
       } else {
-        const errors = response.data.errors;
-        if (errors && errors.length > 0) {
-          errors.forEach((error) => {
+        if (response.data.errors) {
+          response.data.errors.forEach((error) => {
             if (error.propertyName === "email") {
               setEmailError(error.message);
             } else if (error.propertyName === "password") {
@@ -75,26 +80,30 @@ export const Registration: React.FC = () => {
               toast.error(error.message);
             }
           });
-        } else {
-          toast.error("Registration failed. Please try again.");
         }
       }
-    } catch {
-      toast.error("Failed to connect to the server. Please try again later.");
+    } catch (error: unknown) {
+      const apiError = error as
+        | { error?: { errors?: { message: string }[] } }
+        | undefined;
+      toast.error(
+        apiError?.error?.errors?.[0]?.message ||
+          "An error occurred during login"
+      );
     } finally {
       setIsSubmitting(false);
     }
   };
-
   return (
     <div className="flex justify-center items-center h-full">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle className="text-center">Create an account</CardTitle>
+          <CardTitle className="text-center">Login to Memoraid</CardTitle>
           <CardDescription className="text-center">
-            Enter your details below to register
+            Enter your credentials to access your account
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -103,7 +112,7 @@ export const Registration: React.FC = () => {
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 disabled={isSubmitting}
               />
               {emailError && (
@@ -122,7 +131,7 @@ export const Registration: React.FC = () => {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 disabled={isSubmitting}
               />
               {passwordError && (
@@ -136,28 +145,23 @@ export const Registration: React.FC = () => {
             </div>
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Registering..." : "Register"}
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </form>
         </CardContent>
+
         <CardFooter className="flex flex-col space-y-4">
           <div className="text-sm text-center text-muted-foreground">
-            Already have an account?{" "}
+            Don't have an account?{" "}
             <a
-              href="/login"
+              href="/register"
               className="text-primary underline-offset-4 hover:underline"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/login");
-              }}
             >
-              Log in
+              Register
             </a>
           </div>
         </CardFooter>
       </Card>
     </div>
   );
-};
-
-export default Registration;
+}

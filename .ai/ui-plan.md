@@ -12,9 +12,9 @@ A modular React-based UI utilizing functional components, hooks, shadcn/ui for r
   - **Key View Components:** Input fields, Button, Form, Toast notifications for success/error messages.
   - **UX, Accessibility, and Security Considerations:** Inline field validations, accessible labels, HTTPS secure submissions.
 
-- **Authentication View**
+- **Login View**
   - **View Path:** /login
-  - **Primary Purpose:** Enable user registration and login.
+  - **Primary Purpose:** Enable user login.
   - **Key Information to Display:** Email/password fields, validation messages, and submit action feedback.
   - **Key View Components:** Input fields, Button, Form, Toast notifications for success/error messages.
   - **UX, Accessibility, and Security Considerations:** Clear form validations, accessible labels, HTTPS secure submissions.
@@ -50,7 +50,7 @@ A modular React-based UI utilizing functional components, hooks, shadcn/ui for r
 ## 3. User Journey Map
 1. **Entry Point:** User accesses the application.
    - If unauthenticated, redirected to /login.
-2. **Authentication:** User registers/logs in via the Register/Authentication views.
+2. **Authentication:** User registers/logs in via the Register/Login views.
 3. **AI Flashcard Generation:** Authenticated users are automatically redirected to /generate.
    - Paste text → AI generates flashcards → User reviews and accepts/rejects/edits flashcards. Then clicks "Submit flashcards" to save accepted ones in bulk.
 4. **Flashcard Management:** User enters /flashcards to view all of his saved flashcards.

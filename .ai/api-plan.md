@@ -31,7 +31,7 @@
       "password": "string, required"
     }
   - Success response:
-    - 200 OK with response: { "token": "JWT string" }
+    - 200 OK with response: { isSuccess: boolean, data: { token: string }, errors: [] }
   - Error responses:
     - 400 for syntactic validation errors
     - 401 for invalid credentials

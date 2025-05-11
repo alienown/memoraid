@@ -2,8 +2,13 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import Generate from "../pages/generate/Generate";
 import { Flashcards } from "../pages/flashcards/Flashcards";
 import Registration from "../pages/Registration";
+import Login from "../pages/Login";
 
 export const router = createBrowserRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
   {
     path: "/register",
     element: <Registration />,
