@@ -7,7 +7,8 @@ try {
     fileName: "api.ts",
     url: "http://localhost:7000/openapi/v1.json",
     output: path.join(process.cwd(), "src", "api"),
-    httpClientType: "fetch",
+    httpClientType: "axios",
+    extractRequestParams: true,
   });
 
   console.log("API generated successfully!");

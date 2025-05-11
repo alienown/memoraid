@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { LoginUserRequest } from "@/api/api";
-import { Api } from "@/api/api";
 import { toast } from "sonner";
 import {
   Card,
@@ -13,11 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-const apiClient = new Api();
+import { useAuth } from "@/lib/auth/useAuth";
+import { apiClient } from "@/api/apiClient";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -66,7 +66,8 @@ export default function Login() {
     try {
       const request: LoginUserRequest = { email, password };
       const response = await apiClient.users.loginUser(request);
-      if (response.data.isSuccess) {
+      if (response.data.isSuccess && response.data.data?.token) {
+        login(response.data.data.token);
         toast.success("Login successful!");
         navigate("/generate");
       } else {
@@ -84,10 +85,10 @@ export default function Login() {
       }
     } catch (error: unknown) {
       const apiError = error as
-        | { error?: { errors?: { message: string }[] } }
+        | { response?: { data: { errors: { message: string }[] } } }
         | undefined;
       toast.error(
-        apiError?.error?.errors?.[0]?.message ||
+        apiError?.response?.data?.errors?.[0].message ||
           "An error occurred during login"
       );
     } finally {

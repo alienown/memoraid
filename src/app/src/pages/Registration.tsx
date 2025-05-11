@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Api } from "../api/api";
+import { apiClient } from "@/api/apiClient";
 
 export const Registration: React.FC = () => {
   const navigate = useNavigate();
@@ -20,8 +20,6 @@ export const Registration: React.FC = () => {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const api = new Api();
 
   const validateForm = (): boolean => {
     let isValid = true;
@@ -55,7 +53,7 @@ export const Registration: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await api.users.registerUser({
+      const response = await apiClient.users.registerUser({
         email,
         password,
       });
@@ -79,8 +77,14 @@ export const Registration: React.FC = () => {
           toast.error("Registration failed. Please try again.");
         }
       }
-    } catch {
-      toast.error("Failed to connect to the server. Please try again later.");
+    } catch (error: unknown) {
+      const apiError = error as
+        | { response?: { data: { errors: { message: string }[] } } }
+        | undefined;
+      toast.error(
+        apiError?.response?.data?.errors?.[0].message ||
+          "An error occurred during registration"
+      );
     } finally {
       setIsSubmitting(false);
     }

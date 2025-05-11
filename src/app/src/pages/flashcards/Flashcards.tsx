@@ -2,15 +2,14 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { Api, FlashcardSource } from "@/api/api";
+import { FlashcardSource } from "@/api/api";
 import { FlashcardsList } from "./FlashcardsList";
 import { CreateFlashcardModal } from "./CreateFlashcardModal";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { Pagination } from "./Pagination";
 import { CreateFlashcardData, EditFlashcardData } from "./types";
-
-const apiClient = new Api();
+import { apiClient } from "@/api/apiClient";
 
 export function Flashcards() {
   const [flashcards, setFlashcards] = useState<{

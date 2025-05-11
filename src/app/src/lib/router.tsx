@@ -4,6 +4,7 @@ import { Flashcards } from "../pages/flashcards/Flashcards";
 import Registration from "../pages/Registration";
 import Login from "../pages/Login";
 import { RootLayout } from "../components/RootLayout";
+import { ProtectedRoute } from "./ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -16,11 +17,19 @@ export const router = createBrowserRouter([
       },
       {
         path: "/generate",
-        element: <Generate />,
+        element: (
+          <ProtectedRoute>
+            <Generate />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/flashcards",
-        element: <Flashcards />,
+        element: (
+          <ProtectedRoute>
+            <Flashcards />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "/login",

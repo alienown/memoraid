@@ -1,83 +1,103 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth/useAuth";
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, logout } = useAuth();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <div className="sticky w-full top-0 border-b">
       <div className="flex h-14 items-center">
-        <div className="mr-4 font-bold text-xl">Memoraid</div>
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link to="/generate">
-                <NavigationMenuLink
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    isActive("/generate") &&
-                      "font-bold bg-accent text-accent-foreground"
-                  )}
-                >
-                  Generate
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link to="/flashcards">
-                <NavigationMenuLink
-                  className={cn(
-                    navigationMenuTriggerStyle(),
-                    isActive("/flashcards") &&
-                      "font-bold bg-accent text-accent-foreground"
-                  )}
-                >
-                  My Flashcards
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
-        <div className="ml-auto flex gap-2">
+        <Link to="/">
+          <div className="mr-4 font-bold text-xl">Memoraid</div>
+        </Link>
+        {isAuthenticated && (
           <NavigationMenu>
             <NavigationMenuList>
               <NavigationMenuItem>
-                <Link to="/login">
-                  <NavigationMenuLink
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      isActive("/login") &&
-                        "font-bold bg-accent text-accent-foreground"
-                    )}
-                  >
-                    Login
-                  </NavigationMenuLink>
-                </Link>
+                <NavigationMenuLink
+                  className={cn(
+                    isActive("/generate") &&
+                      "font-bold bg-accent text-accent-foreground"
+                  )}
+                  asChild
+                >
+                  <Link to="/generate">Generate </Link>
+                </NavigationMenuLink>
               </NavigationMenuItem>
               <NavigationMenuItem>
-                <Link to="/register">
+                <NavigationMenuLink
+                  className={cn(
+                    isActive("/flashcards") &&
+                      "font-bold bg-accent text-accent-foreground"
+                  )}
+                  asChild
+                >
+                  <Link to="/flashcards">My Flashcards</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+        )}
+        <div className="ml-auto flex gap-2">
+          <NavigationMenu>
+            <NavigationMenuList>
+              {!isAuthenticated && (
+                <>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink
+                      className={cn(
+                        isActive("/login") &&
+                          "font-bold bg-accent text-accent-foreground"
+                      )}
+                      asChild
+                    >
+                      <Link to="/login">Login</Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <NavigationMenuLink
+                      className={cn(
+                        isActive("/register") &&
+                          "font-bold bg-accent text-accent-foreground"
+                      )}
+                      asChild
+                    >
+                      <Link to="/register">Register</Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                </>
+              )}
+              {isAuthenticated && (
+                <NavigationMenuItem>
                   <NavigationMenuLink
+                    onClick={handleLogout}
                     className={cn(
-                      navigationMenuTriggerStyle(),
-                      isActive("/register") &&
+                      isActive("/logout") &&
                         "font-bold bg-accent text-accent-foreground"
                     )}
                   >
-                    Register
+                    Logout
                   </NavigationMenuLink>
-                </Link>
-              </NavigationMenuItem>
+                </NavigationMenuItem>
+              )}
             </NavigationMenuList>
           </NavigationMenu>
         </div>

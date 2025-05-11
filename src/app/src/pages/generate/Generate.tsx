@@ -8,14 +8,11 @@ import {
   CreateFlashcardData,
   CreateFlashcardsRequest,
   GenerateFlashcardsRequest,
-  Api,
 } from "@/api/api";
 import { FlashcardList } from "./FlashcardList";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { FlashcardData } from "./types";
-
-// Initialize the API client
-const apiClient = new Api();
+import { apiClient } from "@/api/apiClient";
 
 interface ModalState {
   isOpen: boolean;
