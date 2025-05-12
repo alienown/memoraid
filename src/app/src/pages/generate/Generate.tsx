@@ -20,7 +20,6 @@ interface ModalState {
 }
 
 const Generate = () => {
-  // Local state variables
   const [sourceText, setSourceText] = useState<string>("");
   const [generatedFlashcards, setGeneratedFlashcards] = useState<
     FlashcardData[]
@@ -31,87 +30,75 @@ const Generate = () => {
   });
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [sourceTextError, setSourceTextError] = useState<string | null>(null);
 
-  // Function to handle text input changes
   const handleTextChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setSourceText(event.target.value);
-    // Clear any previous error
-    if (error) setError(null);
+
+    if (sourceTextError) setSourceTextError(null);
   };
 
-  // Function to generate flashcards via API
   const handleGenerateFlashcards = async () => {
-    // Validate input
     if (!sourceText.trim()) {
-      setError("Please enter text to generate flashcards.");
+      setSourceTextError("Please enter text to generate flashcards.");
       return;
     }
 
     if (sourceText.length > 10000) {
-      setError("Text is too long. Maximum 10,000 characters allowed.");
+      setSourceTextError(
+        "Text is too long. Maximum 10,000 characters allowed."
+      );
       return;
     }
 
     setIsGenerating(true);
-    setError(null);
+    setSourceTextError(null);
 
     try {
-      // Prepare request payload
       const request: GenerateFlashcardsRequest = {
         sourceText: sourceText.trim(),
       };
 
-      // Call the API
       const response = await apiClient.flashcards.generateFlashcards(request);
 
-      // Check if the API call was successful
-      if (response.data.isSuccess && response.data.data) {
-        // Map the API response to our component's flashcards state
-        const flashcards = response.data.data.flashcards.map(
-          (card: GeneratedFlashcard) => ({
-            front: card.front,
-            back: card.back,
-            source: FlashcardSource.AIFull,
-            generationId: response.data.data!.generationId,
-            isAccepted: false,
-          })
-        );
+      if (response.data.isSuccess) {
+        if (
+          !response.data.data ||
+          response.data.data?.flashcards.length === 0
+        ) {
+          toast.error("No flashcards generated. Please try again.");
+        } else {
+          const flashcards = response.data.data.flashcards.map(
+            (card: GeneratedFlashcard) => ({
+              front: card.front,
+              back: card.back,
+              source: FlashcardSource.AIFull,
+              generationId: response.data.data!.generationId,
+              isAccepted: false,
+              errors: [],
+            })
+          );
 
-        setGeneratedFlashcards(flashcards);
+          setGeneratedFlashcards(flashcards);
 
-        // Show success toast
-        if (flashcards.length > 0) {
           toast.success(
             `Generated ${flashcards.length} flashcards successfully!`
           );
-        } else {
-          toast.info(
-            "No flashcards could be generated from the provided text."
-          );
         }
+      } else if (response.data.errors.length > 0) {
+        response.data.errors?.forEach((error) => {
+          toast.error(error.message);
+        });
       } else {
-        // Handle API error
-        const errorMessage =
-          response.data.errors && response.data.errors.length > 0
-            ? response.data.errors[0].message
-            : "Failed to generate flashcards. Please try again.";
-
-        setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error("Failed to generate flashcards. Please try again.");
       }
-    } catch (err) {
-      console.error("Error generating flashcards:", err);
-      setError(
-        "An error occurred while generating flashcards. Please try again."
-      );
-      toast.error("Failed to connect to the server. Please try again later.");
+    } catch {
+      toast.error("Failed to generate flashcards. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // Function to handle accepting a flashcard
   const handleAcceptFlashcard = (index: number) => {
     setGeneratedFlashcards((currentCards) =>
       currentCards.map((card, i) =>
@@ -120,7 +107,6 @@ const Generate = () => {
     );
   };
 
-  // Function to handle rejecting a flashcard
   const handleRejectFlashcard = (index: number) => {
     setGeneratedFlashcards((currentCards) =>
       currentCards.map((card, i) =>
@@ -129,7 +115,6 @@ const Generate = () => {
     );
   };
 
-  // Function to open edit modal for a flashcard
   const handleEditFlashcard = (index: number) => {
     setModalState({
       isOpen: true,
@@ -137,7 +122,6 @@ const Generate = () => {
     });
   };
 
-  // Function to close the edit modal
   const handleCloseModal = () => {
     setModalState({
       isOpen: false,
@@ -145,9 +129,7 @@ const Generate = () => {
     });
   };
 
-  // Function to save edited flashcard
   const handleSaveEdit = (editedCard: { front: string; back: string }) => {
-    // Update the flashcard in the state
     setGeneratedFlashcards((currentCards) =>
       currentCards.map((card) =>
         card === modalState.flashcardToEdit
@@ -161,27 +143,18 @@ const Generate = () => {
       )
     );
 
-    // Close the modal
     handleCloseModal();
 
-    // Show success toast
-    toast.success("Flashcard updated successfully!");
+    toast.success("Flashcard edited successfully");
   };
 
-  // Function to submit accepted flashcards
   const handleSubmitFlashcards = async () => {
     const acceptedCards = generatedFlashcards.filter((card) => card.isAccepted);
 
-    if (acceptedCards.length === 0) {
-      setError("Please accept at least one flashcard before submitting.");
-      return;
-    }
-
     setIsSubmitting(true);
-    setError(null);
+    setSourceTextError(null);
 
     try {
-      // Map to API request format
       const flashcardsToCreate: CreateFlashcardData[] = acceptedCards.map(
         (card) => ({
           front: card.front,
@@ -195,31 +168,22 @@ const Generate = () => {
         flashcards: flashcardsToCreate,
       };
 
-      // Call the API
       const response = await apiClient.flashcards.createFlashcards(request);
 
-      // Handle response
       if (response.data.isSuccess) {
-        // Show success message
         toast.success(`${acceptedCards.length} flashcards saved successfully!`);
 
-        // Reset state
         setSourceText("");
         setGeneratedFlashcards([]);
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          toast.error(error.message);
+        });
       } else {
-        // Handle API error
-        const errorMessage =
-          response.data.errors && response.data.errors.length > 0
-            ? response.data.errors[0].message
-            : "Failed to save flashcards. Please try again.";
-
-        setError(errorMessage);
-        toast.error(errorMessage);
+        toast.error("Failed to save flashcards. Please try again.");
       }
-    } catch (err) {
-      console.error("Error submitting flashcards:", err);
-      setError("An error occurred while saving flashcards. Please try again.");
-      toast.error("Failed to connect to the server. Please try again later.");
+    } catch {
+      toast.error("Failed to save flashcards. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -246,7 +210,9 @@ const Generate = () => {
           disabled={isGenerating}
           className="min-h-[200px] resize-y"
         />
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {sourceTextError && (
+          <p className="text-sm text-red-500">{sourceTextError}</p>
+        )}
         <div className="text-right text-sm text-muted-foreground">
           {sourceText.length}/10,000 characters
         </div>
@@ -284,11 +250,10 @@ const Generate = () => {
         </div>
       )}
 
-      {/* Edit flashcard modal */}
       <EditFlashcardModal
         isOpen={modalState.isOpen}
         flashcard={modalState.flashcardToEdit}
-        onSave={handleSaveEdit}
+        onEdited={handleSaveEdit}
         onCancel={handleCloseModal}
       />
     </div>

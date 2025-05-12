@@ -9,18 +9,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { EditFlashcardData } from "./types";
+import { apiClient } from "@/api/apiClient";
+import { toast } from "sonner";
 
 export interface EditFlashcardModalProps {
   isOpen: boolean;
   flashcard: EditFlashcardData;
-  onSave: (data: EditFlashcardData) => void;
+  onEdited: () => void;
   onCancel: () => void;
 }
 
 export function EditFlashcardModal({
   isOpen,
   flashcard,
-  onSave,
+  onEdited,
   onCancel,
 }: EditFlashcardModalProps) {
   const [front, setFront] = useState("");
@@ -63,15 +65,34 @@ export function EditFlashcardModal({
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const editFlashcard = async () => {
+    try {
+      const response = await apiClient.flashcards.updateFlashcard(
+        flashcard.id,
+        { front, back }
+      );
+
+      if (response.data.isSuccess) {
+        toast.success("Flashcard edited successfully");
+        handleDialogClose();
+        onEdited();
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          toast.error(error.message);
+        });
+      } else {
+        toast.error("Failed to edit flashcard");
+      }
+    } catch {
+      toast.error("Failed to edit flashcard");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      onSave({
-        id: flashcard.id,
-        front: front.trim(),
-        back: back.trim()
-      });
+      await editFlashcard();
     }
   };
 
@@ -86,11 +107,15 @@ export function EditFlashcardModal({
   };
 
   const handleDialogClose = () => {
+    setFront("");
+    setBack("");
+    setFrontError(null);
+    setBackError(null);
     onCancel();
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[900px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>

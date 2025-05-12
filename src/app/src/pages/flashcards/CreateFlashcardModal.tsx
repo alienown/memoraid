@@ -8,17 +8,19 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { CreateFlashcardData } from "./types";
+import { apiClient } from "@/api/apiClient";
+import { FlashcardSource } from "@/api/api";
+import { toast } from "sonner";
 
 export interface CreateFlashcardModalProps {
   isOpen: boolean;
-  onSave: (data: CreateFlashcardData) => void;
+  onCreated: () => void;
   onCancel: () => void;
 }
 
 export function CreateFlashcardModal({
   isOpen,
-  onSave,
+  onCreated,
   onCancel,
 }: CreateFlashcardModalProps) {
   const [front, setFront] = useState("");
@@ -52,13 +54,40 @@ export function CreateFlashcardModal({
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const createFlashcard = async () => {
+    try {
+      const response = await apiClient.flashcards.createFlashcards({
+        flashcards: [
+          {
+            front,
+            back,
+            source: FlashcardSource.Manual,
+            generationId: null,
+          },
+        ],
+      });
+
+      if (response.data.isSuccess) {
+        toast.success("Flashcard created successfully");
+        handleDialogClose();
+        onCreated();
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          toast.error(error.message);
+        });
+      } else {
+        toast.error("Failed to create flashcard");
+      }
+    } catch {
+      toast.error("Failed to create flashcard");
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      onSave({ front: front.trim(), back: back.trim() });
-      setFront("");
-      setBack("");
+      await createFlashcard();
     }
   };
 
@@ -81,7 +110,7 @@ export function CreateFlashcardModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
+    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
       <DialogContent className="sm:max-w-[900px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>

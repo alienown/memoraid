@@ -51,6 +51,5 @@ public class Response<T> : Response where T : class
         Data = null;
     }
 
-    [Required]
-    public required T? Data { get; init; }
+    public T? Data { get; init; }
 }

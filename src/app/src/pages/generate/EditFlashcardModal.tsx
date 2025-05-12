@@ -13,14 +13,14 @@ import { FlashcardData } from "./types";
 interface EditFlashcardModalProps {
   isOpen: boolean;
   flashcard: FlashcardData | null;
-  onSave: (editedCard: { front: string; back: string }) => void;
+  onEdited: (editedCard: { front: string; back: string }) => void;
   onCancel: () => void;
 }
 
 export function EditFlashcardModal({
   isOpen,
   flashcard,
-  onSave,
+  onEdited,
   onCancel,
 }: EditFlashcardModalProps) {
   const [front, setFront] = useState("");
@@ -28,7 +28,6 @@ export function EditFlashcardModal({
   const [frontError, setFrontError] = useState<string | null>(null);
   const [backError, setBackError] = useState<string | null>(null);
 
-  // Reset state when the modal opens with a new flashcard
   useEffect(() => {
     if (flashcard) {
       setFront(flashcard.front);
@@ -68,7 +67,7 @@ export function EditFlashcardModal({
     e.preventDefault();
 
     if (validateForm()) {
-      onSave({ front: front.trim(), back: back.trim() });
+      onEdited({ front: front.trim(), back: back.trim() });
     }
   };
 
@@ -83,7 +82,7 @@ export function EditFlashcardModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+    <Dialog open={isOpen} onOpenChange={onCancel}>
       <DialogContent className="sm:max-w-[900px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>

@@ -27,7 +27,6 @@ export default function Login() {
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Handlers
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     setEmailError(undefined);
@@ -70,27 +69,15 @@ export default function Login() {
         login(response.data.data.token);
         toast.success("Login successful!");
         navigate("/generate");
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          toast.error(error.message);
+        });
       } else {
-        if (response.data.errors) {
-          response.data.errors.forEach((error) => {
-            if (error.propertyName === "email") {
-              setEmailError(error.message);
-            } else if (error.propertyName === "password") {
-              setPasswordError(error.message);
-            } else {
-              toast.error(error.message);
-            }
-          });
-        }
+        toast.error("Login failed. Please try again.");
       }
-    } catch (error: unknown) {
-      const apiError = error as
-        | { response?: { data: { errors: { message: string }[] } } }
-        | undefined;
-      toast.error(
-        apiError?.response?.data?.errors?.[0].message ||
-          "An error occurred during login"
-      );
+    } catch {
+      toast.error("Login failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

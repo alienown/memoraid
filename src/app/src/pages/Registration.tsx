@@ -24,7 +24,6 @@ export const Registration: React.FC = () => {
   const validateForm = (): boolean => {
     let isValid = true;
 
-    // Validate email
     if (!email) {
       setEmailError("Email is required");
       isValid = false;
@@ -32,7 +31,6 @@ export const Registration: React.FC = () => {
       setEmailError(null);
     }
 
-    // Validate password
     if (!password) {
       setPasswordError("Password is required");
       isValid = false;
@@ -61,30 +59,19 @@ export const Registration: React.FC = () => {
       if (response.data.isSuccess) {
         toast.success("Registration successful! Please log in.");
         navigate("/login");
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          if (error.propertyName === "email") {
+            setEmailError(error.message);
+          } else {
+            toast.error(error.message);
+          }
+        });
       } else {
-        const errors = response.data.errors;
-        if (errors && errors.length > 0) {
-          errors.forEach((error) => {
-            if (error.propertyName === "email") {
-              setEmailError(error.message);
-            } else if (error.propertyName === "password") {
-              setPasswordError(error.message);
-            } else {
-              toast.error(error.message);
-            }
-          });
-        } else {
-          toast.error("Registration failed. Please try again.");
-        }
+        toast.error("Registration failed. Please try again.");
       }
-    } catch (error: unknown) {
-      const apiError = error as
-        | { response?: { data: { errors: { message: string }[] } } }
-        | undefined;
-      toast.error(
-        apiError?.response?.data?.errors?.[0].message ||
-          "An error occurred during registration"
-      );
+    } catch {
+      toast.error("Registration failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

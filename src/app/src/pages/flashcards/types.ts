@@ -3,8 +3,3 @@ export interface EditFlashcardData {
   front: string;
   back: string;
 }
-
-export interface CreateFlashcardData {
-  front: string;
-  back: string;
-}

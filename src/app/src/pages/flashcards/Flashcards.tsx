@@ -2,13 +2,12 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { FlashcardSource } from "@/api/api";
 import { FlashcardsList } from "./FlashcardsList";
 import { CreateFlashcardModal } from "./CreateFlashcardModal";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
 import { Pagination } from "./Pagination";
-import { CreateFlashcardData, EditFlashcardData } from "./types";
+import { EditFlashcardData } from "./types";
 import { apiClient } from "@/api/apiClient";
 
 export function Flashcards() {
@@ -20,7 +19,6 @@ export function Flashcards() {
     total: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -37,7 +35,6 @@ export function Flashcards() {
 
   const fetchFlashcards = async () => {
     setLoading(true);
-    setError(null);
 
     try {
       const response = await apiClient.flashcards.getFlashcards({
@@ -48,12 +45,14 @@ export function Flashcards() {
       if (response.data.isSuccess && response.data.data) {
         setFlashcards(response.data.data);
       } else {
-        setError("Failed to load flashcards");
-        toast.error("Failed to load flashcards");
+        toast.error(
+          "Failed to load flashcards. Please refresh the page to try again."
+        );
       }
     } catch {
-      setError("An error occurred while fetching flashcards");
-      toast.error("An error occurred while fetching flashcards");
+      toast.error(
+        "Failed to load flashcards. Please refresh the page to try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -61,32 +60,11 @@ export function Flashcards() {
 
   useEffect(() => {
     fetchFlashcards();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, pageSize]);
 
-  const handleCreateFlashcard = async (data: CreateFlashcardData) => {
-    try {
-      const response = await apiClient.flashcards.createFlashcards({
-        flashcards: [
-          {
-            front: data.front,
-            back: data.back,
-            source: FlashcardSource.Manual,
-            generationId: null,
-          },
-        ],
-      });
-
-      if (response.data.isSuccess) {
-        toast.success("Flashcard created successfully");
-        setIsCreateModalOpen(false);
-        fetchFlashcards();
-      } else {
-        toast.error("Failed to create flashcard");
-      }
-    } catch {
-      toast.error("An error occurred while creating flashcard");
-    }
+  const handleFlashcardCreated = async () => {
+    fetchFlashcards();
   };
 
   const handleEditFlashcard = (id: number) => {
@@ -101,25 +79,8 @@ export function Flashcards() {
     }
   };
 
-  const handleUpdateFlashcard = async (data: EditFlashcardData) => {
-    if (!selectedFlashcard) return;
-
-    try {
-      const response = await apiClient.flashcards.updateFlashcard(
-        selectedFlashcard.id,
-        { front: data.front, back: data.back }
-      );
-
-      if (response.data.isSuccess) {
-        toast.success("Flashcard updated successfully");
-        setIsEditModalOpen(false);
-        fetchFlashcards();
-      } else {
-        toast.error("Failed to update flashcard");
-      }
-    } catch {
-      toast.error("An error occurred while updating flashcard");
-    }
+  const handleFlashcardEdited = async () => {
+    fetchFlashcards();
   };
 
   const handleDeleteFlashcard = (id: number) => {
@@ -139,11 +100,15 @@ export function Flashcards() {
         toast.success("Flashcard deleted successfully");
         setIsDeleteConfirmationOpen(false);
         fetchFlashcards();
+      } else if (response.data.errors.length > 0) {
+        response.data.errors.forEach((error) => {
+          toast.error(error.message);
+        });
       } else {
         toast.error("Failed to delete flashcard");
       }
     } catch {
-      toast.error("An error occurred while deleting flashcard");
+      toast.error("Failed to delete flashcard");
     } finally {
       setFlashcardIdToDelete(null);
     }
@@ -171,10 +136,6 @@ export function Flashcards() {
       {loading ? (
         <div className="flex justify-center items-center h-40">
           <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : error ? (
-        <div className="bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
-          {error}
         </div>
       ) : flashcards.items.length === 0 ? (
         <div className="text-center py-10 border rounded-md">
@@ -204,7 +165,7 @@ export function Flashcards() {
 
       <CreateFlashcardModal
         isOpen={isCreateModalOpen}
-        onSave={handleCreateFlashcard}
+        onCreated={handleFlashcardCreated}
         onCancel={() => setIsCreateModalOpen(false)}
       />
 
@@ -212,7 +173,7 @@ export function Flashcards() {
         <EditFlashcardModal
           isOpen={isEditModalOpen}
           flashcard={selectedFlashcard}
-          onSave={handleUpdateFlashcard}
+          onEdited={handleFlashcardEdited}
           onCancel={() => setIsEditModalOpen(false)}
         />
       )}

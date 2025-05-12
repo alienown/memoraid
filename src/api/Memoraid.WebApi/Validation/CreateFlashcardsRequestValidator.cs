@@ -75,13 +75,13 @@ public class CreateFlashcardsRequestValidator : AbstractValidator<CreateFlashcar
         public FlashcardValidator()
         {
             RuleFor(x => x.Front)
-                .NotNull()
+                .NotEmpty()
                 .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front)))
                 .MaximumLength(500)
                 .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Front), 500));
 
             RuleFor(x => x.Back)
-                .NotNull()
+                .NotEmpty()
                 .WithMessage(string.Format(REQUIRED, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back)))
                 .MaximumLength(200)
                 .WithMessage(string.Format(MAX_LENGTH, nameof(CreateFlashcardsRequest.CreateFlashcardData.Back), 200));

@@ -32,7 +32,6 @@ export function FlashcardListItem({
     setIsBackVisible(!isBackVisible);
   };
 
-  // Card styling based on acceptance state
   const cardClassName = cn(
     isAccepted
       ? "border-green-500 bg-green-50 dark:bg-green-950/30 dark:border-green-800"

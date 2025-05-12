@@ -91,7 +91,6 @@
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
-    - 403 if unauthorized
     - 422 for business rule violations (e.g., inconsistent generationId for AI flashcards)
 
 - **PUT /flashcards/{id}**
@@ -133,7 +132,7 @@
 - Endpoints for user registration/login issue a token.
 - All endpoints (except registration/login) require Authorization header with Bearer token.
 - Authorization checks ensure that users can only access or modify their own flashcards.
-- API should return 401 for unauthenticated requests and 403 for unauthorized access.
+- API should return 401 for unauthenticated requests.
 - Security measures include HTTPS.
 
 ## 4. Validation and Business Logic
@@ -155,7 +154,7 @@
   - AI flashcard generation endpoint integrates with an external AI service (e.g., via Open Router API) and returns a set of candidate flashcards for review.
   - Review allow inline acceptance/rejection or modification via an edit modal to match the PRD requirements.
   - Use pagination for list endpoints to optimize performance.
-  - All endpoints return appropriate HTTP status codes (e.g., 200, 201, 400, 401, 403, 404) and error messages reflecting validation and business rule violations.
+  - All endpoints return appropriate HTTP status codes (e.g., 200, 201, 400, 401, 404) and error messages reflecting validation and business rule violations.
 
 ## 5. Types
 
