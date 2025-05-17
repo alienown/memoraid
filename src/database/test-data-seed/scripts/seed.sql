@@ -1,16 +1,11 @@
 DO $$
 
-DECLARE user_id BIGINT;
+DECLARE user_id VARCHAR := 'user-id-1';
 DECLARE flashcard_ai_generation_id BIGINT;
 DECLARE created_by CHAR(11) := 'Seed script';
 
 BEGIN
-    -- 1. Insert user
-    INSERT INTO users (email, password, created_on, created_by)
-    VALUES ('test@example.com', '123', CURRENT_TIMESTAMP, created_by)
-    RETURNING id INTO user_id;
-
-    -- 2. Insert AI generation
+    -- 1. Insert AI generation
     INSERT INTO flashcard_ai_generations (
         user_id, 
         ai_model, 
@@ -33,7 +28,7 @@ BEGIN
     )
     RETURNING id INTO flashcard_ai_generation_id;
 
-    -- 3. Insert flashcards
+    -- 2. Insert flashcards
     -- Manual flashcard
     INSERT INTO flashcards (
         user_id, 

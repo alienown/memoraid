@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
-import { LoginUserRequest } from "@/api/api";
 import { toast } from "sonner";
 import {
   Card,
@@ -12,8 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/lib/auth/useAuth";
-import { apiClient } from "@/api/apiClient";
+import { useAuth } from "@/services/auth/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -62,26 +60,18 @@ export default function Login() {
 
     setIsSubmitting(true);
 
-    try {
-      const request: LoginUserRequest = { email, password };
-      const response = await apiClient.users.loginUser(request);
-      if (response.data.isSuccess && response.data.data?.token) {
-        login(response.data.data.token);
-        toast.success("Login successful!");
-        navigate("/generate");
-      } else if (response.data.errors.length > 0) {
-        response.data.errors.forEach((error) => {
-          toast.error(error.message);
-        });
-      } else {
-        toast.error("Login failed. Please try again.");
-      }
-    } catch {
-      toast.error("Login failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    const response = await login(email, password);
+
+    if (response.isSuccess) {
+      toast.success("Login successful!");
+      navigate("/generate");
+    } else {
+      toast.error(response.error ?? "Login failed. Please try again.");
     }
+
+    setIsSubmitting(false);
   };
+
   return (
     <div className="flex justify-center items-center h-full">
       <Card className="w-[350px]">

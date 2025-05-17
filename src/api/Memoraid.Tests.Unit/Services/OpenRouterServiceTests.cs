@@ -37,12 +37,6 @@ public class OpenRouterServiceTests
             {
                 ApiKey = "test_api_key",
                 ApiBaseUrl = "https://openrouter.ai/api/v1"
-            },
-            Jwt = new Jwt
-            {
-                Secret = "",
-                Issuer = "",
-                Audience = ""
             }
         });
 

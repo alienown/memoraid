@@ -6,7 +6,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth/useAuth";
+import { useAuth } from "@/services/auth/useAuth";
 
 export function Navbar() {
   const location = useLocation();
@@ -17,8 +17,8 @@ export function Navbar() {
     return location.pathname === path;
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate("/login");
   };
 

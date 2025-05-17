@@ -11,10 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { apiClient } from "@/api/apiClient";
+import { useAuth } from "@/services/auth/useAuth";
 
 export const Registration: React.FC = () => {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
@@ -50,31 +51,16 @@ export const Registration: React.FC = () => {
 
     setIsSubmitting(true);
 
-    try {
-      const response = await apiClient.users.registerUser({
-        email,
-        password,
-      });
+    const response = await register(email, password);
 
-      if (response.data.isSuccess) {
-        toast.success("Registration successful! Please log in.");
-        navigate("/login");
-      } else if (response.data.errors.length > 0) {
-        response.data.errors.forEach((error) => {
-          if (error.propertyName === "email") {
-            setEmailError(error.message);
-          } else {
-            toast.error(error.message);
-          }
-        });
-      } else {
-        toast.error("Registration failed. Please try again.");
-      }
-    } catch {
-      toast.error("Registration failed. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+    if (response.isSuccess) {
+      toast.success("Registration successful! You have been logged in.");
+      navigate("/generate");
+    } else {
+      toast.error(response.error ?? "Registration failed. Please try again.");
     }
+    
+    setIsSubmitting(false);
   };
 
   return (

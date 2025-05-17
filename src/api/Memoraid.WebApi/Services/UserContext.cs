@@ -5,8 +5,8 @@ namespace Memoraid.WebApi.Services;
 
 public interface IUserContext
 {
-    long? UserId { get; }
-    long GetUserIdOrThrow();
+    string? UserId { get; }
+    string GetUserIdOrThrow();
 }
 
 public class UserContext : IUserContext
@@ -18,7 +18,7 @@ public class UserContext : IUserContext
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public long? UserId
+    public string? UserId
     {
         get
         {
@@ -30,19 +30,16 @@ public class UserContext : IUserContext
             if (userIdClaim == null)
                 return null;
 
-            if (long.TryParse(userIdClaim.Value, out var userId))
-                return userId;
-
-            return null;
+            return userIdClaim.Value;
         }
     }
 
-    public long GetUserIdOrThrow()
+    public string GetUserIdOrThrow()
     {
         if (UserId == null)
             throw new UserNotAuthenticatedException();
 
-        return UserId.Value;
+        return UserId;
     }
 }
 

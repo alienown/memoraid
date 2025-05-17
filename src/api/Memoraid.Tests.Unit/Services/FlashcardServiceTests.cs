@@ -22,7 +22,7 @@ namespace Memoraid.Tests.Unit.Services;
 [TestFixture]
 public class FlashcardServiceTests
 {
-    private const long TEST_USER_ID = 1;
+    private const string TEST_USER_ID = "1";
 
     private FlashcardService _flashcardService;
     private MemoraidDbContext _dbContext;
@@ -336,7 +336,7 @@ public class FlashcardServiceTests
         await _dbContext.Flashcards.AddAsync(new Flashcard
         {
             Id = id,
-            UserId = 2,
+            UserId = "2",
             Front = "Other User Front",
             Back = "Other User Back",
             Source = FlashcardSource.Manual
@@ -415,7 +415,7 @@ public class FlashcardServiceTests
     public async Task UpdateFlashcardAsync_Should_ReturnErrorResponse_When_FlashcardBelongsToAnotherUser()
     {
         // Arrange
-        var otherUserFlashcardId = 2;
+        var otherUserFlashcardId = "2";
         var flashcard = await CreateTestFlashcard(otherUserFlashcardId);
 
         var request = new UpdateFlashcardRequest
@@ -487,7 +487,7 @@ public class FlashcardServiceTests
         return flashcard;
     }
 
-    private async Task<Flashcard> CreateTestFlashcard(int userId)
+    private async Task<Flashcard> CreateTestFlashcard(string userId)
     {
         await _flashcardService.CreateFlashcardsAsync(new CreateFlashcardsRequest
         {

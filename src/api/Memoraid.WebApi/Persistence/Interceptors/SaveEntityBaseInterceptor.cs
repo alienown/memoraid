@@ -35,7 +35,7 @@ internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
 
                     if (entry.Entity.CreatedBy == null)
                     {
-                        entry.Entity.CreatedBy = _userContext.UserId?.ToString() ?? System;
+                        entry.Entity.CreatedBy = _userContext.UserId ?? System;
                     }
                 }
                 else if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Modified)
@@ -47,7 +47,7 @@ internal class SaveEntityBaseInterceptor : SaveChangesInterceptor
 
                     if (entry.Entity.LastModifiedBy == null)
                     {
-                        entry.Entity.LastModifiedBy = _userContext.UserId?.ToString() ?? System;
+                        entry.Entity.LastModifiedBy = _userContext.UserId ?? System;
                     }
                 }
             }

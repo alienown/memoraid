@@ -20,7 +20,7 @@ namespace Memoraid.Tests.Unit.Services;
 [TestFixture]
 public class FlashcardGenerationServiceTests
 {
-    private const long TEST_USER_ID = 1;
+    private const string TEST_USER_ID = "1";
 
     private FlashcardGenerationService _service;
     private MemoraidDbContext _dbContext;

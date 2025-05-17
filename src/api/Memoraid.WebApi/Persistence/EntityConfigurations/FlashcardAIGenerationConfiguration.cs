@@ -17,10 +17,5 @@ public class FlashcardAIGenerationConfiguration : EntityBaseConfiguration<Flashc
 
         builder.Property(x => x.AIModel)
             .HasColumnName("ai_model");
-
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(a => a.UserId)
-            .IsRequired();
     }
 }

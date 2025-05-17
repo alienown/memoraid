@@ -92,7 +92,7 @@ internal class FlashcardService : IFlashcardService
 
         int pageNumber = request.PageNumber ?? 1;
         int pageSize = request.PageSize ?? 10;
-        long userId = _userContext.GetUserIdOrThrow();
+        var userId = _userContext.GetUserIdOrThrow();
 
         var query = _dbContext.Flashcards
             .Where(f => f.UserId == userId)
@@ -119,7 +119,7 @@ internal class FlashcardService : IFlashcardService
     {
         _deleteFlashcardRequestValidator.ValidateAndThrow(id);
 
-        long userId = _userContext.GetUserIdOrThrow();
+        var userId = _userContext.GetUserIdOrThrow();
 
         var flashcard = await _dbContext.Flashcards
             .Where(f => f.Id == id && f.UserId == userId)
@@ -141,7 +141,7 @@ internal class FlashcardService : IFlashcardService
     {
         _updateFlashcardRequestValidator.ValidateAndThrow(request);
 
-        long userId = _userContext.GetUserIdOrThrow();
+        var userId = _userContext.GetUserIdOrThrow();
 
         var flashcard = await _dbContext.Flashcards
             .Where(f => f.Id == id && f.UserId == userId)

@@ -10,32 +10,7 @@
 
 ### USERS Resource
 
-- **POST /users/register**
-  - Description: Register a new user.
-  - Request:
-    {
-      "email": "string, required, valid email format",
-      "password": "string, required"
-    }
-  - Success response:
-    - 201 Created
-  - Error responses:
-    - 400 for syntactic validation errors
-    - 422 for business rule violations (e.g., email already exists)
-
-- **POST /users/login**
-  - Description: Authenticate a user and return a JWT.
-  - Request:
-    {
-      "email": "string, required",
-      "password": "string, required"
-    }
-  - Success response:
-    - 200 OK with response: { isSuccess: boolean, data: { token: string }, errors: [] }
-  - Error responses:
-    - 400 for syntactic validation errors
-    - 401 for invalid credentials
-    - 422 for business rule violations (e.g., invalid email format)
+*Note: User registration and authentication are now handled by Firebase Authentication.*
 
 - **PUT /users/password**
   - Description: Change user password.
@@ -128,9 +103,8 @@
 
 ## 3. Authentication and Authorization
 
-- JWT-based authentication.
-- Endpoints for user registration/login issue a token.
-- All endpoints (except registration/login) require Authorization header with Bearer token.
+- Firebase Authentication.
+- All endpoints require Authorization header with Firebase token.
 - Authorization checks ensure that users can only access or modify their own flashcards.
 - API should return 401 for unauthenticated requests.
 - Security measures include HTTPS.
@@ -149,7 +123,7 @@
     - SourceText is limited to 10000 characters.
     - Generated flashcards must conform to the flashcard constraints.
 - **Business Logic Implementation:**
-  - User account actions (register, login, password change, deletion) include secure handling and encrypted password storage.
+  - User authentication and account management are handled by Firebase Authentication.
   - Flashcard creation and editing enforce input validation via FluentValidation.
   - AI flashcard generation endpoint integrates with an external AI service (e.g., via Open Router API) and returns a set of candidate flashcards for review.
   - Review allow inline acceptance/rejection or modification via an edit modal to match the PRD requirements.

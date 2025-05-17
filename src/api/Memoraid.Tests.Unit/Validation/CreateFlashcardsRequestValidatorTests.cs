@@ -17,7 +17,7 @@ namespace Memoraid.Tests.Unit.Validation;
 [TestFixture]
 public class CreateFlashcardsRequestValidatorTests
 {
-    private const long TEST_USER_ID = 1;
+    private const string TEST_USER_ID = "1";
 
     private CreateFlashcardsRequestValidator _validator;
     private MemoraidDbContext _dbContext;
@@ -48,7 +48,7 @@ public class CreateFlashcardsRequestValidatorTests
         _dbContext.FlashcardAIGenerations.Add(new FlashcardAIGeneration
         {
             Id = 2,
-            UserId = 2,
+            UserId = "2",
             AIModel = "TestModel2",
             SourceText = "Test text 2"
         });

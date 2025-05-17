@@ -4,7 +4,7 @@ namespace Memoraid.WebApi.Persistence.Entities;
 
 public class Flashcard : EntityBase<long>
 {
-    public long UserId { get; set; }
+    public required string UserId { get; set; }
     public long? FlashcardAIGenerationId { get; set; }
     public required string Front { get; set; }
     public required string Back { get; set; }

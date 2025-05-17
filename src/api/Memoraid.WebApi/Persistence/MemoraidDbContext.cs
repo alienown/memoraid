@@ -9,7 +9,6 @@ public class MemoraidDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users { get; set; }
     public DbSet<Flashcard> Flashcards { get; set; }
     public DbSet<FlashcardAIGeneration> FlashcardAIGenerations { get; set; }
 

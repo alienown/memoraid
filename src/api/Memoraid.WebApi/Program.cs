@@ -19,7 +19,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,22 +65,22 @@ builder.Services
     .AddAuthentication()
     .AddJwtBearer(options =>
     {
+        var firebaseProjectId = builder.Configuration.GetRequiredSection("Firebase:ProjectId").Value;
+        var authority = builder.Configuration.GetRequiredSection("Firebase:Authority").Value;
+        var isDevelopment = builder.Environment.IsDevelopment();
+
         options.MapInboundClaims = false;
-
-        var key = Encoding.ASCII.GetBytes(builder.Configuration.GetRequiredSection("Jwt:Secret").Value!);
-        var issuer = builder.Configuration.GetRequiredSection("Jwt:Issuer").Value!;
-        var audience = builder.Configuration.GetRequiredSection("Jwt:Audience").Value!;
-
+        options.Authority = authority;
+        options.RequireHttpsMetadata = !isDevelopment;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
-            ValidIssuer = issuer,
+            ValidIssuer = $"https://securetoken.google.com/{firebaseProjectId}",
             ValidateAudience = true,
-            ValidAudience = audience,
+            ValidAudience = firebaseProjectId,
             ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
+            ClockSkew = TimeSpan.Zero,
+            RequireSignedTokens = !isDevelopment,
         };
     });
 
@@ -92,7 +91,6 @@ builder.Services.AddAuthorization();
 // Add services
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 
 // Add validators
@@ -101,8 +99,6 @@ builder.Services.AddScoped<IValidator<CreateFlashcardsRequest>, CreateFlashcards
 builder.Services.AddScoped<IValidator<GetFlashcardsRequest>, GetFlashcardsRequestValidator>();
 builder.Services.AddScoped<IValidator<long>, DeleteFlashcardRequestValidator>();
 builder.Services.AddScoped<IValidator<UpdateFlashcardRequest>, UpdateFlashcardRequestValidator>();
-builder.Services.AddScoped<IValidator<RegisterUserRequest>, RegisterUserRequestValidator>();
-builder.Services.AddScoped<IValidator<LoginUserRequest>, LoginUserRequestValidator>();
 
 var app = builder.Build();
 
@@ -185,31 +181,5 @@ app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, I
 .WithName("UpdateFlashcard")
 .Produces<Response>()
 .RequireAuthorization();
-
-app.MapPost("/users/register", async (RegisterUserRequest request, IUserService userService) =>
-{
-    var result = await userService.RegisterUserAsync(request);
-    return Results.Created("/users/register", result);
-})
-.WithName("RegisterUser")
-.Produces<Response>();
-
-app.MapPost("/users/login", async (LoginUserRequest request, IUserService userService) =>
-{
-    var response = await userService.LoginUserAsync(request);
-
-    if (!response.IsSuccess)
-    {
-        var invalidCredentials = response.Errors.All(x => x.Code == IUserService.ErrorCodes.InvalidCredentials);
-
-        return invalidCredentials
-            ? Results.Json(response, statusCode: StatusCodes.Status401Unauthorized)
-            : Results.UnprocessableEntity(response);
-    }
-
-    return Results.Ok(response);
-})
-.WithName("LoginUser")
-.Produces<Response<LoginUserResponse>>();
 
 app.Run();

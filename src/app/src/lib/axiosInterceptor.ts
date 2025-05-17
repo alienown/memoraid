@@ -2,16 +2,10 @@ import { InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { tokenStorage } from "./tokenStorage";
 import { apiClient } from "@/api/apiClient";
 
-let unauthenticatedHandler: (() => void) | null = null;
-
-export const setupUnauthenticatedHandler = (handler: () => void) => {
-  unauthenticatedHandler = handler;
-};
-
-export const setupAxiosInterceptors = () => {
+export const setupAxiosAuthInterceptors = (unauthenticatedHandler: () => Promise<void>) => {
   apiClient.instance.interceptors.request.use(addAuthTokenToRequest);
   apiClient.instance.interceptors.response.use(
-    handleResponseError,
+    (response) => handleResponseError(response, unauthenticatedHandler),
     (response) => Promise.reject(response)
   );
 };
@@ -27,9 +21,12 @@ const addAuthTokenToRequest = (config: InternalAxiosRequestConfig) => {
   return config;
 };
 
-const handleResponseError = (response: AxiosResponse) => {
-  if (response.status === 401 && unauthenticatedHandler) {
-    unauthenticatedHandler();
+const handleResponseError = async (
+  response: AxiosResponse,
+  unauthenticatedHandler: () => Promise<void>
+) => {
+  if (response.status === 401) {
+    await unauthenticatedHandler();
   }
 
   return response;

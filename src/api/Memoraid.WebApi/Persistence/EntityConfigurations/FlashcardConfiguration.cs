@@ -20,11 +20,6 @@ public class FlashcardConfiguration : EntityBaseConfiguration<Flashcard>
         builder.Property(x => x.FlashcardAIGenerationId)
             .HasColumnName("flashcard_ai_generation_id");
 
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(x => x.UserId)
-            .IsRequired();
-
         builder.HasOne<FlashcardAIGeneration>()
             .WithMany()
             .HasForeignKey(x => x.FlashcardAIGenerationId)

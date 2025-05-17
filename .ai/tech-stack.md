@@ -8,10 +8,12 @@ Frontend - React with Vite:
 Backend - .NET API and PostgreSQL as a database:
 
 - minimal API built with .NET 9
-- simple JWT authentication that is easy to set up in .NET
 - FluentValidation for validating API requests and responses
 - Entity Framework Core for easy database access and migrations
 - NUnit and Shouldly for testing
+
+Auth - Firebase Authentication:
+- Firebase Authentication for user management and authentication
 
 AI - Communication with models via Open Router API:
 - single point of entry for multiple AI models
