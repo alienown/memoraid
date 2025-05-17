@@ -7,6 +7,7 @@ using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Responses;
 using Memoraid.WebApi.Services;
+using Memoraid.WebApi.Services.OpenRouter;
 using Memoraid.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -61,17 +62,29 @@ builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>((servicePr
     client.Timeout = TimeSpan.FromSeconds(60);
 });
 
+builder.Services.AddScoped<IOpenRouterService>(serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ApplicationOptions>>().Value;
+
+    if (options.OpenRouter.UseMock)
+    {
+        return new MockOpenRouterService();
+    }
+
+    return serviceProvider.GetRequiredService<OpenRouterService>();
+});
+
 builder.Services
     .AddAuthentication()
     .AddJwtBearer(options =>
     {
+        var useEmulator = builder.Configuration.GetValue<bool>("Firebase:UseEmulator");
         var firebaseProjectId = builder.Configuration.GetRequiredSection("Firebase:ProjectId").Value;
-        var authority = builder.Configuration.GetRequiredSection("Firebase:Authority").Value;
-        var isDevelopment = builder.Environment.IsDevelopment();
+        var authority = builder.Configuration.GetRequiredSection("Firebase:Auth:Authority").Value;
 
         options.MapInboundClaims = false;
         options.Authority = authority;
-        options.RequireHttpsMetadata = !isDevelopment;
+        options.RequireHttpsMetadata = !useEmulator;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -80,7 +93,7 @@ builder.Services
             ValidAudience = firebaseProjectId,
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero,
-            RequireSignedTokens = !isDevelopment,
+            RequireSignedTokens = !useEmulator,
         };
     });
 

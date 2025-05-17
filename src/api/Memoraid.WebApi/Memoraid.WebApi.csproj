@@ -4,8 +4,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
   <ItemGroup>
+    <PackageReference Include="Bogus" />
     <PackageReference Include="EFCore.NamingConventions" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Validation\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

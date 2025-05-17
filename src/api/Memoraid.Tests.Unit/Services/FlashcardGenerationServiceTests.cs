@@ -5,6 +5,7 @@ using Memoraid.WebApi.Persistence.Enums;
 using Memoraid.WebApi.Persistence.Interceptors;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Services;
+using Memoraid.WebApi.Services.OpenRouter;
 using Memoraid.WebApi.Validation;
 using Microsoft.EntityFrameworkCore;
 using Moq;

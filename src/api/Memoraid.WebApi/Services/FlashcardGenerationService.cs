@@ -5,6 +5,7 @@ using Memoraid.WebApi.Persistence.Entities;
 using Memoraid.WebApi.Persistence.Enums;
 using Memoraid.WebApi.Requests;
 using Memoraid.WebApi.Responses;
+using Memoraid.WebApi.Services.OpenRouter;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

@@ -7,6 +7,7 @@ public class ApplicationOptions
 
 public class OpenRouter
 {
+    public required bool UseMock { get; set; }
     public required string ApiKey { get; set; }
     public required string ApiBaseUrl { get; set; }
 }

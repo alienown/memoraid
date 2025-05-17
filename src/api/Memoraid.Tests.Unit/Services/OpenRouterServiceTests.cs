@@ -1,5 +1,5 @@
 using Memoraid.WebApi.Configuration;
-using Memoraid.WebApi.Services;
+using Memoraid.WebApi.Services.OpenRouter;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
@@ -35,6 +35,7 @@ public class OpenRouterServiceTests
         {
             OpenRouter = new OpenRouter
             {
+                UseMock = false,
                 ApiKey = "test_api_key",
                 ApiBaseUrl = "https://openrouter.ai/api/v1"
             }

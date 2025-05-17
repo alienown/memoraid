@@ -6,41 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Memoraid.WebApi.Services;
-
-public enum ChatRole
-{
-    [JsonPropertyName("system")]
-    System,
-
-    [JsonPropertyName("user")]
-    User,
-
-    [JsonPropertyName("assistant")]
-    Assistant
-}
-
-public class ChatMessage
-{
-    public required ChatRole Role { get; init; }
-    public required string Content { get; init; }
-}
-
-public class CompleteWithStructuredOutputRequest
-{
-    public required string Model { get; init; }
-    public required List<ChatMessage> Messages { get; init; }
-    public required JsonSchemaFormat JsonSchema { get; init; }
-}
-
-public class JsonSchemaFormat
-{
-    public required string Name { get; init; }
-    public required JsonElement Schema { get; init; }
-}
+namespace Memoraid.WebApi.Services.OpenRouter;
 
 public interface IOpenRouterService
 {
