@@ -1,30 +1,4 @@
 services:
-  api:
-    build:
-      context: ./src/api
-      dockerfile: ./Memoraid.WebApi/Dockerfile
-    container_name: api
-    ports:
-      - "7000:8080"
-    depends_on:
-      - database
-    environment:
-      ASPNETCORE_ENVIRONMENT: Development
-      ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
-
-  app:
-    build:
-      context: ./src/app
-      args:
-        VITE_FIREBASE_USE_EMULATOR: "true"
-        VITE_FIREBASE_AUTH_EMULATOR_HOST: "http://localhost:7003"
-        VITE_FIREBASE_PROJECT_ID: "demo-memoraid"
-    container_name: app
-    ports:
-      - "7002:80"
-    depends_on:
-      - api
-
   database:
     image: postgres:latest
     container_name: database
@@ -55,3 +29,43 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: P@ssword1
       POSTGRES_DB: memoraid
+
+  api:
+    build:
+      context: ./src/api
+      dockerfile: ./Memoraid.WebApi/Dockerfile
+    container_name: api
+    ports:
+      - "7000:8080"
+    depends_on:
+      - database
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
+
+  firebase:
+    image: andreysenov/firebase-tools
+    container_name: firebase
+    ports:
+      - "7003:4000"
+      - "7004:9099"
+      - "9099:9099"
+    volumes:
+      - ./src/app/docker/firebase/firebase.json:/home/node/firebase.json
+      - ./src/app/docker/firebase/seed:/home/node/seed
+    command: firebase emulators:start --project demo-memoraid --import=/home/node/seed
+
+  app:
+    build:
+      context: ./src/app
+      dockerfile: ./docker/Dockerfile
+      args:
+        VITE_FIREBASE_USE_EMULATOR: "true"
+        VITE_FIREBASE_AUTH_EMULATOR_HOST: "http://localhost:7004"
+        VITE_FIREBASE_PROJECT_ID: "demo-memoraid"
+    container_name: app
+    ports:
+      - "7002:80"
+    depends_on:
+      - api
+      - firebase

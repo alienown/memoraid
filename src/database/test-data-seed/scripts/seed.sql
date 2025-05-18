@@ -1,6 +1,6 @@
 DO $$
 
-DECLARE user_id VARCHAR := 'user-id-1';
+DECLARE user_id VARCHAR := 'n8GnEhssnXYQuqtU6tFpCx0yQDBq';
 DECLARE flashcard_ai_generation_id BIGINT;
 DECLARE created_by CHAR(11) := 'Seed script';
 
