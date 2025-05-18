@@ -12,6 +12,19 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
 
+  app:
+    build:
+      context: ./src/app
+      args:
+        VITE_FIREBASE_USE_EMULATOR: "true"
+        VITE_FIREBASE_AUTH_EMULATOR_HOST: "http://localhost:7003"
+        VITE_FIREBASE_PROJECT_ID: "demo-memoraid"
+    container_name: app
+    ports:
+      - "7002:80"
+    depends_on:
+      - api
+
   database:
     image: postgres:latest
     container_name: database
