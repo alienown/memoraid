@@ -66,7 +66,7 @@
   - Error responses:
     - 400 for syntactic validation errors
     - 401 if unauthenticated
-    - 422 for business rule violations (e.g., inconsistent generationId for AI flashcards)
+    - 422 for business rule violations (front or back too long, etc.)
 
 - **PUT /flashcards/{id}**
   - Description: Update flashcard content.

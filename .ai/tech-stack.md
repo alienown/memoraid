@@ -18,7 +18,22 @@ Auth - Firebase Authentication:
 AI - Communication with models via Open Router API:
 - single point of entry for multiple AI models
 
+Testing:
+
+- Backend Testing:
+  - NUnit framework with Shouldly for assertions
+  - EF Core InMemory database for unit tests
+  - Moq for mocking dependencies
+  - Docker containers for running services used in integration tests
+
+- Frontend Testing:
+  - React Testing Library with Vitest for component unit testing
+  - Playwright with React Testing Library for end-to-end testing
+
+- API Testing:
+  - Postman/Swagger for manual endpoint verification
+
 CI/CD and Hosting:
 
-- GitHub Actions for creating CI/CD pipelines.
+- GitHub Actions for creating CI/CD pipelines and running automated tests.
 - DigitalOcean for hosting applications via Docker images.
