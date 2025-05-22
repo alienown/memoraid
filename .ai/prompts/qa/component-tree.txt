@@ -1,0 +1,35 @@
+App
+├── AuthProvider
+│   ├── authService (login, logout, onAuthStateChanged, register, getToken)
+│   ├── useState (isAuthenticated)
+│   ├── useEffect (for auth state initialization and axios interceptors)
+│   └── AuthContext.Provider
+│       └── apiClient (with auth interceptors)
+│
+├── RouterProvider
+│   └── router (createBrowserRouter)
+│       └── RootLayout
+│           ├── Navbar
+│           │   ├── useLocation (from react-router-dom)
+│           │   ├── useNavigate (from react-router-dom)
+│           │   ├── useAuth (custom hook from auth context)
+│           │   │   └── AuthContext (context from authProvider)
+│           │   ├── Link (from react-router-dom)
+│           │   └── NavigationMenu components (from shadcn)
+│           │
+│           └── Outlet (for rendering child routes)
+│               ├── Navigate to "/generate" (default route)
+│               │
+│               ├── ProtectedRoute for "/generate"
+│               │   ├── useAuth (custom hook from auth context)
+│               │   └── Generate component
+│               │
+│               ├── ProtectedRoute for "/flashcards"
+│               │   ├── useAuth (custom hook from auth context)
+│               │   └── Flashcards component
+│               │
+│               ├── Login component for "/login"
+│               │
+│               └── Registration component for "/register"
+│
+└── Toaster (from sonner)
