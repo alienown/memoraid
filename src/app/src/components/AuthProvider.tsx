@@ -5,8 +5,8 @@ import {
   onAuthStateChanged,
   register,
   getToken,
-} from "./authService";
-import { AuthContext } from "./AuthContext";
+} from "../core/auth/authService";
+import { AuthContext } from "../core/auth/AuthContext";
 import { AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { apiClient } from "@/api/apiClient";
 

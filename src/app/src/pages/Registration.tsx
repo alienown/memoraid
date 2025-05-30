@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useAuth } from "@/services/auth/useAuth";
+import { useAuth } from "@/core/auth/useAuth";
 
 export const Registration: React.FC = () => {
   const navigate = useNavigate();

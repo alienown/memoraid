@@ -25,18 +25,14 @@ This document outlines a focused strategy for unit testing UI components during 
    - Pure functions that validate input against business rules
    - No external dependencies, predictable input/output
 
-3. **ConfirmationDialog.tsx**
-   - Simple presentational component with props-based rendering
-   - Tests callback handling without external dependencies
-
 ### Components with Limited Dependencies
 
-4. **Login.tsx and Registration.tsx (validation logic only)**
+3. **Login.tsx and Registration.tsx (validation logic only)**
    - Test form validation functions in isolation
    - Skip testing form submission which requires complex auth service mocking
    - Validation logic can be extracted and tested separately
 
-5. **ProtectedRoute.tsx**
+4. **ProtectedRoute.tsx**
    - Simple component with clear conditional rendering logic
    - Can test redirection behavior with minimal context mocking
    - Worth testing as it's critical to application security
@@ -60,46 +56,51 @@ This document outlines a focused strategy for unit testing UI components during 
    - Thin wrappers around shadcn UI library with minimal added logic
    - The underlying library should have its own tests
 
-4. **Pagination Components**
+4. **ConfirmationDialog.tsx**
+   - Simple presentational component with props-based rendering
+   - No complex logic
+   - Probably better tested through integration tests where it is used
+
+5. **Pagination Components**
    - Complex boundary condition logic mixed with UI rendering
    - Better tested through integration tests focused on user interactions
 
-5. **List Components and their Items**
+6. **List Components and their Items**
    - `FlashcardsList` and `FlashcardListItem` in both directories
    - Mostly presentational with complex parent state dependencies
    - More efficient to test through integration tests
 
-6. **Router Configuration**
+7. **Router Configuration**
    - `createBrowserRouter` configuration is better tested through integration tests
    - Routing behavior involves many components working together
    - Testing static configuration has limited value compared to testing actual navigation
 
-7. **App.tsx**
+8. **App.tsx**
    - Top-level component with multiple providers
    - Primarily composition of other components
    - Better verified through integration tests
 
-8. **apiClient with Interceptors**
+9. **apiClient with Interceptors**
    - Network request behavior is difficult to unit test effectively
    - Authentication interceptor logic is tightly coupled to auth service
    - Better tested through integration tests or mocked API responses
 
-9. **authService.ts - Core Auth Methods**
+10. **authService.ts - Core Auth Methods**
    - Methods like `login`, `register`, `logout`, and `getToken` would require mocking multiple Firebase functions
    - Firebase authentication is already tested in the Firebase library
    - Better covered through integration tests that verify end-to-end authentication flow
    
-10. **useAuth Custom Hook**
+11. **useAuth Custom Hook**
     - Contains minimal logic beyond accessing the AuthContext
     - No substantial transformation or business logic to test
     - Behavior will be implicitly tested in components that use it
 
-11. **RootLayout.tsx**
+12. **RootLayout.tsx**
     - Simple presentational component with Outlet rendering
     - No business logic to test in isolation
     - Outlet rendering behavior is implicitly tested in integration/e2e tests
 
-12. **Navbar.tsx**
+13. **Navbar.tsx**
     - Conditional rendering based on authentication state
     - Navigation behavior is better verified through e2e tests
     - Link presence/absence based on auth state is better tested with user interaction in integration tests

@@ -35,7 +35,7 @@ export type AuthResponse = {
   error?: string;
 };
 
-const handleAuthError = (error: unknown): AuthResponse => {
+export const handleAuthError = (error: unknown): AuthResponse => {
   if (!(error instanceof FirebaseError)) {
     return {
       isSuccess: false,

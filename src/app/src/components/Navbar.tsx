@@ -6,7 +6,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
-import { useAuth } from "@/services/auth/useAuth";
+import { useAuth } from "@/core/auth/useAuth";
 
 export function Navbar() {
   const location = useLocation();

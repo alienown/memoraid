@@ -4,7 +4,7 @@ import { Flashcards } from "../pages/flashcards/Flashcards";
 import Registration from "../pages/Registration";
 import Login from "../pages/Login";
 import { RootLayout } from "../components/RootLayout";
-import { ProtectedRoute } from "./ProtectedRoute";
+import { ProtectedRoute } from "../components/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {

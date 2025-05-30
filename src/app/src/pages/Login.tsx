@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useAuth } from "@/services/auth/useAuth";
+import { useAuth } from "@/core/auth/useAuth";
 
 export default function Login() {
   const navigate = useNavigate();
