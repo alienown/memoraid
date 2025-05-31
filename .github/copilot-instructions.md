@@ -121,12 +121,19 @@ The application uses a PostgreSQL database.
 - Use route.lazy() for route-level code splitting with automatic loading states
 - Implement shouldRevalidate functions to control when data revalidation happens after navigation
 
-### Testing
-- Use Vitest and React Testing Library for unit testing
-- Use Playwright with React Testing Library for end-to-end testing
-- Use the following naming convention for test descriptions: should <what shoud bee done> when <under what conditions>
+## Testing
+
 - In each test write the Arrange, Act, Assert comments for clarity
 - Place tests in the same directory as tested files, using the .test.tsx/ts extension
+- Use the following naming convention for test descriptions: should <what shoud bee done> when <under what conditions>
+
+### Unit testing
+- Use Vitest and React Testing Library for unit testing
+
+### E2E
+
+- Implement the Page Object Model for maintainable tests in ./e2e/page-objects
+- Use `data-testid` attributes only when necessary to avoid brittle selectors. Generally, prefer using semantic selectors like text, role, or label
 
 ## Guidelines for Styling
 

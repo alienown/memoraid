@@ -1,18 +1,12 @@
 import { test, expect } from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
+test('should go to the login page when user is not logged in', async ({ page }) => {
+  // Arrange
+  const appUrl = process.env.APP_URL!;
 
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-});
+  // Act
+  await page.goto(appUrl);
 
-test('get started link', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Click the get started link.
-  await page.getByRole('link', { name: 'Get started' }).click();
-
-  // Expects page to have a heading with the name of Installation.
-  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+  // Assert
+  await expect(page.getByText(/Login to Memoraid/)).toBeVisible();
 });
