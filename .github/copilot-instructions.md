@@ -125,6 +125,7 @@ The application uses a PostgreSQL database.
 - Use Vitest and React Testing Library for unit testing
 - Use Playwright with React Testing Library for end-to-end testing
 - Use the following naming convention for test descriptions: should <what shoud bee done> when <under what conditions>
+- In each test write the Arrange, Act, Assert comments for clarity
 - Place tests in the same directory as tested files, using the .test.tsx/ts extension
 
 ## Guidelines for Styling

@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { FlashcardData } from "./types";
+import { validateFlashcard } from "@/core/validation/flashcards";
 
 interface EditFlashcardModalProps {
   isOpen: boolean;
@@ -36,30 +37,10 @@ export function EditFlashcardModal({
       setBackError(null);
     }
   }, [flashcard]);
-
   const validateForm = (): boolean => {
-    let isValid = true;
-
-    if (!front.trim()) {
-      setFrontError("Front text is required");
-      isValid = false;
-    } else if (front.length > 500) {
-      setFrontError("Front text cannot exceed 500 characters");
-      isValid = false;
-    } else {
-      setFrontError(null);
-    }
-
-    if (!back.trim()) {
-      setBackError("Back text is required");
-      isValid = false;
-    } else if (back.length > 200) {
-      setBackError("Back text cannot exceed 200 characters");
-      isValid = false;
-    } else {
-      setBackError(null);
-    }
-
+    const { isValid, frontError, backError } = validateFlashcard(front, back);
+    setFrontError(frontError);
+    setBackError(backError);
     return isValid;
   };
 

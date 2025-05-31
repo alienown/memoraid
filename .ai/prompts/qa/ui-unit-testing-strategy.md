@@ -21,18 +21,14 @@ This document outlines a focused strategy for unit testing UI components during 
    - No external dependencies when properly mocked
 
 2. **Form Validation Functions**
-   - `validateForm()` in EditFlashcardModal and CreateFlashcardModal
+   - `validateFlashcard()` used in EditFlashcardModals and CreateFlashcardModal
+   - `validateAuthForm()` used in Login and Registration components
    - Pure functions that validate input against business rules
    - No external dependencies, predictable input/output
 
 ### Components with Limited Dependencies
 
-3. **Login.tsx and Registration.tsx (validation logic only)**
-   - Test form validation functions in isolation
-   - Skip testing form submission which requires complex auth service mocking
-   - Validation logic can be extracted and tested separately
-
-4. **ProtectedRoute.tsx**
+3. **ProtectedRoute.tsx**
    - Simple component with clear conditional rendering logic
    - Can test redirection behavior with minimal context mocking
    - Worth testing as it's critical to application security

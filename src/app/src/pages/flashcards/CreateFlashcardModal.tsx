@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { apiClient } from "@/api/apiClient";
 import { FlashcardSource } from "@/api/api";
 import { toast } from "sonner";
+import { validateFlashcard } from "@/core/validation/flashcards";
 
 export interface CreateFlashcardModalProps {
   isOpen: boolean;
@@ -27,30 +28,10 @@ export function CreateFlashcardModal({
   const [back, setBack] = useState("");
   const [frontError, setFrontError] = useState<string | null>(null);
   const [backError, setBackError] = useState<string | null>(null);
-
   const validateForm = (): boolean => {
-    let isValid = true;
-
-    if (!front.trim()) {
-      setFrontError("Front text is required");
-      isValid = false;
-    } else if (front.length > 500) {
-      setFrontError("Front text cannot exceed 500 characters");
-      isValid = false;
-    } else {
-      setFrontError(null);
-    }
-
-    if (!back.trim()) {
-      setBackError("Back text is required");
-      isValid = false;
-    } else if (back.length > 200) {
-      setBackError("Back text cannot exceed 200 characters");
-      isValid = false;
-    } else {
-      setBackError(null);
-    }
-
+    const { isValid, frontError, backError } = validateFlashcard(front, back);
+    setFrontError(frontError);
+    setBackError(backError);
     return isValid;
   };
 

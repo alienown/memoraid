@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/core/auth/useAuth";
+import { validateAuthForm } from "@/core/validation/auth";
 
 export const Registration: React.FC = () => {
   const navigate = useNavigate();
@@ -22,30 +23,23 @@ export const Registration: React.FC = () => {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const validateForm = (): boolean => {
-    let isValid = true;
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setEmailError(null);
+  };
 
-    if (!email) {
-      setEmailError("Email is required");
-      isValid = false;
-    } else {
-      setEmailError(null);
-    }
-
-    if (!password) {
-      setPasswordError("Password is required");
-      isValid = false;
-    } else {
-      setPasswordError(null);
-    }
-
-    return isValid;
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setPasswordError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    const validationResult = validateAuthForm(email, password);
+    if (!validationResult.isValid) {
+      setEmailError(validationResult.emailError);
+      setPasswordError(validationResult.passwordError);
       return;
     }
 
@@ -59,7 +53,7 @@ export const Registration: React.FC = () => {
     } else {
       toast.error(response.error ?? "Registration failed. Please try again.");
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -75,12 +69,12 @@ export const Registration: React.FC = () => {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">Email</label>{" "}
               <Input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 disabled={isSubmitting}
               />
               {emailError && (
@@ -99,7 +93,7 @@ export const Registration: React.FC = () => {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 disabled={isSubmitting}
               />
               {passwordError && (

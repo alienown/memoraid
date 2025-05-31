@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useAuth } from "@/core/auth/useAuth";
+import { validateAuthForm } from "@/core/validation/auth";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -19,42 +20,29 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState<string | undefined>(undefined);
-  const [passwordError, setPasswordError] = useState<string | undefined>(
-    undefined
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [passwordError, setPasswordError] = useState<string | null>(
+    null
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
-    setEmailError(undefined);
+    setEmailError(null);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
-    setPasswordError(undefined);
-  };
-
-  const validateForm = (): boolean => {
-    let isValid = true;
-
-    if (!email.trim()) {
-      setEmailError("Email is required");
-      isValid = false;
-    }
-
-    if (!password.trim()) {
-      setPasswordError("Password is required");
-      isValid = false;
-    }
-
-    return isValid;
+    setPasswordError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validateForm()) {
+    const validationResult = validateAuthForm(email, password);
+    if (!validationResult.isValid) {
+      setEmailError(validationResult.emailError);
+      setPasswordError(validationResult.passwordError);
       return;
     }
 
