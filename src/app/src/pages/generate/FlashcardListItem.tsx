@@ -39,7 +39,7 @@ export function FlashcardListItem({
   );
 
   return (
-    <Card className={cardClassName}>
+    <Card className={cardClassName} data-testid="flashcard-item">
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="ml-auto flex space-x-1">
           <Button
@@ -86,21 +86,21 @@ export function FlashcardListItem({
           </Button>
         </div>
       </CardHeader>
-
       <CardContent className="space-y-4 flex-grow">
-        {!isBackVisible ? (
+        {!isBackVisible && (
           <div>
-            <div className="font-medium">Front:</div>
-            <p className="mt-1 break-words">{front}</p>
+            <p className="font-medium">Front:</p>
+            <p className="mt-1 break-words" data-testid="flashcard-front-text">{front}</p>
           </div>
-        ) : (
+        )}
+
+        {isBackVisible && (
           <div>
-            <div className="font-medium">Back:</div>
-            <p className="mt-1 break-words">{back}</p>
+            <p className="font-medium">Back:</p>
+            <p className="mt-1 break-words" data-testid="flashcard-back-text">{back}</p>
           </div>
         )}
       </CardContent>
-
       <CardFooter></CardFooter>
     </Card>
   );

@@ -127,16 +127,7 @@
    - Ensure deletion prompts a confirmation dialog before removal.
    - Confirm that the flashcard is properly removed from the UI and backend.
 
-### 12.4 Study Mode
-1. Flashcard Reveal and Rating:
-   - Verify that in Study Mode (/study), flashcards initially display only the "Front".
-   - Test the reveal mechanism for displaying the "Back" upon user interaction.
-   - Validate that user rating input is accepted and logged for future spaced repetition adjustments.
-2. Session Flow:
-   - Ensure multiple flashcards can be reviewed in a single study session.
-   - Confirm that analytics capture each interaction correctly.
-
-### 12.5 API Endpoints
+### 12.4 API Endpoints
 1. GET /flashcards:
    - Retrieve paginated flashcards; validate default pageNumber (1) and pageSize (10) with upper limit (50).
    - Verify that only flashcards owned by the authenticated user are returned.
@@ -154,7 +145,7 @@
    - For POST /users, validate that email and password are required and email must be unique.
    - For POST /users/login, ensure correct credentials return a valid token and 200 status.
 
-### 12.6 Error and Edge Cases
+### 12.5 Error and Edge Cases
 1. Input Violations:
    - Test scenarios with inputs exceeding maximum character limits in both AI-generated and manual flashcards.
    - Verify that violation triggers proper error responses (e.g., 422) and displays corresponding error messages.

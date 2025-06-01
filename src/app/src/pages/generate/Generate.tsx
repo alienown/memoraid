@@ -37,7 +37,6 @@ const Generate = () => {
 
     if (sourceTextError) setSourceTextError(null);
   };
-
   const handleGenerateFlashcards = async () => {
     if (!sourceText.trim()) {
       setSourceTextError("Please enter text to generate flashcards.");
@@ -81,9 +80,7 @@ const Generate = () => {
 
           setGeneratedFlashcards(flashcards);
 
-          toast.success(
-            `Generated ${flashcards.length} flashcards successfully!`
-          );
+          toast.success("Flashcards generated successfully!");
         }
       } else if (response.data.errors.length > 0) {
         response.data.errors?.forEach((error) => {
@@ -196,7 +193,6 @@ const Generate = () => {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <h1 className="text-3xl font-bold mb-6">Generate Flashcards</h1>
-
       <div className="mb-6 space-y-2">
         <label htmlFor="source-text" className="text-sm font-medium">
           Enter Text
@@ -211,21 +207,29 @@ const Generate = () => {
           className="min-h-[200px] resize-y"
         />
         {sourceTextError && (
-          <p className="text-sm text-red-500">{sourceTextError}</p>
+          <p className="text-sm text-red-500">
+            {sourceTextError}
+          </p>
         )}
         <div className="text-right text-sm text-muted-foreground">
           {sourceText.length}/10,000 characters
         </div>
       </div>
-
       <Button
         onClick={handleGenerateFlashcards}
         disabled={isGenerating || !sourceText.trim()}
         className="mb-6"
       >
-        {isGenerating ? "Generating..." : "Generate Flashcards"}
+        {isGenerating ? (
+          <>
+            <span className="mr-2">
+              Generating...
+            </span>
+          </>
+        ) : (
+          "Generate Flashcards"
+        )}
       </Button>
-
       {generatedFlashcards.length > 0 && (
         <div className="mb-6 w-full">
           <FlashcardList
@@ -234,7 +238,6 @@ const Generate = () => {
             onReject={handleRejectFlashcard}
             onEdit={handleEditFlashcard}
           />
-
           <div className="mt-6">
             <Button
               onClick={handleSubmitFlashcards}
@@ -242,14 +245,11 @@ const Generate = () => {
             >
               {isSubmitting
                 ? "Submitting..."
-                : `Submit ${acceptedCount} Accepted Flashcard${
-                    acceptedCount !== 1 ? "s" : ""
-                  }`}
+                : `Submit accepted flashcard${acceptedCount !== 1 ? "s" : ""}`}
             </Button>
           </div>
         </div>
       )}
-
       <EditFlashcardModal
         isOpen={modalState.isOpen}
         flashcard={modalState.flashcardToEdit}

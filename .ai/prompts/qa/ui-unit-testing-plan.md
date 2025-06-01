@@ -1,4 +1,4 @@
-# Revised UI Unit Testing Strategy for Memoraid MVP
+# Memoraid Unit Test Plan (MVP)
 
 ## Introduction
 

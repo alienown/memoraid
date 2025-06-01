@@ -23,7 +23,6 @@ export function FlashcardList({
       <h2 className="text-xl font-semibold mb-4">
         Generated Flashcards ({flashcards.length})
       </h2>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {flashcards.map((card, index) => (
           <FlashcardListItem

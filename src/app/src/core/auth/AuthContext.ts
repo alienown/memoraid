@@ -2,7 +2,7 @@ import { createContext } from "react";
 import { AuthResponse } from "./authService";
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
   register: (email: string, password: string) => Promise<AuthResponse>;
   login: (email: string, password: string) => Promise<AuthResponse>;
   logout: () => Promise<void>;
@@ -10,7 +10,7 @@ interface AuthContextType {
 
 export function createDefaultAuthContext(): AuthContextType {
   return {
-    isAuthenticated: false,
+    isAuthenticated: null,
     register: async () => ({ isSuccess: false }),
     login: async () => ({ isSuccess: false }),
     logout: async () => {},

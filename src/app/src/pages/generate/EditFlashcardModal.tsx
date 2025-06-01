@@ -69,8 +69,8 @@ export function EditFlashcardModal({
           <DialogHeader>
             <DialogTitle>Edit Flashcard</DialogTitle>
           </DialogHeader>
-
           <div className="grid gap-4 py-4">
+            {" "}
             <div className="space-y-2">
               <label htmlFor="front" className="text-sm font-medium">
                 Front (Question)
@@ -82,6 +82,7 @@ export function EditFlashcardModal({
                 placeholder="Enter the question or term (max 500 characters)"
                 className="resize-y h-30"
                 maxLength={500}
+                aria-label="Front (Question)"
               />
               {frontError && (
                 <p className="text-sm text-red-500">{frontError}</p>
@@ -90,7 +91,6 @@ export function EditFlashcardModal({
                 {front.length}/500 characters
               </div>
             </div>
-
             <div className="space-y-2">
               <label htmlFor="back" className="text-sm font-medium">
                 Back (Answer)
@@ -102,19 +102,21 @@ export function EditFlashcardModal({
                 placeholder="Enter the answer or definition (max 200 characters)"
                 className="resize-y"
                 maxLength={200}
+                aria-label="Back (Answer)"
               />
               {backError && <p className="text-sm text-red-500">{backError}</p>}
               <div className="text-right text-sm text-muted-foreground">
                 {back.length}/200 characters
               </div>
             </div>
-          </div>
-
+          </div>{" "}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button type="submit">
+              Save Changes
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
