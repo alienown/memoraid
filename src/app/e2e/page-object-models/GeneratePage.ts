@@ -1,12 +1,13 @@
 import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
-export class FlashcardGenerationPage extends BasePage {
+export class GeneratePage extends BasePage {
   readonly sourceTextArea: Locator;
   readonly generateButton: Locator;
   readonly flashcardItems: Locator;
   readonly toastGenerateSuccess: Locator;
   readonly submitAcceptedButton: Locator;
+  readonly toastSubmitSuccess: Locator;
 
   constructor(page: Page) {
     super(page, "/generate");
@@ -18,6 +19,9 @@ export class FlashcardGenerationPage extends BasePage {
     this.toastGenerateSuccess = page.getByText(
       /flashcards generated successfully/i
     );
+    this.toastSubmitSuccess = page.getByText(
+      /flashcards saved successfully/i
+    );
     this.submitAcceptedButton = page.getByRole("button", {
       name: /submit accepted flashcards/i,
     });
@@ -26,6 +30,9 @@ export class FlashcardGenerationPage extends BasePage {
   async generateFlashcards(text: string) {
     await this.sourceTextArea.fill(text);
     await this.generateButton.click();
+  }
+
+  async waitUntilFlashcardsGenerated() {
     await this.toastGenerateSuccess.waitFor({
       state: "visible",
     });
@@ -35,8 +42,10 @@ export class FlashcardGenerationPage extends BasePage {
     await this.submitAcceptedButton.click();
   }
 
-  async getFlashcardsCount() {
-    return this.flashcardItems.count();
+  async waitUntilFlashcardsSubmitted() {
+    await this.toastSubmitSuccess.waitFor({
+      state: "visible",
+    });
   }
 
   async acceptFlashcard(index: number) {
@@ -54,7 +63,7 @@ export class FlashcardGenerationPage extends BasePage {
     await flashcard.getByTitle(/edit/i).click();
   }
 
-  async toggleFlashcardBackVisibility(index: number) {
+  async flipFlashcard(index: number) {
     const flashcard = this.flashcardItems.nth(index);
     const viewButton = flashcard.getByTitle(/show answer|hide answer/i);
     await viewButton.click();
@@ -70,19 +79,19 @@ export class FlashcardGenerationPage extends BasePage {
     const flashcard = this.flashcardItems.nth(index);
 
     if (await this.isAnswerVisible(index)) {
-      await this.toggleFlashcardBackVisibility(index);
+      await this.flipFlashcard(index);
     }
 
-    return flashcard.getByTestId("flashcard-front-text").innerText();
+    return await flashcard.getByTestId("flashcard-front-text").innerText();
   }
 
   async getFlashcardBackText(index: number) {
     const flashcard = this.flashcardItems.nth(index);
 
     if (!(await this.isAnswerVisible(index))) {
-      await this.toggleFlashcardBackVisibility(index);
+      await this.flipFlashcard(index);
     }
 
-    return flashcard.getByTestId("flashcard-back-text").innerText();
+    return await flashcard.getByTestId("flashcard-back-text").innerText();
   }
 }

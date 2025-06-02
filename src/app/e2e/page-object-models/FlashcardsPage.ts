@@ -17,7 +17,7 @@ export class FlashcardsPage extends BasePage {
     await this.loadingSpinner.waitFor({ state: "detached" });
   }
 
-  async toggleFlashcardBackVisibility(index: number) {
+  async flipFlashcard(index: number) {
     const flashcard = this.flashcardItems.nth(index);
     const viewButton = flashcard.getByTitle(/show answer|hide answer/i);
     await viewButton.click();
@@ -33,19 +33,19 @@ export class FlashcardsPage extends BasePage {
     const flashcard = this.flashcardItems.nth(index);
 
     if (await this.isAnswerVisible(index)) {
-      await this.toggleFlashcardBackVisibility(index);
+      await this.flipFlashcard(index);
     }
 
-    return flashcard.getByTestId("flashcard-front-text").innerText();
+    return await flashcard.getByTestId("flashcard-front-text").innerText();
   }
 
   async getFlashcardBackText(index: number) {
     const flashcard = this.flashcardItems.nth(index);
 
     if (!(await this.isAnswerVisible(index))) {
-      await this.toggleFlashcardBackVisibility(index);
+      await this.flipFlashcard(index);
     }
 
-    return flashcard.getByTestId("flashcard-back-text").innerText();
+    return await flashcard.getByTestId("flashcard-back-text").innerText();
   }
 }

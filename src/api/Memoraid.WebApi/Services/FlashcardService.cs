@@ -58,7 +58,7 @@ internal class FlashcardService : IFlashcardService
 
         var userId = _userContext.GetUserIdOrThrow();
 
-        var flashcards = request.Flashcards!.Select(f => new Flashcard
+        var flashcards = request.Flashcards!.Reverse().Select(f => new Flashcard
         {
             UserId = userId,
             Front = f.Front!,

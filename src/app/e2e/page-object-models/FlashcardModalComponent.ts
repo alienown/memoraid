@@ -19,8 +19,10 @@ export class FlashcardModalComponent {
     });
   }
 
-  async isOpen() {
-    return this.modal.isVisible();
+  async waitForModelToBeOpened() {
+    await this.modal.waitFor({
+      state: "visible",
+    });
   }
 
   async fillForm(front: string, back: string) {

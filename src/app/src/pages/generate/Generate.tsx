@@ -168,7 +168,7 @@ const Generate = () => {
       const response = await apiClient.flashcards.createFlashcards(request);
 
       if (response.data.isSuccess) {
-        toast.success(`${acceptedCards.length} flashcards saved successfully!`);
+        toast.success("Flashcards saved successfully!");
 
         setSourceText("");
         setGeneratedFlashcards([]);
@@ -207,9 +207,7 @@ const Generate = () => {
           className="min-h-[200px] resize-y"
         />
         {sourceTextError && (
-          <p className="text-sm text-red-500">
-            {sourceTextError}
-          </p>
+          <p className="text-sm text-red-500">{sourceTextError}</p>
         )}
         <div className="text-right text-sm text-muted-foreground">
           {sourceText.length}/10,000 characters
@@ -222,9 +220,7 @@ const Generate = () => {
       >
         {isGenerating ? (
           <>
-            <span className="mr-2">
-              Generating...
-            </span>
+            <span className="mr-2">Generating...</span>
           </>
         ) : (
           "Generate Flashcards"
@@ -243,9 +239,7 @@ const Generate = () => {
               onClick={handleSubmitFlashcards}
               disabled={isSubmitting || acceptedCount === 0}
             >
-              {isSubmitting
-                ? "Submitting..."
-                : `Submit accepted flashcard${acceptedCount !== 1 ? "s" : ""}`}
+              {isSubmitting ? "Submitting..." : "Submit accepted flashcards"}
             </Button>
           </div>
         </div>

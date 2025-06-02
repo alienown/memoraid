@@ -90,14 +90,18 @@ export function FlashcardListItem({
         {!isBackVisible && (
           <div>
             <p className="font-medium">Front:</p>
-            <p className="mt-1 break-words" data-testid="flashcard-front-text">{front}</p>
+            <p className="mt-1 break-words" data-testid="flashcard-front-text">
+              {front}
+            </p>
           </div>
         )}
 
         {isBackVisible && (
           <div>
             <p className="font-medium">Back:</p>
-            <p className="mt-1 break-words" data-testid="flashcard-back-text">{back}</p>
+            <p className="mt-1 break-words" data-testid="flashcard-back-text">
+              {back}
+            </p>
           </div>
         )}
       </CardContent>

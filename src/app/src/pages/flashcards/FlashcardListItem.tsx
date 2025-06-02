@@ -27,9 +27,8 @@ export function FlashcardListItem({
   const toggleBackVisibility = () => {
     setIsBackVisible(!isBackVisible);
   };
-
   return (
-    <Card className="hover:border-gray-300">
+    <Card className="hover:border-gray-300" data-testid="flashcard-item">
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="ml-auto flex space-x-1">
           <Button
