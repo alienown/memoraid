@@ -15,6 +15,7 @@ public interface IFlashcardService
     Task<Response<GetFlashcardsResponse>> GetFlashcardsAsync(GetFlashcardsRequest request);
     Task<Response> DeleteFlashcardAsync(long id);
     Task<Response> UpdateFlashcardAsync(long id, UpdateFlashcardRequest request);
+    Task DeleteUserFlashcardsAsync(string userId);
 
     public static class ErrorCodes
     {
@@ -114,7 +115,6 @@ internal class FlashcardService : IFlashcardService
 
         return new Response<GetFlashcardsResponse>(response);
     }
-
     public async Task<Response> DeleteFlashcardAsync(long id)
     {
         _deleteFlashcardRequestValidator.ValidateAndThrow(id);
@@ -158,5 +158,12 @@ internal class FlashcardService : IFlashcardService
         await _dbContext.SaveChangesAsync();
 
         return new Response();
+    }
+
+    public async Task DeleteUserFlashcardsAsync(string userId)
+    {
+        await _dbContext.Flashcards
+            .Where(f => f.UserId == userId)
+            .ExecuteDeleteAsync();
     }
 }

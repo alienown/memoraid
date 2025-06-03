@@ -26,16 +26,13 @@
     - 401 if unauthenticated or invalid credentials
 
 - **DELETE /users**
-  - Description: Secure account deletion (requires reauthentication).
-  - Request:
-    {
-      "password": "string, required"
-    }
+  - Description: Secure account deletion with all user data.
+  - Request body: none
   - Success response:
-    - 204 No Content
+    - 200 Ok with response: `Response`
   - Error responses:
     - 400 for syntactic validation errors
-    - 401 if unauthenticated or invalid credentials
+    - 401 if unauthenticated
 
 ### FLASHCARDS Resource
 

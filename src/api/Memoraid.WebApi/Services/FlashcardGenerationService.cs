@@ -19,6 +19,7 @@ public interface IFlashcardGenerationService
 {
     Task<GenerateFlashcardsResponse> GenerateFlashcardsAsync(GenerateFlashcardsRequest request);
     Task UpdateGenerationMetricsAsync(IEnumerable<long> generationIds);
+    Task DeleteUserFlashcardGenerationsAsync(string userId);
 }
 
 internal class FlashcardGenerationService : IFlashcardGenerationService
@@ -177,7 +178,6 @@ internal class FlashcardGenerationService : IFlashcardGenerationService
 
         await _dbContext.SaveChangesAsync();
     }
-
     private void CutStringLengthsIfExceedLimits(FlashcardGenerationResult result)
     {
         foreach (var flashcard in result.Flashcards)
@@ -192,6 +192,13 @@ internal class FlashcardGenerationService : IFlashcardGenerationService
                 flashcard.Back = flashcard.Back[..200];
             }
         }
+    }
+
+    public async Task DeleteUserFlashcardGenerationsAsync(string userId)
+    {
+        await _dbContext.FlashcardAIGenerations
+            .Where(g => g.UserId == userId)
+            .ExecuteDeleteAsync();
     }
 
     internal class FlashcardGenerationResult

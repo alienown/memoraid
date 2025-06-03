@@ -104,6 +104,7 @@ builder.Services.AddAuthorization();
 // Add services
 builder.Services.AddScoped<IFlashcardGenerationService, FlashcardGenerationService>();
 builder.Services.AddScoped<IFlashcardService, FlashcardService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserContext, UserContext>();
 
 // Add validators
@@ -192,6 +193,21 @@ app.MapPut("/flashcards/{id}", async (long id, UpdateFlashcardRequest request, I
     return Results.Ok(response);
 })
 .WithName("UpdateFlashcard")
+.Produces<Response>()
+.RequireAuthorization();
+
+app.MapDelete("/users", async (IUserService userService) =>
+{
+    var response = await userService.DeleteUserAsync();
+
+    if (!response.IsSuccess)
+    {
+        return Results.UnprocessableEntity(response);
+    }
+
+    return Results.Ok(response);
+})
+.WithName("DeleteUser")
 .Produces<Response>()
 .RequireAuthorization();
 
