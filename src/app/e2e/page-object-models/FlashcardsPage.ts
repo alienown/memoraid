@@ -3,18 +3,28 @@ import { BasePage } from "./BasePage";
 
 export class FlashcardsPage extends BasePage {
   readonly flashcardItems: Locator;
-  readonly paginationContainer: Locator;
-  readonly loadingSpinner: Locator;
+  readonly noFlashcardsText: Locator;
 
   constructor(page: Page) {
     super(page, "/flashcards");
-    this.flashcardItems = page.locator('[data-testid="flashcard-item"]');
-    this.paginationContainer = page.locator('[data-testid="pagination"]');
-    this.loadingSpinner = page.getByTestId("loading-spinner");
+    this.flashcardItems = page.getByTestId("flashcard-item");
+    this.noFlashcardsText = page.getByText(
+      /No flashcards found. Create your first one!/i
+    );
+  }
+
+  async getFlashcardsCount(): Promise<number> {
+    return await this.flashcardItems.count();
   }
 
   async waitUntilFlashcardsLoaded() {
-    await this.loadingSpinner.waitFor({ state: "detached" });
+    await Promise.race([
+      this.flashcardItems
+        .first()
+        .waitFor({ state: "visible" })
+        .catch(() => {}),
+      this.noFlashcardsText.waitFor({ state: "visible" }).catch(() => {}),
+    ]);
   }
 
   async flipFlashcard(index: number) {

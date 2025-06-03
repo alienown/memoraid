@@ -53,9 +53,7 @@ test.describe("AI-Generated Flashcards", () => {
     await flashcardsPage.waitUntilFlashcardsLoaded();
 
     // Assert
-
-    // Uncomment the next line when we introduce e2e test user with tear down
-    // await expect(flashcardsPage.flashcardItems).toHaveCount(2);
+    expect(await flashcardsPage.getFlashcardsCount()).toBe(2);
 
     // Verify first card content (edited)
     expect(await flashcardsPage.getFlashcardFrontText(0)).toBe(editedFront);

@@ -134,7 +134,7 @@ export function Flashcards() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-40" data-testid="loading-spinner">
+        <div className="flex justify-center items-center h-40">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       ) : flashcards.items.length === 0 ? (
