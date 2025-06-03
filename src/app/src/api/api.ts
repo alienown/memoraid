@@ -367,4 +367,20 @@ export class Api<
         ...params,
       }),
   };
+  users = {
+    /**
+     * No description
+     *
+     * @tags Memoraid.WebApi
+     * @name DeleteUser
+     * @request DELETE:/users
+     */
+    deleteUser: (params: RequestParams = {}) =>
+      this.request<Response, any>({
+        path: `/users`,
+        method: "DELETE",
+        format: "json",
+        ...params,
+      }),
+  };
 }

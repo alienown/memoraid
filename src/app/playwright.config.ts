@@ -35,8 +35,13 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: "teardown",
+      testMatch: /global\.teardown\.ts/,
+    },
+    {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      teardown: "teardown",
     },
 
     // {
