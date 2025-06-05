@@ -2,6 +2,7 @@ import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
 export class LoginPage extends BasePage {
+  readonly cardTitle: Locator;
   readonly emailInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
@@ -9,6 +10,8 @@ export class LoginPage extends BasePage {
 
   constructor(page: Page) {
     super(page, "/login");
+
+    this.cardTitle = page.getByText(/login to memoraid/i);
     this.emailInput = page.getByLabel("Email");
     this.passwordInput = page.getByLabel("Password");
     this.loginButton = page.getByRole("button", { name: "Login" });

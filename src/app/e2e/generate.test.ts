@@ -1,15 +1,27 @@
 import { test, expect } from "@playwright/test";
-import { LoginPage } from "./page-object-models/LoginPage";
 import { GeneratePage } from "./page-object-models/GeneratePage";
 import { FlashcardsPage } from "./page-object-models/FlashcardsPage";
 import { FlashcardModalComponent } from "./page-object-models/FlashcardModalComponent";
 
 test.describe("AI-Generated Flashcards", () => {
+  test("should be redirected to flashcard generation page when accessing application as authenticated user", async ({
+    page,
+  }) => {
+    // Arrange
+    const generatePage = new GeneratePage(page);
+    const appUrl = process.env.APP_URL!;
+
+    // Act
+    await page.goto(appUrl);
+
+    // Assert
+    await generatePage.header.waitFor({ state: "visible" });
+  });
+
   test("should generate flashcards from text, accept, edit, and submit accepted flashcards, and then show them on my flashcards page", async ({
     page,
   }) => {
     // Arrange
-    const loginPage = new LoginPage(page);
     const generatePage = new GeneratePage(page);
     const flashcardsPage = new FlashcardsPage(page);
     const flashcardModal = new FlashcardModalComponent(page);
@@ -21,12 +33,7 @@ test.describe("AI-Generated Flashcards", () => {
     `;
 
     // Act
-    await loginPage.navigate();
-    await loginPage.login(
-      process.env.TEST_USER_EMAIL || "",
-      process.env.TEST_USER_PASSWORD || ""
-    );
-    await expect(page).toHaveURL(/.*\/generate/);
+    await generatePage.navigate();
     await generatePage.generateFlashcards(sampleText);
     await generatePage.waitUntilFlashcardsGenerated();
 

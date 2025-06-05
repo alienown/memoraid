@@ -1,14 +1,16 @@
 import { test as teardown } from "@playwright/test";
-import { apiClient } from "@/api/apiClient";
 import { getToken, login } from "./authService";
+import { Api } from "./api";
 
 teardown("cleanup e2e user data", async () => {
   try {
+    const api = new Api();
+
     await login();
 
     const token = await getToken();
 
-    await apiClient.users.deleteUser({
+    await api.users.deleteUser({
       headers: {
         Authorization: `Bearer ${token}`,
       },

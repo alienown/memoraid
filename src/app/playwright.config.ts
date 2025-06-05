@@ -35,12 +35,21 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: "setup",
+      testMatch: /auth\.setup\.ts/,
+      retries: 0,
+    },
+    {
       name: "teardown",
       testMatch: /global\.teardown\.ts/,
     },
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: { 
+        ...devices["Desktop Chrome"],
+        storageState: "./e2e/test-results/auth.json",
+      },
+      dependencies: ["setup"],
       teardown: "teardown",
     },
 

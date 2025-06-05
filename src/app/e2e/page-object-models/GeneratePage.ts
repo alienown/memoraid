@@ -2,6 +2,7 @@ import { Page, Locator } from "@playwright/test";
 import { BasePage } from "./BasePage";
 
 export class GeneratePage extends BasePage {
+  readonly header: Locator;
   readonly sourceTextArea: Locator;
   readonly generateButton: Locator;
   readonly flashcardItems: Locator;
@@ -11,6 +12,8 @@ export class GeneratePage extends BasePage {
 
   constructor(page: Page) {
     super(page, "/generate");
+
+    this.header = page.getByRole("heading", { name: /generate flashcards/i });
     this.sourceTextArea = page.getByRole("textbox", { name: /enter text/i });
     this.generateButton = page.getByRole("button", {
       name: /generate flashcards/i,

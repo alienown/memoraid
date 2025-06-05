@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "api": "node ./apiGenerator.js",
+    "api:e2e": "node ./e2e/apiGenerator.js",
     "firebase-emulators": "firebase emulators:start --project demo-memoraid"
   },
   "dependencies": {
