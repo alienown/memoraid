@@ -40,7 +40,6 @@ services:
     depends_on:
       - database
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
 
   firebase:

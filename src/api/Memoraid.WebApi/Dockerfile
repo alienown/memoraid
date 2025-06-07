@@ -4,7 +4,6 @@ COPY ["Memoraid.WebApi/Memoraid.WebApi.csproj", "Memoraid.WebApi/"]
 RUN dotnet restore "Memoraid.WebApi/Memoraid.WebApi.csproj"
 COPY . .
 RUN dotnet build "Memoraid.WebApi/Memoraid.WebApi.csproj" -c Release -o /app/build
-RUN dotnet test "Memoraid.Tests.Unit/Memoraid.Tests.Unit.csproj"
 RUN dotnet publish "Memoraid.WebApi/Memoraid.WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base

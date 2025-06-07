@@ -149,3 +149,32 @@ The application uses a PostgreSQL database.
 - Implement dark mode with the dark: variant
 - Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
 - Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
+
+## Github Action Guidelines
+
+- Check if `package.json` exists in project root and summarize key scripts
+- Check if `.nvmrc` exists in project root
+- Check if `.env` exists in project root to identify key `env:` variables
+- Always use `git branch -a` to verify whether we use `main` or `master` branch
+- Always use `env:` variables and secrets attached to jobs instead of global workflows
+- Always use `yarn` instead of `npm` for Node-based dependency setup
+- Extract common steps into composite actions in separate files
+- Once you're done, as a final step conduct the following:
+
+1. For each public action always use <tool>"Run Terminal"</tool> to see what is the most up-to-date version (use only major version):
+
+```powershell
+$response = Invoke-RestMethod -Uri 'https://api.github.com/repos/{owner}/{repo}/releases/latest'; $tagName = $response.tag_name; $majorVersion = $tagName -replace '.*v(\d+).*', '$1'; Write-Output $majorVersion
+```
+
+3. (Ask if needed) Use <tool>"Run Terminal"</tool> to fetch repo metadata and see if we're not using any deprecated actions by mistake:
+
+```powershell
+$response = Invoke-RestMethod -Uri 'https://api.github.com/repos/{owner}/{repo}'; Write-Output $response.archived
+```
+
+4. (Ask if needed) In case of linter issues related to action parameters, try to fetch action description directly from GitHub and use the following command:
+
+```powershell
+Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{main/master}/action.yml'
+```

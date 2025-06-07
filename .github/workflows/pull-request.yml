@@ -1,0 +1,183 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  api-unit-tests:
+    name: API Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test
+        run: dotnet test "Memoraid.Tests.Unit/Memoraid.Tests.Unit.csproj" --no-build --verbosity normal
+
+  app-unit-tests:
+    name: App Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "src/app/.nvmrc"
+          cache: "yarn"
+          cache-dependency-path: src/app/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test
+
+  api-build:
+    name: Build API
+    runs-on: ubuntu-latest
+    needs: [api-unit-tests]
+    defaults:
+      run:
+        working-directory: src/api
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Build API
+        run: dotnet build --configuration Release
+
+  app-build:
+    name: Build App
+    runs-on: ubuntu-latest
+    needs: [app-unit-tests]
+    defaults:
+      run:
+        working-directory: src/app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "src/app/.nvmrc"
+          cache: "yarn"
+          cache-dependency-path: src/app/yarn.lock
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build App
+        run: yarn build
+
+  status-comment:
+    name: PR Status Comment
+    runs-on: ubuntu-latest
+    needs: [api-build, app-build]
+    if: always()
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Generate status comment
+        id: status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const runId = context.runId;
+            const issue_number = context.issue.number;
+
+            // Get the workflow run info
+            const run = await github.rest.actions.getWorkflowRun({
+              owner,
+              repo,
+              run_id: runId
+            });
+
+            // Get jobs for this workflow run
+            const jobs = await github.rest.actions.listJobsForWorkflowRun({
+              owner,
+              repo,
+              run_id: runId
+            });
+
+            // Extract status for each job
+            const jobResults = {};
+            jobs.data.jobs.forEach(job => {
+              jobResults[job.name] = job.conclusion || 'pending';
+            });
+
+            // Format status emojis
+            function getStatusEmoji(status) {
+              if (status === 'success') return '✅';
+              if (status === 'skipped') return '⏭️';
+              if (status === 'pending') return '⏳';
+              return '❌';
+            }
+
+            // Extract statuses
+            const apiTestStatus = jobResults['API Unit Tests'] || 'pending';
+            const appTestStatus = jobResults['App Unit Tests'] || 'pending';
+            const apiBuildStatus = jobResults['Build API'] || 'pending';
+            const appBuildStatus = jobResults['Build App'] || 'pending';
+
+            // Determine overall build status
+            const buildStatus = (apiBuildStatus === 'success' && appBuildStatus === 'success') 
+              ? 'success' 
+              : (apiBuildStatus === 'pending' || appBuildStatus === 'pending')
+                ? 'pending'
+                : 'failure';
+
+            // Prepare comment body
+            const body = `## Pull Request Build Status
+
+            | Job | Status |
+            | --- | ------ |
+            | API Tests | ${getStatusEmoji(apiTestStatus)} ${apiTestStatus.toUpperCase()} |
+            | App Tests | ${getStatusEmoji(appTestStatus)} ${appTestStatus.toUpperCase()} |
+            | API Build | ${getStatusEmoji(apiBuildStatus)} ${apiBuildStatus.toUpperCase()} |
+            | App Build | ${getStatusEmoji(appBuildStatus)} ${appBuildStatus.toUpperCase()} |
+
+            ${buildStatus === 'success' ? '🎉 All checks passed!' : '⚠️ Some checks are pending or failed. Please review the build logs for details.'}
+            `;
+
+            // Post comment
+            await github.rest.issues.createComment({
+              owner,
+              repo,
+              issue_number,
+              body
+            });
