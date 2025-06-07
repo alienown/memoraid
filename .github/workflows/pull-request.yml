@@ -58,37 +58,25 @@ jobs:
       - name: Run tests
         run: yarn test
 
-  api-build:
-    name: Build API
+  e2e-tests:
+    name: E2E Tests
     runs-on: ubuntu-latest
-    needs: [api-unit-tests]
-    defaults:
-      run:
-        working-directory: src/api
+    needs: [api-unit-tests, app-unit-tests]
+    permissions:
+      contents: read
+      actions: write 
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 9.0.x
+      - name: Set up Docker Compose
+        uses: docker/setup-compose-action@v1
 
-      - name: Build API
-        run: dotnet build --configuration Release
-
-  app-build:
-    name: Build App
-    runs-on: ubuntu-latest
-    needs: [app-unit-tests]
-    defaults:
-      run:
-        working-directory: src/app
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Start application with Docker Compose
+        run: |
+          echo "Waiting for services to be ready..."
+          docker-compose up -d --wait
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -98,15 +86,32 @@ jobs:
           cache-dependency-path: src/app/yarn.lock
 
       - name: Install dependencies
+        working-directory: src/app
         run: yarn install --frozen-lockfile
 
-      - name: Build App
-        run: yarn build
+      - name: Install Playwright browsers
+        working-directory: src/app
+        run: npx playwright install chromium
+
+      - name: Run E2E tests
+        working-directory: src/app
+        run: yarn e2e
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: src/app/e2e/playwright-report
+          retention-days: 7
+
+      - name: Stop Docker containers
+        if: always()
+        run: docker-compose down
 
   status-comment:
     name: PR Status Comment
     runs-on: ubuntu-latest
-    needs: [api-build, app-build]
+    needs: [e2e-tests]
     if: always()
     permissions:
       pull-requests: write
@@ -152,25 +157,23 @@ jobs:
             // Extract statuses
             const apiTestStatus = jobResults['API Unit Tests'] || 'pending';
             const appTestStatus = jobResults['App Unit Tests'] || 'pending';
-            const apiBuildStatus = jobResults['Build API'] || 'pending';
-            const appBuildStatus = jobResults['Build App'] || 'pending';
+            const e2eTestStatus = jobResults['E2E Tests'] || 'pending';
 
             // Determine overall build status
-            const buildStatus = (apiBuildStatus === 'success' && appBuildStatus === 'success') 
+            const buildStatus = (apiTestStatus === 'success' && appTestStatus === 'success' && e2eTestStatus === 'success') 
               ? 'success' 
-              : (apiBuildStatus === 'pending' || appBuildStatus === 'pending')
+              : (apiTestStatus === 'pending' || appTestStatus === 'pending' || e2eTestStatus === 'pending')
                 ? 'pending'
                 : 'failure';
-
+                
             // Prepare comment body
             const body = `## Pull Request Build Status
 
             | Job | Status |
             | --- | ------ |
-            | API Tests | ${getStatusEmoji(apiTestStatus)} ${apiTestStatus.toUpperCase()} |
-            | App Tests | ${getStatusEmoji(appTestStatus)} ${appTestStatus.toUpperCase()} |
-            | API Build | ${getStatusEmoji(apiBuildStatus)} ${apiBuildStatus.toUpperCase()} |
-            | App Build | ${getStatusEmoji(appBuildStatus)} ${appBuildStatus.toUpperCase()} |
+            | API unit tests | ${getStatusEmoji(apiTestStatus)} ${apiTestStatus.toUpperCase()} |
+            | App unit tests | ${getStatusEmoji(appTestStatus)} ${appTestStatus.toUpperCase()} |
+            | E2E tests | ${getStatusEmoji(e2eTestStatus)} ${e2eTestStatus.toUpperCase()} |
 
             ${buildStatus === 'success' ? '🎉 All checks passed!' : '⚠️ Some checks are pending or failed. Please review the build logs for details.'}
             `;
