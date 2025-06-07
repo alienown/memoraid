@@ -103,7 +103,7 @@ jobs:
 
       - name: Stop Docker containers
         if: always()
-        run: docker-compose down
+        run: docker compose down
 
   status-comment:
     name: PR Status Comment
