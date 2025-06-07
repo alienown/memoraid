@@ -70,13 +70,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker Compose
-        uses: docker/setup-compose-action@v1
-
       - name: Start application with Docker Compose
         run: |
           echo "Waiting for services to be ready..."
-          docker-compose up -d --wait
+          docker compose up -d --wait
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
