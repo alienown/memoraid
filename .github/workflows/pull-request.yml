@@ -110,6 +110,7 @@ jobs:
     if: always()
     permissions:
       pull-requests: write
+      actions: read
     steps:
       - name: Generate status comment
         id: status
