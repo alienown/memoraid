@@ -6,12 +6,18 @@ services:
       POSTGRES_PASSWORD: P@ssword1
     ports:
       - "7001:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
       
   migrations:
     build:
       context: ./src/database/migrations
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       POSTGRES_HOST: database
       POSTGRES_USER: postgres
@@ -38,13 +44,18 @@ services:
     ports:
       - "7000:8080"
     depends_on:
-      - database
+      test-data-seed:
+        condition: service_completed_successfully
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__Postgres: "Host=database;Port=5432;Username=postgres;Password=P@ssword1;Database=memoraid"
-
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/openapi/v1.json"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   firebase:
-    image: andreysenov/firebase-tools
+    build:
+      context: ./src/app/docker/firebase
     container_name: firebase
     ports:
       - "7003:4000"
@@ -54,6 +65,11 @@ services:
       - ./src/app/docker/firebase/firebase.json:/home/node/firebase.json
       - ./src/app/docker/firebase/seed:/home/node/seed
     command: firebase emulators:start --project demo-memoraid --import=/home/node/seed
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:9099 | grep -q '\"ready\": true'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build:
@@ -67,5 +83,7 @@ services:
     ports:
       - "7002:80"
     depends_on:
-      - api
-      - firebase
+      api:
+        condition: service_healthy
+      firebase:
+        condition: service_healthy

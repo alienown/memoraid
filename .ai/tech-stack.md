@@ -1,5 +1,6 @@
 Frontend - React with Vite:
 
+- yarn as a package manager
 - React 19 provides interactivity where needed.
 - TypeScript 5 ensures static typing and better IDE support.
 - Tailwind 4 allows for convenient application styling.

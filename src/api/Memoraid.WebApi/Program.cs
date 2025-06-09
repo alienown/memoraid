@@ -122,10 +122,7 @@ app.UseMiddleware<UserNotAuthenticatedExceptionMiddleware>();
 app.UseCors();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+app.MapOpenApi();
 
 app.UseHttpsRedirection();
 
