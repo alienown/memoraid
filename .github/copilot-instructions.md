@@ -178,3 +178,32 @@ $response = Invoke-RestMethod -Uri 'https://api.github.com/repos/{owner}/{repo}'
 ```powershell
 Invoke-RestMethod -Uri 'https://raw.githubusercontent.com/{owner}/{repo}/refs/heads/{main/master}/action.yml'
 ```
+
+## Docker guidelines
+
+### Naming and Conventions
+- Always use UPPERCASED keywords
+
+### Base Image Selection
+- Always use specific version tags matching tech stack (e.g., `node:22-alpine` not `node:latest`)
+- Use images compatible with CI/CD & Github Actions runner - `ubuntu-latest`
+- Choose slim/alpine variants for production images
+- Use two-stage builds to separate build and runtime environments
+
+### Essential Security Practices
+- Run containers as non-root users
+- Never store secrets or credentials in images
+- Set appropriate file permissions
+- Use COPY instead of ADD for predictable behavior
+- Scan images for vulnerabilities before deployment
+
+### Optimization Essentials
+- Use .dockerignore to exclude unnecessary files
+- Order instructions by change frequency (least frequent first)
+- Cache dependency installation separately from application code
+- Copy only what's needed in multi-stage builds using `--from`
+- Clean up package manager caches in the same layer they're created
+
+### Building
+- Use versioning based on commit SHA for image tags
+- Add metadata with labels
