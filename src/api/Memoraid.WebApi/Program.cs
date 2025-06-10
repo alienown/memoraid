@@ -82,6 +82,7 @@ builder.Services
         var useEmulator = builder.Configuration.GetValue<bool>("Firebase:UseEmulator");
         var firebaseProjectId = builder.Configuration.GetRequiredSection("Firebase:ProjectId").Value;
         var authority = builder.Configuration.GetRequiredSection("Firebase:Auth:Authority").Value;
+        var issuer = builder.Configuration.GetRequiredSection("Firebase:Auth:Issuer").Value;
 
         options.MapInboundClaims = false;
         options.Authority = authority;
@@ -89,7 +90,7 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = authority,
+            ValidIssuer = issuer,
             ValidateAudience = true,
             ValidAudience = firebaseProjectId,
             ValidateLifetime = true,

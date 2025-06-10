@@ -4,9 +4,7 @@ on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,6 +20,7 @@ jobs:
   build-and-push-images:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -35,6 +34,14 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Extract branch name and sanitize for tag
+        id: branch-name
+        shell: bash
+        run: |
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          SANITIZED_BRANCH_NAME=${BRANCH_NAME//\//-}
+          echo "branch=$SANITIZED_BRANCH_NAME" >> $GITHUB_OUTPUT
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -56,7 +63,7 @@ jobs:
           dockerfile: ./Memoraid.WebApi/Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -67,20 +74,18 @@ jobs:
           context: ./src/app
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}:${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
             VITE_API_URL=${{ vars.VITE_API_URL }}
-            VITE_FIREBASE_USE_EMULATOR=${{ vars.VITE_FIREBASE_USE_EMULATOR }}
-            VITE_FIREBASE_AUTH_EMULATOR_HOST=${{ vars.VITE_FIREBASE_AUTH_EMULATOR_HOST }}
-            VITE_FIREBASE_PROJECT_ID=${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-            VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY }}
-            VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-            VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-            VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-            VITE_FIREBASE_APP_ID=${{ secrets.VITE_FIREBASE_APP_ID }}
+            VITE_FIREBASE_PROJECT_ID=${{ vars.VITE_FIREBASE_PROJECT_ID }}
+            VITE_FIREBASE_API_KEY=${{ vars.VITE_FIREBASE_API_KEY }}
+            VITE_FIREBASE_AUTH_DOMAIN=${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+            VITE_FIREBASE_STORAGE_BUCKET=${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+            VITE_FIREBASE_MESSAGING_SENDER_ID=${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+            VITE_FIREBASE_APP_ID=${{ vars.VITE_FIREBASE_APP_ID }}
 
       - name: Build and push Migrations image
         uses: docker/build-push-action@v6
@@ -88,7 +93,7 @@ jobs:
           context: ./src/database/migrations
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}:${{ github.head_ref || github.ref_name }}-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
             ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
