@@ -60,7 +60,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src/api
-          dockerfile: ./Memoraid.WebApi/Dockerfile
+          file: ./Memoraid.WebApi/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
@@ -72,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src/app
-          dockerfile: ./docker/Dockerfile
+          file: ./docker/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
