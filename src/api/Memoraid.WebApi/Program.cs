@@ -10,16 +10,16 @@ using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Services.OpenRouter;
 using Memoraid.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +28,9 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:7002")
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+
+        policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -36,8 +38,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddOpenApi(options =>
 {
-    options.AddDocumentTransformer<DocumentTransformer>()
-        .AddSchemaTransformer<ResponseSchemaTransformer>()
+    options.AddSchemaTransformer<ResponseSchemaTransformer>()
         .AddSchemaTransformer<NonNullableEnumSchemaTransformer>();
 });
 
@@ -55,24 +56,24 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
 
-builder.Services.AddHttpClient<IOpenRouterService, OpenRouterService>((serviceProvider, client) =>
-{
-    var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ApplicationOptions>>().Value;
-    client.BaseAddress = new Uri(options.OpenRouter.ApiBaseUrl);
-    client.Timeout = TimeSpan.FromSeconds(60);
-});
+var appOptions = builder.Configuration.Get<ApplicationOptions>();
+var useOpenRouterMock = appOptions!.OpenRouter.UseMock;
 
-builder.Services.AddScoped<IOpenRouterService>(serviceProvider =>
+if (useOpenRouterMock)
 {
-    var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<ApplicationOptions>>().Value;
-
-    if (options.OpenRouter.UseMock)
+    builder.Services.AddScoped<IOpenRouterService, MockOpenRouterService>();
+}
+else
+{
+    builder.Services.AddHttpClient<OpenRouterService>((serviceProvider, client) =>
     {
-        return new MockOpenRouterService();
-    }
-
-    return serviceProvider.GetRequiredService<OpenRouterService>();
-});
+        var options = serviceProvider.GetRequiredService<IOptions<ApplicationOptions>>().Value;
+        client.BaseAddress = new Uri(options.OpenRouter.ApiBaseUrl);
+        client.Timeout = TimeSpan.FromSeconds(60);
+    });
+    
+    builder.Services.AddScoped<IOpenRouterService>(sp => sp.GetRequiredService<OpenRouterService>());
+}
 
 builder.Services
     .AddAuthentication()
@@ -81,6 +82,7 @@ builder.Services
         var useEmulator = builder.Configuration.GetValue<bool>("Firebase:UseEmulator");
         var firebaseProjectId = builder.Configuration.GetRequiredSection("Firebase:ProjectId").Value;
         var authority = builder.Configuration.GetRequiredSection("Firebase:Auth:Authority").Value;
+        var issuer = builder.Configuration.GetRequiredSection("Firebase:Auth:Issuer").Value;
 
         options.MapInboundClaims = false;
         options.Authority = authority;
@@ -88,7 +90,7 @@ builder.Services
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = $"https://securetoken.google.com/{firebaseProjectId}",
+            ValidIssuer = issuer,
             ValidateAudience = true,
             ValidAudience = firebaseProjectId,
             ValidateLifetime = true,

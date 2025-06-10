@@ -1,4 +1,4 @@
-@Memoraid.WebApi_HostAddress = http://localhost:5247
+@Memoraid.WebApi_HostAddress = http://localhost:7000
 
 GET {{Memoraid.WebApi_HostAddress}}/dbtest
 Accept: application/json

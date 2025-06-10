@@ -37,4 +37,4 @@ Testing:
 CI/CD and Hosting:
 
 - GitHub Actions for creating CI/CD pipelines and running automated tests.
-- DigitalOcean for hosting applications via Docker images.
+- Applications will be containerized and images pushed to a github container registry.

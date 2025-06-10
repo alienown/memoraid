@@ -1,0 +1,27 @@
+name: Deploy to Render
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Services
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy API
+        run: |
+          echo "Deploying API..."
+          curl "${{ secrets.RENDER_API_DEPLOY_HOOK_URL }}"
+      
+      - name: Deploy App
+        run: |
+          echo "Deploying App..."
+          curl "${{ secrets.RENDER_APP_DEPLOY_HOOK_URL }}"
+      
+      - name: Deploy Migrations
+        run: |
+          echo "Deploying Migrations..."
+          curl "${{ secrets.RENDER_MIGRATIONS_DEPLOY_HOOK_URL }}"
+      
+      - name: Deployment Status
+        run: echo "Deployment triggered. Check Render dashboard for status."
