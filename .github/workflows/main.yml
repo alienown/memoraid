@@ -20,7 +20,8 @@ jobs:
   build-and-push-images:
     name: Build and Push Docker Images
     runs-on: ubuntu-latest
-    
+    environment: Production
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -34,8 +35,8 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Extract branch name and sanitize for tag
+
+      - name: Extract branch name and sanitize for image tag
         id: branch-name
         shell: bash
         run: |
@@ -52,7 +53,6 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}
             ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
             type=sha,prefix=,format=short
             latest
 
@@ -72,6 +72,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./src/app
+          dockerfile: ./docker/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.APP_IMAGE_NAME }}:${{ steps.branch-name.outputs.branch }}-${{ github.sha }}
