@@ -5,18 +5,18 @@ export PGPASSWORD="$POSTGRES_PASSWORD"
 
 echo "Executing migration scripts..."
 
-DB_EXISTS=$(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -tc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" | grep -q 1 && echo "true" || echo "false")
+DB_EXISTS=$(psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -v sslmode=require -tc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" | grep -q 1 && echo "true" || echo "false")
 
 if [ "$DB_EXISTS" = "true" ]; then
   echo "Database exists - applying migrations..."
 else
-  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -c "CREATE DATABASE $POSTGRES_DB"
+  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -v sslmode=require -c "CREATE DATABASE $POSTGRES_DB"
   echo "Database created - applying migrations..."
 fi
 
 for migration in /scripts/*.sql; do
   echo "Applying migration: $(basename $migration)"
-  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f "$migration"
+  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v sslmode=require -f "$migration"
 done
 
 echo "All migrations applied successfully!"
