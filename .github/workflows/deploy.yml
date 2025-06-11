@@ -1,27 +1,41 @@
-name: Deploy to Render
+name: Deploy application
 
 on:
   workflow_dispatch:
 
 jobs:
   deploy:
-    name: Deploy Services
+    name: Deploy application
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+      
+      - name: Run database migrations
+        working-directory: ./src/database/migrations
+        run: |
+          echo "Running database migrations..."
+          chmod +x run-migrations.sh
+          ./run-migrations.sh
+        env:
+          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+      
       - name: Deploy API
+        if: success()
         run: |
           echo "Deploying API..."
           curl "${{ secrets.RENDER_API_DEPLOY_HOOK_URL }}"
       
       - name: Deploy App
+        if: success()
         run: |
           echo "Deploying App..."
           curl "${{ secrets.RENDER_APP_DEPLOY_HOOK_URL }}"
-      
-      - name: Deploy Migrations
-        run: |
-          echo "Deploying Migrations..."
-          curl "${{ secrets.RENDER_MIGRATIONS_DEPLOY_HOOK_URL }}"
-      
-      - name: Deployment Status
-        run: echo "Deployment triggered. Check Render dashboard for status."

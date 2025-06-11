@@ -4,7 +4,7 @@ set -e
 # Export PGPASSWORD environment variable to avoid manual password entry
 export PGPASSWORD="$POSTGRES_PASSWORD"
 
-echo "Executing migrations script..."
+echo "Executing migration scripts..."
 
 # Check if database exists and create it if it doesn't
 DB_EXISTS=$(psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -tc "SELECT 1 FROM pg_database WHERE datname = '$POSTGRES_DB'" | grep -q 1 && echo "true" || echo "false")
