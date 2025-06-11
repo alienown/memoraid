@@ -7,6 +7,8 @@ jobs:
   deploy:
     name: Deploy application
     runs-on: ubuntu-latest
+    environment: Production
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -15,17 +17,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
-      
-      - name: Debug ENV
-        run: |
-          echo "POSTGRES_HOST=$POSTGRES_HOST"
-          echo "POSTGRES_USER=$POSTGRES_USER"
-          echo "POSTGRES_DB=$POSTGRES_DB"
-        env:
-          POSTGRES_HOST: ${{ secrets.POSTGRES_HOST }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
 
       - name: Run database migrations
         working-directory: ./src/database/migrations
