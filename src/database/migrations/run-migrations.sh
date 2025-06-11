@@ -10,7 +10,7 @@ DB_EXISTS=$(psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d postgres -tc "SELECT
 if [ "$DB_EXISTS" = "true" ]; then
   echo "Database exists - applying migrations..."
 else
-  psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -c "CREATE DATABASE $POSTGRES_DB"
+  psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d postgres -c "CREATE DATABASE $POSTGRES_DB"
   echo "Database created - applying migrations..."
 fi
 
