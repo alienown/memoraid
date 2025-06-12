@@ -24,8 +24,8 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      
-      - name: Run database migrations with Docker
+
+      - name: Run database migrations
         run: |
           echo "Running database migrations..."
           docker pull ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}:latest
@@ -35,13 +35,17 @@ jobs:
             -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
             -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
             ${{ env.REGISTRY }}/${{ env.MIGRATIONS_IMAGE_NAME }}:latest
-      
+
       - name: Deploy API
-        run: |
-          echo "Deploying API..."
-          curl "${{ secrets.RENDER_API_DEPLOY_HOOK_URL }}"
-      
+        uses: ./.github/actions/deploy-to-render
+        with:
+          deploy-hook-url: ${{ secrets.RENDER_API_DEPLOY_HOOK_URL }}
+          service-id: ${{ secrets.RENDER_API_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
+
       - name: Deploy App
-        run: |
-          echo "Deploying App..."
-          curl "${{ secrets.RENDER_APP_DEPLOY_HOOK_URL }}"
+        uses: ./.github/actions/deploy-to-render
+        with:
+          deploy-hook-url: ${{ secrets.RENDER_APP_DEPLOY_HOOK_URL }}
+          service-id: ${{ secrets.RENDER_APP_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}

@@ -1,0 +1,101 @@
+name: "Wait for Render Deployment"
+description: "Waits for a Render deployment to complete successfully"
+
+inputs:
+  deploy-hook-url:
+    description: "URL of the deploy hook to trigger the deployment"
+    required: true
+  service-id:
+    description: "ID of the service to deploy"
+    required: true
+  api-key:
+    description: "Render API key for authentication"
+    required: true
+  deployment-status-poll-interval:
+    description: "Time to wait between polling for deployment status (in seconds)"
+    required: false
+    default: "5"
+  deployment-status-poll-max-retries:
+    description: "Maximum number of retries to check deployment status"
+    required: false
+    default: "10"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Trigger deployment
+      id: trigger-deployment
+      shell: bash
+      run: |
+        DEPLOY_RESPONSE=$(curl -s "${{ inputs.deploy-hook-url }}")
+
+        if [ $? -ne 0 ]; then
+          echo "Failed to trigger deployment"
+          echo "Deploy hook response: $DEPLOY_RESPONSE"
+          exit 1
+        fi
+        
+        # Use grep for JSON parsing
+        DEPLOY_ID=$(echo $DEPLOY_RESPONSE | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
+
+        if [ -z "$DEPLOY_ID" ]; then
+          echo "Failed to retrieve deployment ID from response:"
+          echo "$DEPLOY_RESPONSE"
+          exit 1
+        fi
+
+        echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
+
+    - name: Wait for deployment completion
+      id: wait-for-deployment
+      shell: bash
+      run: |
+        DEPLOY_ID=${{ steps.trigger-deployment.outputs.deploy_id }}
+        SERVICE_ID="${{ inputs.service-id }}"
+        
+        echo "Waiting for deployment to complete..."
+        
+        RETRIES=0
+        MAX_RETRIES=${{ inputs.deployment-status-poll-max-retries }}
+        
+        while [ $RETRIES -lt $MAX_RETRIES ]; do
+          DEPLOY_RESPONSE=$(curl -s -H "Authorization: Bearer ${{ inputs.api-key }}" \
+            "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID")
+          
+          # Handle request failure
+          if [ $? -ne 0 ]; then
+            echo "Failed to fetch deployment status"
+            echo "Retrieve deploy response: $DEPLOY_RESPONSE"
+            sleep ${{ inputs.deployment-status-poll-interval }}
+            RETRIES=$((RETRIES + 1))
+            continue
+          fi
+          
+          # Parse status using grep
+          STATUS=$(echo $DEPLOY_RESPONSE | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+          
+          if [ -z "$STATUS" ]; then
+            echo "Failed to parse status from response:"
+            echo "$DEPLOY_RESPONSE"
+            exit 1
+          fi
+          
+          echo "Current deployment status: $STATUS"
+          
+          if [ "$STATUS" = "live" ]; then
+            echo "Deployment successful!"
+            break
+          elif [ "$STATUS" = "build_failed" ] || [ "$STATUS" = "update_failed" ] || [ "$STATUS" = "canceled" ] || [ "$STATUS" = "deactivated" ] || [ "$STATUS" = "pre_deploy_failed" ]; then
+            echo "Deployment failed with status: $STATUS"
+            exit 1
+          fi
+          
+          echo "Waiting for deployment to complete..."
+          RETRIES=$((RETRIES + 1))
+          sleep ${{ inputs.deployment-status-poll-interval }}
+        done
+        
+        if [ $RETRIES -ge $MAX_RETRIES ]; then
+          echo "Deployment did not complete after $MAX_RETRIES retries"
+          exit 1
+        fi
