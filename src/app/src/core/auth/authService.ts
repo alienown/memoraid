@@ -43,6 +43,8 @@ export const handleAuthError = (error: unknown): AuthResponse => {
 
   const errorCodeToMessageDict: Record<string, string> = {
     "auth/user-not-found": "Invalid email or password",
+    "auth/invalid-credential": "Invalid email or password",
+    "auth/invalid-email": "Invalid email address",
     "auth/email-already-in-use": "Email is already in use",
     "auth/email-already-exists": "Email is already in use",
     "auth/weak-password": "Password should be at least 6 characters",

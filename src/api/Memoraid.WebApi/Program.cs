@@ -19,7 +19,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +27,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+        var allowedOriginsString = builder.Configuration.GetRequiredSection("Cors:AllowedOrigins").Value ?? "";
+        var allowedOrigins = allowedOriginsString.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
