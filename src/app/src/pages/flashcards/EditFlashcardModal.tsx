@@ -108,7 +108,7 @@ export function EditFlashcardModal({
 
           <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <label htmlFor="front" className="text-sm font-medium">
+              <label htmlFor="front" className="font-medium">
                 Front (Question)
               </label>
               <Textarea
@@ -129,7 +129,7 @@ export function EditFlashcardModal({
             </div>
 
             <div className="space-y-2">
-              <label htmlFor="back" className="text-sm font-medium">
+              <label htmlFor="back" className="font-medium">
                 Back (Answer)
               </label>
               <Textarea

@@ -195,6 +195,9 @@ const Generate = () => {
   return (
     <div className="container mx-auto p-4 max-w-7xl">
       <div className="mb-6 space-y-2">
+        <label htmlFor="source-text" className="font-medium">
+          Source text
+        </label>
         <Textarea
           id="source-text"
           value={sourceText}

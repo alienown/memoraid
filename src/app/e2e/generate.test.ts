@@ -15,7 +15,7 @@ test.describe("AI-Generated Flashcards", () => {
     await page.goto(appUrl);
 
     // Assert
-    await generatePage.header.waitFor({ state: "visible" });
+    await generatePage.sourceTextArea.waitFor({ state: "visible" });
   });
 
   test("should generate flashcards from text, accept, edit, and submit accepted flashcards, and then show them on my flashcards page", async ({
