@@ -8,12 +8,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Loader2 } from "lucide-react";
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 export function ConfirmationDialog({
@@ -21,6 +23,7 @@ export function ConfirmationDialog({
   message,
   onConfirm,
   onCancel,
+  isLoading = false,
 }: ConfirmationDialogProps) {
   return (
     <AlertDialog open={isOpen}>
@@ -30,8 +33,19 @@ export function ConfirmationDialog({
           <AlertDialogDescription>{message}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm}>Confirm</AlertDialogAction>
+          <AlertDialogCancel onClick={onCancel} disabled={isLoading}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={onConfirm} disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Confirming...
+              </>
+            ) : (
+              "Confirm"
+            )}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

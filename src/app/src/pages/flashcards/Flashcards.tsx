@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { FlashcardsList } from "./FlashcardsList";
+import { FlashcardsList, FlashcardsListSkeleton } from "./FlashcardsList";
 import { CreateFlashcardModal } from "./CreateFlashcardModal";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
@@ -18,7 +18,7 @@ export function Flashcards() {
     items: [],
     total: 0,
   });
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -27,6 +27,7 @@ export function Flashcards() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
+  const [isDeleteProcessing, setIsDeleteProcessing] = useState(false);
   const [selectedFlashcard, setSelectedFlashcard] =
     useState<EditFlashcardData | null>(null);
   const [flashcardIdToDelete, setFlashcardIdToDelete] = useState<number | null>(
@@ -34,7 +35,7 @@ export function Flashcards() {
   );
 
   const fetchFlashcards = async () => {
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       const response = await apiClient.flashcards.getFlashcards({
@@ -54,7 +55,7 @@ export function Flashcards() {
         "Failed to load flashcards. Please refresh the page to try again."
       );
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -91,6 +92,8 @@ export function Flashcards() {
   const confirmDeleteFlashcard = async () => {
     if (flashcardIdToDelete === null) return;
 
+    setIsDeleteProcessing(true);
+
     try {
       const response = await apiClient.flashcards.deleteFlashcard(
         flashcardIdToDelete
@@ -110,6 +113,7 @@ export function Flashcards() {
     } catch {
       toast.error("Failed to delete flashcard");
     } finally {
+      setIsDeleteProcessing(false);
       setFlashcardIdToDelete(null);
     }
   };
@@ -125,34 +129,38 @@ export function Flashcards() {
 
   return (
     <div className="container mx-auto py-8 max-w-6xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">My Flashcards</h1>
-        <Button onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Flashcard
+      <div className="flex justify-between items-center mb-5">
+        <Button onClick={() => setIsCreateModalOpen(true)} disabled={isLoading}>
+          <Plus className="h-4 w-4" />
+          Create flashcard
         </Button>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <Loader2 className="h-8 w-8 animate-spin" />
-        </div>
-      ) : flashcards.items.length === 0 ? (
-        <div className="text-center py-10 border rounded-md">
-          <p className="text-gray-500">
-            No flashcards found. Create your first one!
-          </p>
-        </div>
-      ) : (
-        <FlashcardsList
-          flashcards={flashcards.items}
-          onEdit={handleEditFlashcard}
-          onDelete={handleDeleteFlashcard}
-        />
-      )}
+      <div className="relative">
+        {isLoading && (
+          <FlashcardsListSkeleton
+            count={flashcards.items.length ? flashcards.items.length : 6}
+          />
+        )}
+        {!isLoading && flashcards.items.length === 0 ? (
+          <div className="text-center py-10 border rounded-md">
+            <p className="text-gray-500">
+              No flashcards found. Create your first one!
+            </p>
+          </div>
+        ) : (
+          !isLoading && (
+            <FlashcardsList
+              flashcards={flashcards.items}
+              onEdit={handleEditFlashcard}
+              onDelete={handleDeleteFlashcard}
+            />
+          )
+        )}
+      </div>
 
       {flashcards.total > 0 && (
-        <div className="mt-8">
+        <div className="mt-5">
           <Pagination
             currentPage={currentPage}
             totalItems={flashcards.total}
@@ -183,6 +191,7 @@ export function Flashcards() {
         message="Are you sure you want to delete this flashcard? This action cannot be undone."
         onConfirm={confirmDeleteFlashcard}
         onCancel={() => setIsDeleteConfirmationOpen(false)}
+        isLoading={isDeleteProcessing}
       />
     </div>
   );

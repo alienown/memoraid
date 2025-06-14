@@ -84,7 +84,7 @@ export default function Login() {
               {emailError && (
                 <p
                   id="email-error"
-                  className="text-sm font-medium text-red-500"
+                  className="text-sm text-red-500"
                 >
                   {emailError}
                 </p>
@@ -103,7 +103,7 @@ export default function Login() {
               {passwordError && (
                 <p
                   id="password-error"
-                  className="text-sm font-medium text-red-500"
+                  className="text-sm text-red-500"
                 >
                   {passwordError}
                 </p>

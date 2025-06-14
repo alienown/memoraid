@@ -23,10 +23,10 @@ export function Navbar() {
   };
 
   return (
-    <div className="sticky w-full top-0 border-b">
+    <div className="sticky w-full top-0 bg-gray-200 z-10 px-5 rounded-xl">
       <div className="flex h-14 items-center">
         <Link to="/">
-          <div className="mr-4 font-bold text-xl">Memoraid</div>
+          <div className="mr-4 text-xl">Memoraid</div>
         </Link>
         {isAuthenticated && (
           <NavigationMenu>
@@ -35,7 +35,7 @@ export function Navbar() {
                 <NavigationMenuLink
                   className={cn(
                     isActive("/generate") &&
-                      "font-bold bg-accent text-accent-foreground"
+                      "bg-accent text-accent-foreground"
                   )}
                   asChild
                 >
@@ -46,11 +46,11 @@ export function Navbar() {
                 <NavigationMenuLink
                   className={cn(
                     isActive("/flashcards") &&
-                      "font-bold bg-accent text-accent-foreground"
+                      "bg-accent text-accent-foreground"
                   )}
                   asChild
                 >
-                  <Link to="/flashcards">My Flashcards</Link>
+                  <Link to="/flashcards">My flashcards</Link>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -65,7 +65,7 @@ export function Navbar() {
                     <NavigationMenuLink
                       className={cn(
                         isActive("/login") &&
-                          "font-bold bg-accent text-accent-foreground"
+                          "bg-accent text-accent-foreground"
                       )}
                       asChild
                     >
@@ -76,7 +76,7 @@ export function Navbar() {
                     <NavigationMenuLink
                       className={cn(
                         isActive("/register") &&
-                          "font-bold bg-accent text-accent-foreground"
+                          "bg-accent text-accent-foreground"
                       )}
                       asChild
                     >
@@ -91,7 +91,7 @@ export function Navbar() {
                     onClick={handleLogout}
                     className={cn(
                       isActive("/logout") &&
-                        "font-bold bg-accent text-accent-foreground"
+                        "bg-accent text-accent-foreground"
                     )}
                   >
                     Logout

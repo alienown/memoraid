@@ -27,8 +27,12 @@ export function FlashcardListItem({
   const toggleBackVisibility = () => {
     setIsBackVisible(!isBackVisible);
   };
+
   return (
-    <Card className="hover:border-gray-300" data-testid="flashcard-item">
+    <Card
+      className={"hover:border-gray-300"}
+      data-testid="flashcard-item"
+    >
       <CardHeader className="flex flex-row items-start justify-between pb-2">
         <div className="ml-auto flex space-x-1">
           <Button
@@ -83,6 +87,35 @@ export function FlashcardListItem({
             </p>
           </div>
         )}
+      </CardContent>
+
+      <CardFooter></CardFooter>
+    </Card>
+  );
+}
+
+export function FlashcardListItemSkeleton() {
+  return (
+    <Card className="animate-pulse">
+      <CardHeader className="flex flex-row items-start justify-between pb-2">
+        <div className="ml-auto flex space-x-1">
+          <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8" disabled>
+            <Eye className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div>
+          <p className="font-medium">Front:</p>
+          <p className="h-4 w-2/3 mt-3 bg-gray-200 rounded"></p>
+        </div>
       </CardContent>
 
       <CardFooter></CardFooter>

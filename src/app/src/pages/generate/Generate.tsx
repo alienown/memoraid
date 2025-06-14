@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import {
   GeneratedFlashcard,
   FlashcardSource,
@@ -9,7 +10,7 @@ import {
   CreateFlashcardsRequest,
   GenerateFlashcardsRequest,
 } from "@/api/api";
-import { FlashcardList } from "./FlashcardList";
+import { FlashcardList, FlashcardsListSkeleton } from "./FlashcardList";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { FlashcardData } from "./types";
 import { apiClient } from "@/api/apiClient";
@@ -37,6 +38,7 @@ const Generate = () => {
 
     if (sourceTextError) setSourceTextError(null);
   };
+
   const handleGenerateFlashcards = async () => {
     if (!sourceText.trim()) {
       setSourceTextError("Please enter text to generate flashcards.");
@@ -192,10 +194,9 @@ const Generate = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6">Generate Flashcards</h1>
       <div className="mb-6 space-y-2">
-        <label htmlFor="source-text" className="text-sm font-medium">
-          Enter Text
+        <label htmlFor="source-text" className="font-medium">
+          Source text
         </label>
         <Textarea
           id="source-text"
@@ -215,33 +216,47 @@ const Generate = () => {
       </div>
       <Button
         onClick={handleGenerateFlashcards}
-        disabled={isGenerating || !sourceText.trim()}
+        disabled={isGenerating || isSubmitting || !sourceText.trim()}
         className="mb-6"
       >
         {isGenerating ? (
           <>
+            <Loader2 className="animate-spin" />
             <span className="mr-2">Generating...</span>
           </>
         ) : (
           "Generate Flashcards"
         )}
       </Button>
-      {generatedFlashcards.length > 0 && (
-        <div className="mb-6 w-full">
-          <FlashcardList
-            flashcards={generatedFlashcards}
-            onAccept={handleAcceptFlashcard}
-            onReject={handleRejectFlashcard}
-            onEdit={handleEditFlashcard}
+      <div className="mb-6 w-full relative">
+        {isGenerating && (
+          <FlashcardsListSkeleton
+            count={generatedFlashcards.length ? generatedFlashcards.length : 6}
           />
-          <div className="mt-6">
-            <Button
-              onClick={handleSubmitFlashcards}
-              disabled={isSubmitting || acceptedCount === 0}
-            >
-              {isSubmitting ? "Submitting..." : "Submit accepted flashcards"}
-            </Button>
-          </div>
+        )}
+        <FlashcardList
+          flashcards={generatedFlashcards}
+          disabled={isSubmitting}
+          onAccept={handleAcceptFlashcard}
+          onReject={handleRejectFlashcard}
+          onEdit={handleEditFlashcard}
+        />
+      </div>
+      {generatedFlashcards.length > 0 && (
+        <div className="mt-6">
+          <Button
+            onClick={handleSubmitFlashcards}
+            disabled={isGenerating || isSubmitting || acceptedCount === 0}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit accepted flashcards"
+            )}
+          </Button>
         </div>
       )}
       <EditFlashcardModal

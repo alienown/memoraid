@@ -1,4 +1,7 @@
-import { FlashcardListItem } from "./FlashcardListItem";
+import {
+  FlashcardListItem,
+  FlashcardListItemSkeleton,
+} from "./FlashcardListItem";
 
 export interface FlashcardsListProps {
   flashcards: Array<{ id: number; front: string; back: string }>;
@@ -27,6 +30,18 @@ export function FlashcardsList({
             onEdit={() => onEdit(card.id)}
             onDelete={() => onDelete(card.id)}
           />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function FlashcardsListSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {Array.from({ length: count }).map((_, index) => (
+          <FlashcardListItemSkeleton key={index} />
         ))}
       </div>
     </div>
