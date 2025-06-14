@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { FlashcardsList } from "./FlashcardsList";
+import { FlashcardsList, FlashcardsListSkeleton } from "./FlashcardsList";
 import { CreateFlashcardModal } from "./CreateFlashcardModal";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { ConfirmationDialog } from "@/components/ConfirmationDialog";
@@ -129,21 +129,19 @@ export function Flashcards() {
 
   return (
     <div className="container mx-auto py-8 max-w-6xl">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">My Flashcards</h1>
+      <div className="flex justify-between items-center mb-5">
         <Button onClick={() => setIsCreateModalOpen(true)} disabled={isLoading}>
-          <Plus className="mr-2 h-4 w-4" />
-          Create Flashcard
+          <Plus className="h-4 w-4" />
+          Create flashcard
         </Button>
       </div>
 
       <div className="relative">
         {isLoading && (
-          <div className="absolute inset-0 bg-white/80 dark:bg-black/50 flex justify-center items-center z-10 rounded-md">
-            <Loader2 className="h-8 w-8 animate-spin" />
-          </div>
+          <FlashcardsListSkeleton
+            count={flashcards.items.length ? flashcards.items.length : 6}
+          />
         )}
-
         {!isLoading && flashcards.items.length === 0 ? (
           <div className="text-center py-10 border rounded-md">
             <p className="text-gray-500">
@@ -151,16 +149,18 @@ export function Flashcards() {
             </p>
           </div>
         ) : (
-          <FlashcardsList
-            flashcards={flashcards.items}
-            onEdit={handleEditFlashcard}
-            onDelete={handleDeleteFlashcard}
-          />
+          !isLoading && (
+            <FlashcardsList
+              flashcards={flashcards.items}
+              onEdit={handleEditFlashcard}
+              onDelete={handleDeleteFlashcard}
+            />
+          )
         )}
       </div>
 
       {flashcards.total > 0 && (
-        <div className="mt-8">
+        <div className="mt-5">
           <Pagination
             currentPage={currentPage}
             totalItems={flashcards.total}

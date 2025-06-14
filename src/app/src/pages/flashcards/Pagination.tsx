@@ -65,8 +65,8 @@ export function Pagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-      <ShadcnPagination>
+    <div className="flex justify-between gap-4">
+      <ShadcnPagination className="w-fit m-0">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious 

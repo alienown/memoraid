@@ -70,7 +70,6 @@ export function EditFlashcardModal({
             <DialogTitle>Edit Flashcard</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            {" "}
             <div className="space-y-2">
               <label htmlFor="front" className="text-sm font-medium">
                 Front (Question)
@@ -114,9 +113,7 @@ export function EditFlashcardModal({
             <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button type="submit">
-              Save Changes
-            </Button>
+            <Button type="submit">Save Changes</Button>
           </DialogFooter>
         </form>
       </DialogContent>

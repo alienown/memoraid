@@ -10,7 +10,7 @@ import {
   CreateFlashcardsRequest,
   GenerateFlashcardsRequest,
 } from "@/api/api";
-import { FlashcardList } from "./FlashcardList";
+import { FlashcardList, FlashcardsListSkeleton } from "./FlashcardList";
 import { EditFlashcardModal } from "./EditFlashcardModal";
 import { FlashcardData } from "./types";
 import { apiClient } from "@/api/apiClient";
@@ -194,11 +194,7 @@ const Generate = () => {
 
   return (
     <div className="container mx-auto p-4 max-w-7xl">
-      <h1 className="text-3xl font-bold mb-6">Generate Flashcards</h1>
       <div className="mb-6 space-y-2">
-        <label htmlFor="source-text" className="text-sm font-medium">
-          Enter Text
-        </label>
         <Textarea
           id="source-text"
           value={sourceText}
@@ -229,37 +225,36 @@ const Generate = () => {
           "Generate Flashcards"
         )}
       </Button>
+      <div className="mb-6 w-full relative">
+        {isGenerating && (
+          <FlashcardsListSkeleton
+            count={generatedFlashcards.length ? generatedFlashcards.length : 6}
+          />
+        )}
+        <FlashcardList
+          flashcards={generatedFlashcards}
+          disabled={isSubmitting}
+          onAccept={handleAcceptFlashcard}
+          onReject={handleRejectFlashcard}
+          onEdit={handleEditFlashcard}
+        />
+      </div>
       {generatedFlashcards.length > 0 && (
-        <>
-          <div className="mb-6 w-full relative">
-            {(isGenerating || isSubmitting) && (
-              <div className="absolute inset-0 bg-white/80 dark:bg-black/50 flex justify-center items-center z-10 rounded-md">
-                {isGenerating && <Loader2 className="h-8 w-8 animate-spin" />}
-              </div>
+        <div className="mt-6">
+          <Button
+            onClick={handleSubmitFlashcards}
+            disabled={isGenerating || isSubmitting || acceptedCount === 0}
+          >
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit accepted flashcards"
             )}
-            <FlashcardList
-              flashcards={generatedFlashcards}
-              onAccept={handleAcceptFlashcard}
-              onReject={handleRejectFlashcard}
-              onEdit={handleEditFlashcard}
-            />
-          </div>
-          <div className="mt-6">
-            <Button
-              onClick={handleSubmitFlashcards}
-              disabled={isGenerating || isSubmitting || acceptedCount === 0}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                "Submit accepted flashcards"
-              )}
-            </Button>
-          </div>
-        </>
+          </Button>
+        </div>
       )}
       <EditFlashcardModal
         isOpen={modalState.isOpen}

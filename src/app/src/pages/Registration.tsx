@@ -80,7 +80,7 @@ export const Registration: React.FC = () => {
               {emailError && (
                 <p
                   id="email-error"
-                  className="text-sm font-medium text-red-500"
+                  className="text-sm text-red-500"
                 >
                   {emailError}
                 </p>
@@ -99,7 +99,7 @@ export const Registration: React.FC = () => {
               {passwordError && (
                 <p
                   id="password-error"
-                  className="text-sm font-medium text-red-500"
+                  className="text-sm text-red-500"
                 >
                   {passwordError}
                 </p>
