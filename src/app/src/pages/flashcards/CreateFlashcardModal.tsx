@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { apiClient } from "@/api/apiClient";
 import { FlashcardSource } from "@/api/api";
 import { toast } from "sonner";
 import { validateFlashcard } from "@/core/validation/flashcards";
+import { Loader2 } from "lucide-react";
 
 export interface CreateFlashcardModalProps {
   isOpen: boolean;
@@ -28,6 +29,8 @@ export function CreateFlashcardModal({
   const [back, setBack] = useState("");
   const [frontError, setFrontError] = useState<string | null>(null);
   const [backError, setBackError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const validateForm = (): boolean => {
     const { isValid, frontError, backError } = validateFlashcard(front, back);
     setFrontError(frontError);
@@ -36,6 +39,8 @@ export function CreateFlashcardModal({
   };
 
   const createFlashcard = async () => {
+    setIsLoading(true);
+
     try {
       const response = await apiClient.flashcards.createFlashcards({
         flashcards: [
@@ -61,6 +66,8 @@ export function CreateFlashcardModal({
       }
     } catch {
       toast.error("Failed to create flashcard");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,15 +90,20 @@ export function CreateFlashcardModal({
   };
 
   const handleDialogClose = () => {
-    setFront("");
-    setBack("");
-    setFrontError(null);
-    setBackError(null);
     onCancel();
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      setFront("");
+      setBack("");
+      setFrontError(null);
+      setBackError(null);
+    }
+  }, [isOpen]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleDialogClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleDialogClose()}>
       <DialogContent className="sm:max-w-[900px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
@@ -110,6 +122,7 @@ export function CreateFlashcardModal({
                 placeholder="Enter the question or term (max 500 characters)"
                 className="resize-y h-30"
                 maxLength={500}
+                disabled={isLoading}
               />
               {frontError && (
                 <p className="text-sm text-red-500">{frontError}</p>
@@ -130,6 +143,7 @@ export function CreateFlashcardModal({
                 placeholder="Enter the answer or definition (max 200 characters)"
                 className="resize-y"
                 maxLength={200}
+                disabled={isLoading}
               />
               {backError && <p className="text-sm text-red-500">{backError}</p>}
               <div className="text-right text-sm text-muted-foreground">
@@ -139,10 +153,24 @@ export function CreateFlashcardModal({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={handleDialogClose}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleDialogClose}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
-            <Button type="submit">Create</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create"
+              )}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

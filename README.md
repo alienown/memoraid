@@ -1,9 +1,13 @@
 # Memoraid
 
-Memoraid is a web-based flashcard platform designed to simplify and accelerate the creation of high-quality educational flashcards. Leveraging AI for rapid flashcard generation from user-supplied text, Memoraid also supports manual flashcard creation, review, editing, and deletion. It offers robust user account management and seamlessly integrates with a spaced repetition algorithm to optimize study sessions.
+Memoraid is an AI-powered web application for creating and studying flashcards efficiently. This platform simplifies and accelerates the creation of educational flashcards by leveraging AI to automatically generate high-quality content from user-supplied text.
+
+This application was created as a certification project for the [10xdevs](https://www.10xdevs.pl/?aidevs) course, which focuses on using AI tools in software development lifecycle. The project was inspired by original idea of 10xCards - flashcards application proposed by authors of the course - [Przemek Smyrdek](https://www.linkedin.com/in/psmyrdek/) and [Marcin Czarkowski](https://www.linkedin.com/in/mkczarkowski/). Memoraid which is in MVP stage has the same functionalities as 10xCards but with intention to be extended in the future. Big thanks to the authors of the course for their guidance and support throughout the course.
 
 ## Table of Contents
 
+- [Overview](#overview)
+- [Features](#features)
 - [Tech Stack](#tech-stack)
 - [Getting Started Locally](#getting-started-locally)
 - [Available Scripts](#available-scripts)
@@ -11,101 +15,204 @@ Memoraid is a web-based flashcard platform designed to simplify and accelerate t
 - [Project Status](#project-status)
 - [License](#license)
 
+## Overview
+
+Memoraid addresses the time-consuming process of manually creating educational flashcards. Users who wish to benefit from spaced repetition are often discouraged by the effort required to produce high-quality flashcards. Memoraid solves this by automating a large portion of the flashcard creation process while still providing flexibility for manual input and corrections.
+
+Application MVP is accessible at https://app-latest-1m1f.onrender.com.
+
+## Features
+
+### AI-Generated Flashcards
+- Paste large blocks of text (up to 10,000 characters)
+- Automatically generate flashcards with front (question) and back (answer) content
+- Review AI-generated flashcards with options to accept, reject, or modify
+
+### Manual Flashcard Management
+- Create, view, edit, and delete flashcards
+- Intuitive user interface for flashcard management
+- Validation rules enforce quality standards
+
+### User Account Management
+- Secure email and password registration/login
+
 ## Tech Stack
 
-**Frontend:**
-
+### Frontend
 - React 19 with Vite
 - TypeScript 5
 - Tailwind CSS 4
-- shadcn/ui components
+- Shadcn/UI component library
+- React Router 7
+- Firebase Authentication
 
-**Backend:**
+### Backend
+- .NET 9 Minimal API
+- PostgreSQL database
+- Entity Framework Core 9
+- FluentValidation
+- JWT Authentication via Firebase
 
-- ASP NET Core Web API
-- PostgreSQL
-- Entity Framework Core for database access
-- FluentValidation for request model validation
-- OpenAI API integration via .NET SDK
+### AI Integration
+- Open Router API for AI model communication & flashcard generation
+
+### Testing
+- Backend: NUnit, Shouldly, EF Core InMemory
+- Frontend: React Testing Library, Vitest
+- E2E: Playwright
+
+### CI/CD & Hosting
+- GitHub Actions for CI/CD pipelines
+- Docker containers
+- Render hosting platform
 
 ## Getting Started Locally
 
-### Running with Docker
+### Prerequisites
+- Docker Desktop
+- Without using docker, you will need the following installed on your machine:
+  - [.NET 9.x SDK](https://dotnet.microsoft.com/download)
+  - [Node.js v22.11.0 or higher](https://nodejs.org/en/download/)
+  - [Yarn package manager](https://yarnpkg.com/getting-started/install)
+  - [PostgreSQL](https://www.postgresql.org/download/)
+  - [Firebase CLI](https://firebase.google.com/docs/cli) with [Firebase Emulator Suite](https://firebase.google.com/docs/emulator-suite/install_and_configure)
 
-TODO ...
+You can run part of the application using Docker and part of them without Docker. The choice depends on your development environment and preferences.
 
-### Running without Docker
+### Run with Docker Compose
 
-Alternatively, you can run applications without Docker. To do that you need to install the following software and follow the setup instructions:
+The easiest way to run the complete application stack is using Docker Compose:
 
-- Node.js (>= v22.11.0)
-- .NET SDK 9.0
-- PostgreSQL
+```bash
+# Start all services
+docker-compose up
+```
 
-#### Frontend Setup
+Access the application at http://localhost:7002
 
-1. Navigate to the [/src/app](./src/app) directory
-2. Install dependencies:
-   ```
-   npm install
-   ```
-3. Run the development server:
-   ```
-   npm run dev
-   ```
+You can use demo user credentials to log in:
+- **Email:**: demo@xyz.com
+- **Password:**: 123456
+
+### Manual Setup (Development)
+
+#### Database Setup
+
+Run migrations:
+
+```bash
+# Navigate to migrations directory
+cd src/database/migrations
+
+# Run migrations
+POSTGRES_HOST="your_host" POSTGRES_USER="your_username" POSTGRES_PASSWORD="your_password" POSTGRES_DB="your_database" ./run-migrations.sh
+```
 
 #### Backend Setup
 
-1. Navigate to the [/src/api](./src/api) directory
-2. Restore NuGet packages and build the project:
-   ```
-   dotnet restore
-   dotnet build
-   ```
-3. Update your appsettings.json with Open AIRouter API key
-   ```
-   {
-    "OpenRouter": {
-      "ApiKey": "INSERT YOUR OPEN ROUTER API KEY HERE",
-      ...
-    },
-    ...
-   }
-   ```
-4. Run the API:
-   ```
-   dotnet run
-   ```
-5. Apply any pending Entity Framework migrations:
-   ```
-   dotnet ef database update
-   ```
+Change the connection string in [appsettings.json](src/api/Memoraid.WebApi/appsettings.json) to match your local PostgreSQL setup.
+
+```bash
+# Navigate to API directory
+cd src/api
+
+# Restore packages
+dotnet restore
+
+# Run the API
+cd Memoraid.WebApi
+dotnet run
+```
+
+#### Frontend Setup
+
+```bash
+# Navigate to app directory
+cd src/app
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+#### Firebase Emulator Setup
+
+```bash
+# Navigate to app directory
+cd src/app
+
+# Start Firebase emulator
+yarn firebase-emulators
+```
 
 ## Available Scripts
 
-### Frontend
+### Backend (.NET)
 
-- `npm run dev` - Runs the app in development mode.
-- `npm run build` - Builds the project for production.
-- `npm run preview` - Runs the built app for preview.
-- `npm run lint` - Lints the project files.
+```bash
+# Navigate to api directory
+cd src/api
 
-### Backend
+# Run tests
+dotnet test 
+```
 
-- `dotnet build` - Builds the backend project.
-- `dotnet run` - Runs the application.
-- `dotnet ef database update` - Applies database migrations.
+### Frontend (React)
+
+```bash
+# Navigate to app directory
+cd src/app
+
+# Start development server
+yarn dev
+
+# Build for production
+yarn build
+
+# Run unit tests
+yarn test
+
+# Run end-to-end tests
+yarn e2e
+
+# Lint code
+yarn lint
+
+# Preview production build
+yarn preview
+
+# Generate API client from OpenAPI spec
+yarn api
+
+# Generate E2E API client from OpenAPI spec
+yarn api:e2e
+
+# Start Firebase emulators
+yarn firebase-emulators
+```
 
 ## Project Scope
 
-- **AI-Driven Flashcard Generation:** Paste text to automatically generate flashcards (Front: max 500 characters, Back: max 200 characters) with options to accept, reject, or edit.
-- **Manual Flashcard Creation & CRUD Operations:** Create, view, edit, and delete flashcards with proper validation.
-- **Study Mode:** Utilize spaced repetition for flashcard review with performance ratings.
-- **User Account Management:** Registration, login, password change, and account deletion.
+### Current MVP Features
+
+✅ AI-driven flashcard generation with copy-paste functionality
+✅ Manual creation and CRUD operations for flashcards
+✅ Flashcard review interface for accepting/rejecting AI-generated content
+✅ Basic user account management
+
+### Not Included in MVP
+
+❌ Integration with spaced repetition algorithm for study mode
+❌ Support for importing multiple document formats (PDF, DOCX)
+❌ Sharing flashcard sets between users
+❌ Integration with external educational platforms
+❌ Mobile applications (initially web-only)
 
 ## Project Status
 
-This project is in early development stage with intention to develop MVP product with core functionalities.
+Memoraid is currently in active development with intention to bring more features in the future.
 
 ## License
 

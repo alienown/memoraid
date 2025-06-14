@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import {
   GeneratedFlashcard,
   FlashcardSource,
@@ -37,6 +38,7 @@ const Generate = () => {
 
     if (sourceTextError) setSourceTextError(null);
   };
+
   const handleGenerateFlashcards = async () => {
     if (!sourceText.trim()) {
       setSourceTextError("Please enter text to generate flashcards.");
@@ -215,11 +217,12 @@ const Generate = () => {
       </div>
       <Button
         onClick={handleGenerateFlashcards}
-        disabled={isGenerating || !sourceText.trim()}
+        disabled={isGenerating || isSubmitting || !sourceText.trim()}
         className="mb-6"
       >
         {isGenerating ? (
           <>
+            <Loader2 className="animate-spin" />
             <span className="mr-2">Generating...</span>
           </>
         ) : (
@@ -227,22 +230,36 @@ const Generate = () => {
         )}
       </Button>
       {generatedFlashcards.length > 0 && (
-        <div className="mb-6 w-full">
-          <FlashcardList
-            flashcards={generatedFlashcards}
-            onAccept={handleAcceptFlashcard}
-            onReject={handleRejectFlashcard}
-            onEdit={handleEditFlashcard}
-          />
+        <>
+          <div className="mb-6 w-full relative">
+            {(isGenerating || isSubmitting) && (
+              <div className="absolute inset-0 bg-white/80 dark:bg-black/50 flex justify-center items-center z-10 rounded-md">
+                {isGenerating && <Loader2 className="h-8 w-8 animate-spin" />}
+              </div>
+            )}
+            <FlashcardList
+              flashcards={generatedFlashcards}
+              onAccept={handleAcceptFlashcard}
+              onReject={handleRejectFlashcard}
+              onEdit={handleEditFlashcard}
+            />
+          </div>
           <div className="mt-6">
             <Button
               onClick={handleSubmitFlashcards}
-              disabled={isSubmitting || acceptedCount === 0}
+              disabled={isGenerating || isSubmitting || acceptedCount === 0}
             >
-              {isSubmitting ? "Submitting..." : "Submit accepted flashcards"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                "Submit accepted flashcards"
+              )}
             </Button>
           </div>
-        </div>
+        </>
       )}
       <EditFlashcardModal
         isOpen={modalState.isOpen}

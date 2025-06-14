@@ -38,3 +38,4 @@ CI/CD and Hosting:
 
 - GitHub Actions for creating CI/CD pipelines and running automated tests.
 - Applications will be containerized and images pushed to a github container registry.
+- Applications will be deployed to Render hosting platform
