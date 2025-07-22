@@ -1,0 +1,10 @@
+src/api/Memoraid.WebApi/Program.cs: 23 changes
+docker-compose.yaml: 12 changes
+.ai/api-plan.md: 12 changes
+src/app/src/pages/generate/Generate.tsx: 11 changes
+src/app/src/api/api.ts: 11 changes
+src/api/Memoraid.WebApi/Services/FlashcardService.cs: 11 changes
+.github/workflows/deploy.yml: 11 changes
+src/api/Memoraid.Tests.Unit/Services/FlashcardServiceTests.cs: 9 changes
+.ai/tech-stack.md: 9 changes
+src/database/migrations/run-migrations.sh: 8 changes
