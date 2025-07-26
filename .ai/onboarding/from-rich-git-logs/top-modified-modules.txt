@@ -1,0 +1,10 @@
+src/app: 69 changes
+src/api/Memoraid.WebApi: 50 changes
+.ai: 38 changes
+src/app/src/pages/generate: 31 changes
+src/app/src/pages/flashcards: 27 changes
+src/api/Memoraid.WebApi/Services: 27 changes
+.ai/prompts: 27 changes
+src/api/Memoraid.Tests.Unit/Services: 26 changes
+src/api/Memoraid.WebApi/Requests: 25 changes
+src/api/Memoraid.Tests.Unit/Validation: 20 changes

@@ -10,18 +10,25 @@ using Memoraid.WebApi.Services;
 using Memoraid.WebApi.Services.OpenRouter;
 using Memoraid.WebApi.Validation;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.UseDefaultServiceProvider(options =>
+{
+    options.ValidateScopes = true;
+    options.ValidateOnBuild = true;
+});
 
 builder.Services.AddCors(options =>
 {
@@ -71,7 +78,7 @@ else
         client.BaseAddress = new Uri(options.OpenRouter.ApiBaseUrl);
         client.Timeout = TimeSpan.FromSeconds(60);
     });
-    
+
     builder.Services.AddScoped<IOpenRouterService>(sp => sp.GetRequiredService<OpenRouterService>());
 }
 
