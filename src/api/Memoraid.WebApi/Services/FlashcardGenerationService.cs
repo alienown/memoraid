@@ -15,13 +15,42 @@ using System.Threading.Tasks;
 
 namespace Memoraid.WebApi.Services;
 
+/// <summary>
+/// Service interface for AI-powered flashcard generation, metrics updating, and user data cleanup.
+/// </summary>
 public interface IFlashcardGenerationService
 {
+    /// <summary>
+    /// Generates flashcards from the provided source text using an AI model.
+    /// </summary>
+    /// <param name="request">The request containing the source text for flashcard generation.</param>
+    /// <returns>A <see cref="GenerateFlashcardsResponse"/> containing generated flashcards and generation metadata.</returns>
+    /// <exception cref="ValidationException">Thrown if the request is invalid or AI generation fails.</exception>
     Task<GenerateFlashcardsResponse> GenerateFlashcardsAsync(GenerateFlashcardsRequest request);
+
+    /// <summary>
+    /// Updates flashcard generation metrics (counts of accepted/edited AI-generated flashcards by user) for the specified generation IDs.
+    /// </summary>
+    /// <param name="generationIds">A collection of flashcard generation IDs to update metrics for.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task UpdateGenerationMetricsAsync(IEnumerable<long> generationIds);
+
+    /// <summary>
+    /// Deletes all flashcard AI generation records for a specific user. This method does not delete the flashcards themselves, only the generation metadata.
+    /// </summary>
+    /// <param name="userId">The user ID whose flashcard generations should be deleted.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
     Task DeleteUserFlashcardGenerationsAsync(string userId);
 }
 
+/// <summary>
+/// Provides AI-powered flashcard generation, metrics updating, and user flashcard generation records cleanup.
+/// Depends on <see cref="IUserContext"/>, <see cref="MemoraidDbContext"/>, <see cref="IOpenRouterService"/>, and FluentValidation.
+/// </summary>
+/// <remarks>
+/// This service uses OpenRouter's AI models to generate flashcards from user-supplied text.
+/// It stores generation metadata and supports updating generation metrics and deleting user flashcard generation data.
+/// </remarks>
 internal class FlashcardGenerationService : IFlashcardGenerationService
 {
     internal const string AIModel = "openai/gpt-4o-mini";
@@ -127,7 +156,7 @@ internal class FlashcardGenerationService : IFlashcardGenerationService
         {
             var result = await _openRouterService.CompleteWithStructuredOutputAsync<FlashcardGenerationResult>(request);
 
-            CutStringLengthsIfExceedLimits(result);
+            CutFlashcardFrontAndBackLengthsIfExceedLimits(result);
 
             return [.. result.Flashcards.Select(f => new GenerateFlashcardsResponse.GeneratedFlashcard(f.Front, f.Back))];
         }
@@ -178,7 +207,8 @@ internal class FlashcardGenerationService : IFlashcardGenerationService
 
         await _dbContext.SaveChangesAsync();
     }
-    private void CutStringLengthsIfExceedLimits(FlashcardGenerationResult result)
+
+    private void CutFlashcardFrontAndBackLengthsIfExceedLimits(FlashcardGenerationResult result)
     {
         foreach (var flashcard in result.Flashcards)
         {
